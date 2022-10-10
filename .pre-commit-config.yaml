@@ -18,4 +18,9 @@ repos:
     rev: v8.25.0
     hooks:
       - id: eslint
+        additional_dependencies:
+          - eslint@8.25.0
+          - eslint-config-prettier@8.5.0
+          - eslint-plugin-prettier@4.2.1
+          - prettier@2.7.1
         args: ["--fix"]

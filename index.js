@@ -7,7 +7,15 @@ dotenv.config();
 
 const { BOT_TOKEN } = process.env;
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [
+    GatewayIntentBits.DirectMessages,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.MessageContent,
+  ],
+});
 
 // Set up commands dynamically using the contents of the /commands folder
 client.commands = new Collection();

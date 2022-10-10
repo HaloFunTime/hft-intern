@@ -1,2 +1,2 @@
 #!/bin/sh
-docker-compose up --build
+sh -c 'echo $$ > intern.pid; exec node index.js'

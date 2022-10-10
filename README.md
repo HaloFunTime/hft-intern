@@ -2,7 +2,7 @@
 
 Welcome to the HFT Intern repo, a [discord.py](https://github.com/Rapptz/discord.py) project for the `HFT Intern` Discord bot.
 
-This codebase is designed to be run on https://fly.io in production, but can be run locally with Docker Compose for development purposes.
+This codebase is designed to be run on https://fly.io in production, but can be run locally with Node.js for development purposes.
 
 ![HFT Intern](HFTIntern.png?raw=true)
 
@@ -14,8 +14,6 @@ To run the application locally, you must have the following installed. It is rec
 
 - [Node.js](https://nodejs.org/en/) (18.X, - should include NPM)
   - macOS: `brew install node@18`
-- [Docker](https://www.docker.com/) (should include Docker Compose)
-  - macOS: `brew install docker`
 - [pre-commit](https://pre-commit.com/)
   - macOS: `brew install pre-commit`
 
@@ -37,9 +35,9 @@ Docker is configured to build one container - it will be running the Discord.py 
 
 ## Quickstart
 
-1. Make changes to Python files as needed (saving changes to Python files will hot-reload your running application)
+1. Make changes to JavaScript files as needed
 1. Run your local application with `./dev-start.sh`
-1. Stop your dev application with `./dev-stop.sh` when you are done
+1. Stop your dev application with `./dev-stop.sh` (or CTRL+C) when you're done
 1. Bundle your changes into git commits on a branch not named `main`, and push your branch to the origin repository
 1. Open a pull request from your branch targeting the `main` branch
 
@@ -52,8 +50,8 @@ Variables and function declarations in Python code are to be named using the `sn
 Use `dev-start.sh` and `dev-stop.sh` to start and stop the application locally.
 
 - `dev-format.sh`: Auto-formats all files in the codebase
-- `dev-start.sh`: Runs the application via Docker Compose
-- `dev-stop.sh`: Stops the application via Docker Compose
+- `dev-start.sh`: Runs the application using Node.js (saves server process ID to `intern.pid`)
+- `dev-stop.sh`: Stops the running application (sends SIGINT to the process ID in `intern.pid`)
 
 ## DevX Notes
 

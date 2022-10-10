@@ -11,6 +11,7 @@ dev-tests.sh
 docker-compose.yaml
 fly.toml
 HFTIntern.png
+intern.pid
 node_modules
 npm-debug.log
 README.md
