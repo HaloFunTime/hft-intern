@@ -1,0 +1,33 @@
+{
+  "name": "hft-intern",
+  "version": "1.0.0",
+  "description": "Bot for HaloFunTime providing valuable unpaid labor.",
+  "main": "index.js",
+  "scripts": {
+    "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
+    "lint": "eslint ./",
+    "lint-fix": "eslint ./ --fix",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HaloFunTime/hft-intern.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HaloFunTime/hft-intern/issues"
+  },
+  "homepage": "https://github.com/HaloFunTime/hft-intern#readme",
+  "dependencies": {
+    "axios": "^1.1.2",
+    "discord.js": "14.5.0",
+    "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
+    "eslint": "8.25.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.7.1"
+  }
+}

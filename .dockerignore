@@ -1,0 +1,16 @@
+.env.example
+.eslintrc.json
+.git
+.github
+.gitignore
+.pre-commit-config.yaml
+dev-format.sh
+dev-start.sh
+dev-stop.sh
+dev-tests.sh
+docker-compose.yaml
+fly.toml
+HFTIntern.png
+node_modules
+npm-debug.log
+README.md
