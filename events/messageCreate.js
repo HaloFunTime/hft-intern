@@ -31,7 +31,7 @@ function attemptChatter(message) {
   // Do not chatter if the message was sent by another application
   if (message.applicationId) return;
   // Do not chatter if the random roll fails
-  if (Math.random() < 0.001) return;
+  if (Math.random() > 0.001) return;
   chatter(message);
 }
 
