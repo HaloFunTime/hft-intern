@@ -1,7 +1,6 @@
 const { HALOFUNTIME_WELCOME_CHANNEL_ID } = require("../constants.js");
 
 async function attemptWelcome(thread) {
-  const starterMessage = await thread.fetchStarterMessage();
   // Do not send a welcome message if the thread is not in the Welcome channel
   if (thread.parentId !== HALOFUNTIME_WELCOME_CHANNEL_ID) return;
   if (thread.sendable) {
