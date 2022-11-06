@@ -24,11 +24,14 @@ async function attemptLfgHelp(thread) {
     return;
   if (thread.sendable) {
     await thread.send({
-      content: `Thanks for making an LFG post, <@${thread.ownerId}>!\n\n\
-      Your post is now visible to everyone on HaloFunTime, and anyone may comment on it or hit the "follow" bell to \
-      see it show up in the Discord sidebar and opt in to receiving pings from messages on this post.\n\n
-      You can force your friends to follow this post by @-mentioning them directly, but keep in mind that Discord \
-      won't force people from a role to follow your post if you @-mention a role that 100 or more people have.`,
+      content:
+        `Thanks for making an LFG post, <@${thread.ownerId}>!\n\n` +
+        "Your post is now visible to everyone. Anyone may **follow** this post by commenting on it or clicking the " +
+        "**Follow** bell, which will allow them to see activity updates for this post in their Discord sidebar and " +
+        "receive notifications from messages that mention them directly or mention a role that they have.\n\n" +
+        "You can force your friends to follow this post by @-mentioning them directly, but keep in mind that Discord " +
+        "will not force people from a role to follow your post if you @-mention a role that 100 or more people have. " +
+        "If Discord warns you that `Some roles were not mentioned or added to the thread` that's what that's about.",
     });
   }
 }
