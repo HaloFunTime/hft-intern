@@ -1,3 +1,4 @@
+const { EmbedBuilder } = require("discord.js");
 const {
   HALOFUNTIME_LFG_CHANNEL_ID,
   HALOFUNTIME_MCC_LFG_CHANNEL_ID,
@@ -45,7 +46,6 @@ async function attemptReleasesEnforcement(thread) {
     starterMessage = await thread
       .fetchStarterMessage({ force: true })
       .catch(() => null);
-    console.log(`Message: ${starterMessage}`);
     await new Promise((r) => setTimeout(r, 1000));
   }
   const missingPictureAttachment =
@@ -57,9 +57,11 @@ async function attemptReleasesEnforcement(thread) {
         attachment.contentType.includes("video")
       );
     }, false);
-  const missingHaloWaypointLink = true; // TODO: Update this once we know what HaloWaypoint links look like
-  console.log(`Missing Picture: ${missingPictureAttachment}`);
-  console.log(`Missing Link: ${missingHaloWaypointLink}`);
+  const waypointUrlRegex =
+    /https:\/\/www\.halowaypoint\.com\/halo-infinite\/ugc\/(maps|modes)\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/g;
+  const missingHaloWaypointLink = !waypointUrlRegex.test(
+    starterMessage.content
+  );
   const rulesViolated = missingPictureAttachment || missingHaloWaypointLink;
   if (rulesViolated) {
     await thread.send({
@@ -67,13 +69,36 @@ async function attemptReleasesEnforcement(thread) {
         `<@${thread.ownerId}>, this post has been automatically closed because it did not follow the guidelines.\n\n` +
         `**Posts in <#${thread.parentId}> must:**\n` +
         "1) Have at least one image or video attached\n" +
-        "2) Contain a valid link to a file on Halo Waypoint\n\n" +
+        "2) Contain a valid link to one or more files on Halo Waypoint (like https://www.halowaypoint.com/halo-infinite/ugc/modes/479923f7-f5ec-4a7c-81b9-d18449af590e)\n\n" +
         "This post will be archived when you navigate away from it. It'll be our little secret.",
     });
     await thread.setLocked(true, "Did not follow submission rules.");
     await thread.setArchived(true, "Did not follow submission rules.");
   } else {
-    // TODO: Send a message to the thread that clearly lists the file ID and posts a [BOOKMARK HERE]() hyperlink to it
+    // Send a message to the thread that clearly lists the file IDs and posts a hyperlink to each of them
+    const matches = starterMessage.content.match(waypointUrlRegex);
+    let bookmarkFields = [];
+    matches.forEach((match) => {
+      let fileType = "FILE";
+      const fileId = match.match(
+        /[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/
+      )[0];
+      if (match.includes("modes")) {
+        fileType = "GAME MODE";
+      } else if (match.includes("maps")) {
+        fileType = "MAP";
+      }
+      bookmarkFields.push({
+        name: `**BOOKMARK THE ${fileType} HERE:**`,
+        value: `[${fileId}](${match})`,
+      });
+    });
+    await thread.send({
+      content: `<@${thread.ownerId}>, thanks for submitting your file to <#${thread.parentId}>!`,
+      embeds: [
+        new EmbedBuilder().setColor(0x9b59b6).addFields(...bookmarkFields),
+      ],
+    });
   }
 }
 
