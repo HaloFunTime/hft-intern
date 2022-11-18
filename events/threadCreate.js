@@ -58,7 +58,7 @@ async function attemptReleasesEnforcement(thread) {
       );
     }, false);
   const waypointUrlRegex =
-    /https:\/\/www\.halowaypoint\.com\/halo-infinite\/ugc\/(maps|modes)\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/g;
+    /https:\/\/www\.halowaypoint\.com\/halo-infinite\/ugc\/(maps|modes|prefabs)\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/g;
   const missingHaloWaypointLink = !waypointUrlRegex.test(
     starterMessage.content
   );
@@ -84,9 +84,11 @@ async function attemptReleasesEnforcement(thread) {
         /[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/
       )[0];
       if (match.includes("modes")) {
-        fileType = "GAME MODE";
+        fileType = "MODE";
       } else if (match.includes("maps")) {
         fileType = "MAP";
+      } else if (match.includes("prefabs")) {
+        fileType = "PREFAB";
       }
       bookmarkFields.push({
         name: `**BOOKMARK THE ${fileType} HERE:**`,
