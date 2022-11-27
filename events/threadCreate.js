@@ -48,7 +48,7 @@ async function attemptReleasesEnforcement(thread) {
       .catch(() => null);
     await new Promise((r) => setTimeout(r, 1000));
   }
-  const missingPictureAttachment =
+  const missingVisualAttachment =
     starterMessage.attachments.size === 0 ||
     starterMessage.attachments.reduce((acc, attachment) => {
       if (acc) return true;
@@ -57,18 +57,21 @@ async function attemptReleasesEnforcement(thread) {
         attachment.contentType.includes("video")
       );
     }, false);
+  const youtubeUrlRegex =
+    /(?:https?:)?(?:\/\/)?(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch|v|embed)(?:\.php)?(?:\?.*v=|\/))([a-zA-Z0-9\_-]{7,15})(?:[\?&][a-zA-Z0-9\_-]+=[a-zA-Z0-9\_-]+)*(?:[&\/\#].*)?/g;
+  const missingYouTubeLink = !youtubeUrlRegex.test(starterMessage.content);
+  const missingVisualContent = missingVisualAttachment && missingYouTubeLink;
   const waypointUrlRegex =
-    /https:\/\/www\.halowaypoint\.com\/halo-infinite\/ugc\/(maps|modes|prefabs)\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/g;
-  const missingHaloWaypointLink = !waypointUrlRegex.test(
-    starterMessage.content
-  );
-  const rulesViolated = missingPictureAttachment || missingHaloWaypointLink;
+    /https:\/\/www\.halowaypoint\.com\/([A-Za-z]{2,4}([_-][A-Za-z]{4})?([_-]([A-Za-z]{2}|[0-9]{3}))?\/)?halo-infinite\/ugc\/(maps|modes|prefabs)\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/g;
+  const missingWaypointLink = !waypointUrlRegex.test(starterMessage.content);
+  const missingFileLink = missingWaypointLink;
+  const rulesViolated = missingVisualContent || missingFileLink;
   if (rulesViolated) {
     await thread.send({
       content:
         `<@${thread.ownerId}>, this post has been automatically closed because it did not follow the guidelines.\n\n` +
         `**Posts in <#${thread.parentId}> must:**\n` +
-        "1) Have at least one image or video attached\n" +
+        "1) Contain visual content (at least one image or video must be attached - a YouTube link is also fine)\n" +
         "2) Contain a valid link to one or more files on Halo Waypoint (like https://www.halowaypoint.com/halo-infinite/ugc/modes/479923f7-f5ec-4a7c-81b9-d18449af590e)\n\n" +
         "This post will be archived when you navigate away from it. It'll be our little secret.",
     });
