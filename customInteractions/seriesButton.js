@@ -45,10 +45,20 @@ module.exports = {
       return;
     }
     // Build the embed payload showing the full series
+    const generateMapUrl = (mapFileId) =>
+      `https://www.halowaypoint.com/halo-infinite/ugc/maps/${mapFileId}`;
+    const generateModeUrl = (modeFileId) =>
+      `https://www.halowaypoint.com/halo-infinite/ugc/modes/${modeFileId}`;
     const fields = [];
     for (let i = 1; i <= seriesLength; i++) {
-      const game = series[`game_${i}`];
-      const gameDescription = `${game.mode} on ${game.map}`;
+      const game = series[`game${i}`];
+      const modeString = !game.modeFileId
+        ? game.mode
+        : `[${game.mode}](${generateModeUrl(game.modeFileId)})`;
+      const mapString = !game.mapFileId
+        ? game.map
+        : `[${game.map}](${generateMapUrl(game.mapFileId)})`;
+      const gameDescription = `${modeString} on ${mapString}`;
       fields.push({
         name: `Game ${i}`,
         value: gameDescription,
