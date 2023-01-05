@@ -1,14 +1,14 @@
 const { EmbedBuilder } = require("discord.js");
 const {
-  HALOFUNTIME_LFG_CHANNEL_ID,
-  HALOFUNTIME_MCC_LFG_CHANNEL_ID,
-  HALOFUNTIME_WELCOME_CHANNEL_ID,
-  PATHFINDERS_RELEASES_CHANNEL_ID,
+  HALOFUNTIME_ID_CHANNEL_LFG,
+  HALOFUNTIME_ID_CHANNEL_MCC_LFG,
+  HALOFUNTIME_ID_CHANNEL_RELEASES,
+  HALOFUNTIME_ID_CHANNEL_WELCOME,
 } = require("../constants.js");
 
 async function attemptWelcome(thread) {
   // Do not send a welcome message if the thread is not in the Welcome channel
-  if (thread.parentId !== HALOFUNTIME_WELCOME_CHANNEL_ID) return;
+  if (thread.parentId !== HALOFUNTIME_ID_CHANNEL_WELCOME) return;
   if (thread.sendable) {
     await thread.send({
       content:
@@ -20,8 +20,8 @@ async function attemptWelcome(thread) {
 async function attemptLfgHelp(thread) {
   // Do not send an LFG Help message if the thread is not in the LFG or MCC LFG forum channel
   if (
-    thread.parentId !== HALOFUNTIME_LFG_CHANNEL_ID &&
-    thread.parentId !== HALOFUNTIME_MCC_LFG_CHANNEL_ID
+    thread.parentId !== HALOFUNTIME_ID_CHANNEL_LFG &&
+    thread.parentId !== HALOFUNTIME_ID_CHANNEL_MCC_LFG
   )
     return;
   if (thread.sendable) {
@@ -40,7 +40,7 @@ async function attemptLfgHelp(thread) {
 
 async function attemptReleasesEnforcement(thread) {
   // Do not enforce post restrictions if the thread is not in the Releases channel
-  if (thread.parentId !== PATHFINDERS_RELEASES_CHANNEL_ID) return;
+  if (thread.parentId !== HALOFUNTIME_ID_CHANNEL_RELEASES) return;
   let starterMessage;
   while (!starterMessage) {
     starterMessage = await thread

@@ -1,7 +1,13 @@
 const fs = require("node:fs");
 const path = require("node:path");
+const cron = require("node-cron");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const dotenv = require("dotenv");
+const {
+  createFunTimeFridayEvent,
+  focusFunTimeFridayEvent,
+  unfocusFunTimeFridayEvent,
+} = require("./cron/funTimeFriday");
 
 dotenv.config();
 
@@ -57,3 +63,52 @@ for (const file of eventFiles) {
 }
 
 client.login(BOT_TOKEN);
+
+// Schedule all future cronjobs when the client emits the "ready" event
+client.on("ready", () => {
+  // Schedule weekly creation of the Fun Time Friday event - Thursdays at noon Mountain
+  cron.schedule(
+    "0 0 12 * * 4",
+    () => {
+      try {
+        createFunTimeFridayEvent(client);
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    {
+      scheduled: true,
+      timezone: "America/Denver",
+    }
+  );
+  // Schedule weekly focusing of the Fun Time Friday category - Fridays at 4PM Mountain
+  cron.schedule(
+    "0 0 16 * * 5",
+    () => {
+      try {
+        focusFunTimeFridayEvent(client);
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    {
+      scheduled: true,
+      timezone: "America/Denver",
+    }
+  );
+  // Schedule weekly unfocusing of the Fun Time Friday category - Saturdays at 3AM Mountain
+  cron.schedule(
+    "0 0 3 * * 6",
+    () => {
+      try {
+        unfocusFunTimeFridayEvent(client);
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    {
+      scheduled: true,
+      timezone: "America/Denver",
+    }
+  );
+});
