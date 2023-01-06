@@ -8,6 +8,7 @@ const {
   focusFunTimeFridayEvent,
   unfocusFunTimeFridayEvent,
 } = require("./cron/funTimeFriday");
+const { createTrailblazerTuesdayEvent } = require("./cron/trailblazers");
 
 dotenv.config();
 
@@ -64,51 +65,32 @@ for (const file of eventFiles) {
 
 client.login(BOT_TOKEN);
 
+const scheduleFunc = (cronExpression, func, ...args) => {
+  cron.schedule(
+    cronExpression,
+    () => {
+      try {
+        func(...args);
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    {
+      scheduled: true,
+      timezone: "America/Denver",
+    }
+  );
+};
+
 // Schedule all future cronjobs when the client emits the "ready" event
 client.on("ready", () => {
-  // Schedule weekly creation of the Fun Time Friday event - Thursdays at noon Mountain
-  cron.schedule(
-    "0 0 12 * * 4",
-    () => {
-      try {
-        createFunTimeFridayEvent(client);
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    {
-      scheduled: true,
-      timezone: "America/Denver",
-    }
-  );
-  // Schedule weekly focusing of the Fun Time Friday category - Fridays at 4PM Mountain
-  cron.schedule(
-    "0 0 16 * * 5",
-    () => {
-      try {
-        focusFunTimeFridayEvent(client);
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    {
-      scheduled: true,
-      timezone: "America/Denver",
-    }
-  );
-  // Schedule weekly unfocusing of the Fun Time Friday category - Saturdays at 3AM Mountain
-  cron.schedule(
-    "0 0 3 * * 6",
-    () => {
-      try {
-        unfocusFunTimeFridayEvent(client);
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    {
-      scheduled: true,
-      timezone: "America/Denver",
-    }
-  );
+  // Fun Time Friday
+  scheduleFunc("0 0 10 * * 2", createFunTimeFridayEvent, client); // every Tuesday at 10AM
+  scheduleFunc("0 0 16 * * 5", focusFunTimeFridayEvent, client); // every Friday at 4PM
+  scheduleFunc("0 0 3 * * 6", unfocusFunTimeFridayEvent, client); // every Saturday at 3AM
+
+  // Pathfinders
+
+  // Trailblazers
+  scheduleFunc("0 0 10 * * 3", createTrailblazerTuesdayEvent, client); // every Wednesday at 10AM
 });
