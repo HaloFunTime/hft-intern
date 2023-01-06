@@ -82,9 +82,7 @@ const updateNewHereRoles = async (client) => {
   for (m of membersToAddNewHere) {
     const member = await m.roles.add(HALOFUNTIME_ID_ROLE_NEW_HERE);
     await channel.send(
-      `Welcome to the <#${HALOFUNTIME_ID_CHANNEL_NEW_HERE}> channel, <@${member.user.id}>!\n\n` +
-        "This channel is exclusively for new members and the server Staff. Feel free to ask questions about the server, or just casually chat here with other people who are new to HaloFunTime!\n\n" +
-        "After you've been a member of the server for a month, you will be ceremonially yeeted from this channel, so enjoy your access while it lasts!"
+      `Welcome to the <#${HALOFUNTIME_ID_CHANNEL_NEW_HERE}> channel, <@${member.user.id}>!`
     );
   }
   for (m of membersToRemoveNewHere) {
@@ -106,6 +104,10 @@ const updateNewHereRoles = async (client) => {
       "A job well done.",
       "Hopefully they don't forget us...",
       "No further comment.",
+      "Yeeting people never gets old.",
+      "Spartans never die, they're just missing in action.",
+      "Everyone's time comes eventually.",
+      "Pour one out, gang.",
     ];
     const quip = quips[(quips.length * Math.random()) | 0];
     await channel.send(
