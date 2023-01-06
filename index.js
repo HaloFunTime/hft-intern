@@ -3,6 +3,7 @@ const path = require("node:path");
 const cron = require("node-cron");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const dotenv = require("dotenv");
+const { kickLurkers, updateNewHereRoles } = require("./cron/members");
 const {
   createFunTimeFridayEvent,
   focusFunTimeFridayEvent,
@@ -84,6 +85,9 @@ const scheduleFunc = (cronExpression, func, ...args) => {
 
 // Schedule all future cronjobs when the client emits the "ready" event
 client.on("ready", () => {
+  // Cleanup
+  scheduleFunc("0 0 8 * * 1", kickLurkers, client); // every Monday at 8AM
+
   // Fun Time Friday
   scheduleFunc("0 0 10 * * 2", createFunTimeFridayEvent, client); // every Tuesday at 10AM
   scheduleFunc("0 0 16 * * 5", focusFunTimeFridayEvent, client); // every Friday at 4PM
