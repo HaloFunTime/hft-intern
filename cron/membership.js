@@ -81,9 +81,10 @@ const updateNewHereRoles = async (client) => {
   const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_NEW_HERE);
   for (m of membersToAddNewHere) {
     const member = await m.roles.add(HALOFUNTIME_ID_ROLE_NEW_HERE);
-    await channel.send(
+    const message = await channel.send(
       `Welcome to the <#${HALOFUNTIME_ID_CHANNEL_NEW_HERE}> channel, <@${member.user.id}>!`
     );
+    message.react("👋");
   }
   for (m of membersToRemoveNewHere) {
     const member = await m.roles.remove(HALOFUNTIME_ID_ROLE_NEW_HERE);
@@ -110,9 +111,10 @@ const updateNewHereRoles = async (client) => {
       "Pour one out, gang.",
     ];
     const quip = quips[(quips.length * Math.random()) | 0];
-    await channel.send(
+    const message = await channel.send(
       `<@${member.user.id}> is no longer <#${HALOFUNTIME_ID_CHANNEL_NEW_HERE}>. ${quip}`
     );
+    message.react("1009898129933488138");
   }
 };
 
