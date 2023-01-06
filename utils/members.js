@@ -1,7 +1,5 @@
 const { PermissionsBitField } = require("discord.js");
 
-const addRoleToMember = async (client, guildId, roleId, memberId) => {};
-
 const kickMember = async (client, guildId, memberId, kickReason) => {
   const guild = client.guilds.cache.get(guildId);
   const member = await guild.members.fetch(memberId);
@@ -13,6 +11,5 @@ const kickMember = async (client, guildId, memberId, kickReason) => {
 };
 
 module.exports = {
-  addRoleToMember: addRoleToMember,
   kickMember: kickMember,
 };
