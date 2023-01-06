@@ -69,6 +69,7 @@ const updateNewHereRoles = async (client) => {
   );
   const membersToAddNewHere = allMembers.filter(
     (m) =>
+      m.roles.cache.has(HALOFUNTIME_ID_ROLE_MEMBER) &&
       !m.roles.cache.has(HALOFUNTIME_ID_ROLE_NEW_HERE) &&
       parseInt(m.joinedTimestamp) >= parseInt(oneMonthAgoUnix)
   );
