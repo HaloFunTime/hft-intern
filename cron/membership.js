@@ -1,3 +1,4 @@
+const axios = require("axios");
 const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
@@ -54,6 +55,28 @@ const kickLurkers = async (client) => {
   } else {
     channel.send("No members to kick for failing to accept the rules.");
   }
+};
+
+const postHelpfulHintToNewHereChannel = async (client) => {
+  const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+  const hintPayload = await axios
+    .get(`${HALOFUNTIME_API_URL}/intern/random-helpful-hint`, {
+      headers: {
+        Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+      },
+    })
+    .then((response) => response.data)
+    .catch(async (error) => {
+      console.error(error);
+      // Return the error payload directly if present
+      if (error.response.data) {
+        return error.response.data;
+      }
+    });
+  // Return without trying to send a hint if error data is present
+  if ("error" in hintPayload) return;
+  const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_NEW_HERE);
+  channel.send(hintPayload.hint);
 };
 
 const updateNewHereRoles = async (client) => {
@@ -120,5 +143,6 @@ const updateNewHereRoles = async (client) => {
 
 module.exports = {
   kickLurkers: kickLurkers,
+  postHelpfulHintToNewHereChannel: postHelpfulHintToNewHereChannel,
   updateNewHereRoles: updateNewHereRoles,
 };

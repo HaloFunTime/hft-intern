@@ -3,7 +3,11 @@ const path = require("node:path");
 const cron = require("node-cron");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const dotenv = require("dotenv");
-const { kickLurkers, updateNewHereRoles } = require("./cron/membership");
+const {
+  kickLurkers,
+  postHelpfulHintToNewHereChannel,
+  updateNewHereRoles,
+} = require("./cron/membership");
 const {
   createFunTimeFridayEvent,
   focusFunTimeFridayEvent,
@@ -87,14 +91,17 @@ const scheduleFunc = (cronExpression, func, ...args) => {
 client.on("ready", () => {
   // Membership
   scheduleFunc("0 0 8 * * 1", kickLurkers, client); // every Monday at 8AM
+  scheduleFunc(
+    "0 30 9,10,11,12,13,14,15,16,17,18 * * *",
+    postHelpfulHintToNewHereChannel,
+    client
+  ); // at the 30 minute mark, ten times per day
   scheduleFunc("0 0 * * * *", updateNewHereRoles, client); // every hour
 
   // Fun Time Friday
   scheduleFunc("0 0 10 * * 2", createFunTimeFridayEvent, client); // every Tuesday at 10AM
   scheduleFunc("0 0 16 * * 5", focusFunTimeFridayEvent, client); // every Friday at 4PM
   scheduleFunc("0 0 3 * * 6", unfocusFunTimeFridayEvent, client); // every Saturday at 3AM
-
-  // Pathfinders
 
   // Trailblazers
   scheduleFunc("0 0 10 * * 3", createTrailblazerTuesdayEvent, client); // every Wednesday at 10AM
