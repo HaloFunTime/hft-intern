@@ -76,7 +76,8 @@ const postHelpfulHintToNewHereChannel = async (client) => {
   // Return without trying to send a hint if error data is present
   if ("error" in hintPayload) return;
   const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_NEW_HERE);
-  channel.send(hintPayload.hint);
+  const message = await channel.send(hintPayload.hint);
+  message.react("🧠");
 };
 
 const updateNewHereRoles = async (client) => {
