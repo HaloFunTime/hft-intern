@@ -101,7 +101,7 @@ client.on("ready", () => {
   // Fun Time Friday
   scheduleFunc("0 0 10 * * 2", createFunTimeFridayEvent, client); // every Tuesday at 10AM
   scheduleFunc("0 0 16 * * 5", focusFunTimeFridayEvent, client); // every Friday at 4PM
-  scheduleFunc("0 0 3 * * 6", unfocusFunTimeFridayEvent, client); // every Saturday at 3AM
+  scheduleFunc("0 0 5 * * 6", unfocusFunTimeFridayEvent, client); // every Saturday at 5AM
 
   // Trailblazers
   scheduleFunc("0 0 10 * * 3", createTrailblazerTuesdayEvent, client); // every Wednesday at 10AM
