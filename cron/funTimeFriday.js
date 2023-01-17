@@ -44,7 +44,7 @@ const createFunTimeFridayEvent = async (client) => {
       client,
       HALOFUNTIME_ID,
       HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS,
-      `Fun Time Friday #${ftfNumber} ${quip}!\n\nWhen the event starts, connect to any voice channel in the __**FUN TIME FRIDAY**__ section to join the fun - or create your own voice channel to start your own lobby.\n\nClick the \"Interested\" bell on the event if you'll be joining us this week!`,
+      `<@&${HALOFUNTIME_ID_ROLE_MEMBER}> Fun Time Friday #${ftfNumber} ${quip}!\n\nWhen the event starts, connect to any voice channel in the __**FUN TIME FRIDAY**__ section to join the fun - or create your own voice channel to start your own lobby.\n\nClick the \"Interested\" bell on the event if you'll be joining us this week!`,
       `Fun Time Friday #${ftfNumber}`,
       HALOFUNTIME_ID_CHANNEL_WAITING_ROOM,
       eventStart.toISOString(),
