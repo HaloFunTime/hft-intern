@@ -141,10 +141,12 @@ async function attemptChatter(message) {
 module.exports = {
   name: "messageCreate",
   async execute(message) {
-    console.log(
-      `${message.guild?.name}: ${message.author?.tag} sent a message in the #${message.channel?.name} channel.`
-    );
-    await attemptChatterPause(message);
-    await attemptChatter(message);
+    if (message.inGuild()) {
+      console.log(
+        `${message.guild?.name}: ${message.author?.tag} sent a message in the #${message.channel?.name} channel.`
+      );
+      await attemptChatterPause(message);
+      await attemptChatter(message);
+    }
   },
 };
