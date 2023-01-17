@@ -9,7 +9,7 @@ const plusRepSuccessQuips = [
   "Supporting our community by rewarding our best party hosts is how we prevent this place from degenerating into /r/halo. Keep it up!",
   "You can only give rep to the same person once a week, but if they're just as awesome next week, make sure to give them rep then too!",
   "You can only give rep three times per week. Make each one count!",
-  "The weekly rep reset happens on Tuesdays. I'll announce it when it happens.",
+  "The weekly `/plus-rep` cooldowns are reset on Tuesdays. I'll announce it when it happens.",
   "Rep disappears one year after it's given, so keep giving rep to your favorite hosts!",
   "You can check anyone's rep with the `/check-rep` command.",
   "You can force me to post the current rep leaderboard with the `/top-rep` command.",

@@ -7,6 +7,7 @@ const {
   kickLurkers,
   postHelpfulHintToNewHereChannel,
   updateNewHereRoles,
+  updatePartyTimerRoles,
 } = require("./cron/membership");
 const {
   createFunTimeFridayEvent,
@@ -97,6 +98,7 @@ client.on("ready", () => {
     client
   ); // at the 30 minute mark, ten times per day
   scheduleFunc("0 0 * * * *", updateNewHereRoles, client); // every hour
+  scheduleFunc("0 0 11 * * 2", updatePartyTimerRoles, client); // every Tuesday at 11AM
 
   // Fun Time Friday
   scheduleFunc("0 0 10 * * 2", createFunTimeFridayEvent, client); // every Tuesday at 10AM

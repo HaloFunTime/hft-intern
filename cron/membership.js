@@ -4,14 +4,22 @@ const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
 const members = require("../utils/members");
 const {
+  HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS,
   HALOFUNTIME_ID_CHANNEL_LOGS,
   HALOFUNTIME_ID_CHANNEL_NEW_HERE,
+  HALOFUNTIME_ID_EMOJI_HFT_BYE,
   HALOFUNTIME_ID_ROLE_MEMBER,
   HALOFUNTIME_ID_ROLE_NEW_HERE,
+  HALOFUNTIME_ID_ROLE_PARTYTIMER,
+  HALOFUNTIME_ID_ROLE_STAFF,
   HALOFUNTIME_ID,
 } = require("../constants.js");
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
+const PARTYTIMER_CAP = 5;
+const PARTYTIMER_TOTAL_REP_MINIMUM = 100;
+const PARTYTIMER_UNIQUE_REP_MINIMUM = 50;
 
 const kickLurkers = async (client) => {
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
@@ -138,12 +146,100 @@ const updateNewHereRoles = async (client) => {
     const message = await channel.send(
       `<@${member.user.id}> is no longer <#${HALOFUNTIME_ID_CHANNEL_NEW_HERE}>. ${quip}`
     );
-    message.react("1009898129933488138");
+    message.react(HALOFUNTIME_ID_EMOJI_HFT_BYE);
   }
+};
+
+const updatePartyTimerRoles = async (client) => {
+  const guild = client.guilds.cache.get(HALOFUNTIME_ID);
+  const allMembersMap = await guild.members.fetch({
+    cache: true,
+    withUserCount: true,
+  });
+  const allMembers = Array.from(allMembersMap.values()).filter(
+    (m) => !m.user.bot
+  );
+  const currentStaff = allMembers.filter((m) =>
+    m.roles.cache.has(HALOFUNTIME_ID_ROLE_STAFF)
+  );
+
+  const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+  const response = await axios
+    .get(
+      `${HALOFUNTIME_API_URL}/reputation/top-rep?count=${
+        PARTYTIMER_CAP + currentStaff.length
+      }`,
+      {
+        headers: {
+          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+        },
+      }
+    )
+    .then((response) => response.data)
+    .catch(async (error) => {
+      // Return the error payload directly if present
+      if (error.response.data) {
+        return error.response.data;
+      }
+      console.error(error);
+    });
+  // Members with `PARTYTIMER_TOTAL_REP_MINIMUM` total rep and at least `PARTYTIMER_UNIQUE_REP_MINIMUM` unique givers qualify.
+  // The top `PARTYTIMER_CAP` of that cohort by total rep (who are not Staff) receive the role.
+  let qualifyingRepReceivers = [];
+  if ("error" in response) {
+    qualifyingRepReceivers = [];
+  } else {
+    qualifyingRepReceivers = response.topRepReceivers.filter(
+      (r) =>
+        r.pastYearTotalRep >= PARTYTIMER_TOTAL_REP_MINIMUM &&
+        r.pastYearUniqueRep >= PARTYTIMER_UNIQUE_REP_MINIMUM
+    );
+  }
+  const qualifyingMemberIds = qualifyingRepReceivers.map((r) => r.discordId);
+  const membersToAddPartyTimer = allMembers
+    .filter(
+      (m) =>
+        !m.roles.cache.has(HALOFUNTIME_ID_ROLE_PARTYTIMER) &&
+        !m.roles.cache.has(HALOFUNTIME_ID_ROLE_STAFF) &&
+        qualifyingMemberIds.includes(m.id)
+    )
+    .slice(0, PARTYTIMER_CAP);
+  const membersToRemovePartyTimer = allMembers.filter(
+    (m) =>
+      m.roles.cache.has(HALOFUNTIME_ID_ROLE_PARTYTIMER) &&
+      !qualifyingMemberIds.includes(m.id)
+  );
+  const partyTimerPromotions = [];
+  for (m of membersToAddPartyTimer) {
+    const member = await m.roles.add(HALOFUNTIME_ID_ROLE_PARTYTIMER);
+    partyTimerPromotions.push(
+      `Congratulations to <@${member.user.id}> for earning the <@&${HALOFUNTIME_ID_ROLE_PARTYTIMER}> role!`
+    );
+  }
+  for (m of membersToRemovePartyTimer) {
+    const member = await m.roles.remove(HALOFUNTIME_ID_ROLE_PARTYTIMER);
+    await member.send(
+      "Unfortunately you no longer meet the minimum requirements for the HaloFunTime PartyTimer role, so it has been removed."
+    );
+  }
+  const channel = client.channels.cache.get(
+    HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS
+  );
+  const introLine = `It's party time! The top ${PARTYTIMER_CAP} FunTimers by rep received (who meet the minimum rep requirements) are eligible for special recognition.`;
+  const partyTimerLine =
+    partyTimerPromotions.length === 0
+      ? `Looks like no one new has earned the <@&${HALOFUNTIME_ID_ROLE_PARTYTIMER}> role this week. We'll check again this time next week.`
+      : partyTimerPromotions.join("\n");
+  const cooldownLine =
+    "All `/plus-rep` cooldowns have been reset for the week. Happy repping!";
+  await channel.send({
+    content: `${introLine}\n\n${partyTimerLine}\n\n${cooldownLine}`,
+  });
 };
 
 module.exports = {
   kickLurkers: kickLurkers,
   postHelpfulHintToNewHereChannel: postHelpfulHintToNewHereChannel,
   updateNewHereRoles: updateNewHereRoles,
+  updatePartyTimerRoles: updatePartyTimerRoles,
 };
