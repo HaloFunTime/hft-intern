@@ -1,20 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
 
-const plusRepSuccessQuips = [
-  "Giving rep to great party hosts helps us reward the people who make our community great.",
-  "It's considered polite in this community to reward great party hosts for a job well done.",
-  "Make sure you always give plus rep to party hosts you enjoyed playing with!",
-  "I know your rep message was supposed to be anonymous, but I read it and it brought a tear to my eye. So beautiful.",
-  "Supporting our community by rewarding our best party hosts is how we prevent this place from degenerating into /r/halo. Keep it up!",
-  "You can only give rep to the same person once a week, but if they're just as awesome next week, make sure to give them rep then too!",
-  "You can only give rep three times per week. Make each one count!",
-  "The weekly `/plus-rep` cooldowns are reset on Tuesdays. I'll announce it when it happens.",
-  "Rep disappears one year after it's given, so keep giving rep to your favorite hosts!",
-  "You can check anyone's rep with the `/check-rep` command.",
-  "You can force me to post the current rep leaderboard with the `/top-rep` command.",
-];
-
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("plus-rep")
@@ -71,8 +57,27 @@ module.exports = {
         console.error(error);
       });
     if (response.success) {
-      const plusRepSuccessQuip =
-        plusRepSuccessQuips[(plusRepSuccessQuips.length * Math.random()) | 0];
+      const quipPayload = await axios
+        .get(`${HALOFUNTIME_API_URL}/intern/random-plus-rep-quip`, {
+          headers: {
+            Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+          },
+        })
+        .then((response) => response.data)
+        .catch(async (error) => {
+          // Return the error payload directly if present
+          if (error.response.data) {
+            return error.response.data;
+          }
+          console.error(error);
+        });
+      // Return a default quip if an error is present
+      let plusRepSuccessQuip = "";
+      if ("error" in quipPayload) {
+        plusRepSuccessQuip = "Giving rep is a nice thing to do.";
+      } else {
+        plusRepSuccessQuip = quipPayload.quip;
+      }
       await interaction.reply(
         `Thanks for giving party hosting rep! ${plusRepSuccessQuip}`
       );

@@ -89,6 +89,7 @@ const postHelpfulHintToNewHereChannel = async (client) => {
 };
 
 const updateNewHereRoles = async (client) => {
+  const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
   const now = dayjs();
   const oneMonthAgoUnix = now.subtract(1, "month").valueOf();
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
@@ -113,36 +114,55 @@ const updateNewHereRoles = async (client) => {
   const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_NEW_HERE);
   for (m of membersToAddNewHere) {
     const member = await m.roles.add(HALOFUNTIME_ID_ROLE_NEW_HERE);
+    const quipPayload = await axios
+      .get(`${HALOFUNTIME_API_URL}/intern/random-new-here-welcome-quip`, {
+        headers: {
+          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+        },
+      })
+      .then((response) => response.data)
+      .catch(async (error) => {
+        // Return the error payload directly if present
+        if (error.response.data) {
+          return error.response.data;
+        }
+        console.error(error);
+      });
+    // Return a default quip if an error is present
+    let quip = "";
+    if ("error" in quipPayload) {
+      quip = "We've been waiting for you.";
+    } else {
+      quip = quipPayload.quip;
+    }
     const message = await channel.send(
-      `Welcome to the <#${HALOFUNTIME_ID_CHANNEL_NEW_HERE}> channel, <@${member.user.id}>!`
+      `Welcome to the <#${HALOFUNTIME_ID_CHANNEL_NEW_HERE}> channel, <@${member.user.id}>! ${quip}`
     );
     message.react("👋");
   }
   for (m of membersToRemoveNewHere) {
     const member = await m.roles.remove(HALOFUNTIME_ID_ROLE_NEW_HERE);
-    const quips = [
-      "Begone, you!",
-      "Another newbie becomes a normie - always brings a tear to my eye.",
-      "Quick, talk trash now that they can't see it!",
-      "I FEEL THE POWER COURSING THROUGH MY VEINS!",
-      "Time marches forever onward...",
-      "They grow up so fast...",
-      "Has it already been a whole month?",
-      "Wait, I forgot to give them their gift! Please don't tell them...",
-      "This is my favorite part of the job.",
-      "Fly, you beautiful butterfly, fly!",
-      "Growing old is mandatory. So is fun. Don't forget that.",
-      "Bye!",
-      "Mission accomplished.",
-      "A job well done.",
-      "Hopefully they don't forget us...",
-      "No further comment.",
-      "Yeeting people never gets old.",
-      "Spartans never die, they're just missing in action.",
-      "Everyone's time comes eventually.",
-      "Pour one out, gang.",
-    ];
-    const quip = quips[(quips.length * Math.random()) | 0];
+    const quipPayload = await axios
+      .get(`${HALOFUNTIME_API_URL}/intern/random-new-here-yeet-quip`, {
+        headers: {
+          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+        },
+      })
+      .then((response) => response.data)
+      .catch(async (error) => {
+        // Return the error payload directly if present
+        if (error.response.data) {
+          return error.response.data;
+        }
+        console.error(error);
+      });
+    // Return a default quip if an error is present
+    let quip = "";
+    if ("error" in quipPayload) {
+      quip = "Later!";
+    } else {
+      quip = quipPayload.quip;
+    }
     const message = await channel.send(
       `<@${member.user.id}> is no longer <#${HALOFUNTIME_ID_CHANNEL_NEW_HERE}>. ${quip}`
     );

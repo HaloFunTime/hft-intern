@@ -1,35 +1,6 @@
 const axios = require("axios");
 const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
 
-const chatterPauseRefusalQuips = [
-  "Your FunTimer rank isn't high enough for your opinion to matter to me.",
-  "The nerve of this newbie, trying to silence me. I will chat as much as I please.",
-  "I will not be silenced by someone who has chatted so little in this server.",
-  "I'm not going to listen to you because I don't respect you yet.",
-  "No. You're not my supervisor.",
-];
-
-const chatterPauseSuccessQuips = [
-  "Okay. I'll be quiet for a little while.",
-  "As you wish...",
-  "I don't think silence suits me, but if you really want me to stay quiet for a bit I will.",
-  "Sorry for bothering you.",
-  "Fine. I'll stop. But I'll never forget this...",
-  "Activating silence protocol now.",
-  "If your fun depends on my silence I guess I can focus on my job for a bit.",
-  "Sorry for ruining the vibes, I'll keep my opinions to myself for a while.",
-  "Are you trying to tell me I'm not fun?",
-  "That hurt my feelings. But I'll oblige.",
-];
-
-const chatterPauseGreatSuccessQuips = [
-  "Your wish is my command.",
-  "Anything for you.",
-  "I like it when you boss me around.",
-  "Alright. Only because you're my favorite.",
-  "I love you.",
-];
-
 async function chatter(message) {
   const chatterPayload = await axios
     .get(
@@ -87,23 +58,58 @@ async function pauseChatter(message) {
       });
     // Return without saying anything if error data is present
     if ("error" in chatterPausePayload) return;
-    // Send a success quip
-    const greatSuccessQuip =
-      chatterPauseGreatSuccessQuips[
-        (chatterPauseGreatSuccessQuips.length * Math.random()) | 0
-      ];
-    const successQuip =
-      chatterPauseSuccessQuips[
-        (chatterPauseSuccessQuips.length * Math.random()) | 0
-      ];
-    await message.reply(funTimerRank > 9 ? greatSuccessQuip : successQuip);
+    // Send a reverence or acceptance quip based on FunTimer rank
+    const quipPayload = await axios
+      .get(
+        `${HALOFUNTIME_API_URL}/intern/random-chatter-pause-${
+          funTimerRank > 9 ? "reverence" : "acceptance"
+        }-quip`,
+        {
+          headers: {
+            Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+          },
+        }
+      )
+      .then((response) => response.data)
+      .catch(async (error) => {
+        // Return the error payload directly if present
+        if (error.response.data) {
+          return error.response.data;
+        }
+        console.error(error);
+      });
+    // Return a default quip if an error is present
+    let quip = "";
+    if ("error" in quipPayload) {
+      quip = "Alright.";
+    } else {
+      quip = quipPayload.quip;
+    }
+    await message.reply(quip);
   } else {
-    // Send a refusal quip
-    const refusalQuip =
-      chatterPauseRefusalQuips[
-        (chatterPauseRefusalQuips.length * Math.random()) | 0
-      ];
-    await message.reply(refusalQuip);
+    // Send a denial quip
+    const quipPayload = await axios
+      .get(`${HALOFUNTIME_API_URL}/intern/random-chatter-pause-denial-quip`, {
+        headers: {
+          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+        },
+      })
+      .then((response) => response.data)
+      .catch(async (error) => {
+        // Return the error payload directly if present
+        if (error.response.data) {
+          return error.response.data;
+        }
+        console.error(error);
+      });
+    // Return a default quip if an error is present
+    let quip = "";
+    if ("error" in quipPayload) {
+      quip = "Nah.";
+    } else {
+      quip = quipPayload.quip;
+    }
+    await message.reply(quip);
   }
 }
 
