@@ -1,7 +1,6 @@
 const { EmbedBuilder } = require("discord.js");
 const {
   HALOFUNTIME_ID_CHANNEL_LFG,
-  HALOFUNTIME_ID_CHANNEL_MCC_LFG,
   HALOFUNTIME_ID_CHANNEL_RELEASES,
   HALOFUNTIME_ID_CHANNEL_WELCOME,
 } = require("../constants.js");
@@ -18,21 +17,17 @@ async function attemptWelcome(thread) {
 }
 
 async function attemptLfgHelp(thread) {
-  // Do not send an LFG Help message if the thread is not in the LFG or MCC LFG forum channel
-  if (
-    thread.parentId !== HALOFUNTIME_ID_CHANNEL_LFG &&
-    thread.parentId !== HALOFUNTIME_ID_CHANNEL_MCC_LFG
-  )
-    return;
+  // Do not send an LFG Help message if the thread is not in the LFG forum channel
+  if (thread.parentId !== HALOFUNTIME_ID_CHANNEL_LFG) return;
   if (thread.sendable) {
     await thread.send({
       content:
         `Thanks for making an LFG post, <@${thread.ownerId}>!\n\n` +
         "Your post is now visible to everyone. Anyone may __**follow**__ this post by commenting on it or clicking " +
         "the *Follow* bell, which will allow them to see activity updates for this post in their Discord sidebar and " +
-        "get notifications from messages here that @-mention them directly or @-mention a role that they have.\n\n" +
-        "You can force your friends to follow this post by @-mentioning them directly, but keep in mind that Discord " +
-        "will not force people from a role to follow your post if you @-mention a role that 100 or more people have. " +
+        "get notifications from messages here that @mention them directly or @mention a role that they have.\n\n" +
+        "You can force your friends to follow this post by @mentioning them directly, but keep in mind that Discord " +
+        "will not force people from a role to follow your post if you @mention a role that 100 or more people have. " +
         "If Discord warns you that `Some roles were not mentioned or added to the thread`, that's what that's about.",
     });
   }
