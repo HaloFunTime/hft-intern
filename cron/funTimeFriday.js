@@ -5,6 +5,10 @@ const {
   HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY,
   HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS,
   HALOFUNTIME_ID_CHANNEL_WAITING_ROOM,
+  HALOFUNTIME_ID_EMOJI_GRUNT_BIRTHDAY,
+  HALOFUNTIME_ID_EMOJI_HALOFUNTIME_DOT_COM,
+  HALOFUNTIME_ID_EMOJI_HFT_INTERESTED,
+  HALOFUNTIME_ID_EMOJI_HFT_UPVOTE,
   HALOFUNTIME_ID_ROLE_MEMBER,
   HALOFUNTIME_ID,
 } = require("../constants.js");
@@ -52,9 +56,24 @@ const createFunTimeFridayEvent = async (client) => {
       "https://i.imgur.com/g704sdo.jpg"
     );
     if (message) {
-      await message.react("🎉");
-      await message.react("🥳");
-      await message.react("🎊");
+      const emojis = [
+        HALOFUNTIME_ID_EMOJI_GRUNT_BIRTHDAY,
+        HALOFUNTIME_ID_EMOJI_HFT_INTERESTED,
+        HALOFUNTIME_ID_EMOJI_HFT_UPVOTE,
+        HALOFUNTIME_ID_EMOJI_HALOFUNTIME_DOT_COM,
+        "🎉",
+        "🥳",
+        "🎊",
+      ];
+      // Shuffle the emojis so reaction order is randomized
+      for (let i = emojis.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [emojis[i], emojis[j]] = [emojis[j], emojis[i]];
+      }
+      // React with seven emojis
+      for (const emoji of emojis) {
+        await message.react(emoji);
+      }
     }
   } catch (e) {
     console.error(e);

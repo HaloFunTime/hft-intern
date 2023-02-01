@@ -5,9 +5,11 @@ const timezone = require("dayjs/plugin/timezone");
 const members = require("../utils/members");
 const {
   HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS,
+  HALOFUNTIME_ID_CHANNEL_FIRST_100,
   HALOFUNTIME_ID_CHANNEL_LOGS,
   HALOFUNTIME_ID_CHANNEL_NEW_HERE,
   HALOFUNTIME_ID_EMOJI_HFT_BYE,
+  HALOFUNTIME_ID_ROLE_FIRST_100,
   HALOFUNTIME_ID_ROLE_MEMBER,
   HALOFUNTIME_ID_ROLE_NEW_HERE,
   HALOFUNTIME_ID_ROLE_PARTYTIMER,
@@ -86,6 +88,37 @@ const postHelpfulHintToNewHereChannel = async (client) => {
   const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_NEW_HERE);
   const message = await channel.send(hintPayload.hint);
   message.react("🧠");
+};
+
+const updateFirst100Roles = async (client) => {
+  const guild = client.guilds.cache.get(HALOFUNTIME_ID);
+  const allMembersMap = await guild.members.fetch({
+    cache: true,
+    withUserCount: true,
+  });
+  const allMembers = Array.from(allMembersMap.values()).filter(
+    (m) => !m.user.bot && m.roles.cache.has(HALOFUNTIME_ID_ROLE_MEMBER)
+  );
+  const allMembersSortedByJoinDate = allMembers.sort((a, b) => {
+    if (parseInt(a.joinedTimestamp) < parseInt(b.joinedTimestamp)) {
+      return -1;
+    } else if (parseInt(a.joinedTimestamp) > parseInt(b.joinedTimestamp)) {
+      return 1;
+    }
+    return 0;
+  });
+  const first100Members = allMembersSortedByJoinDate.slice(0, 100);
+  const membersToAddFirst100 = first100Members.filter(
+    (m) => !m.roles.cache.has(HALOFUNTIME_ID_ROLE_FIRST_100)
+  );
+  const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_FIRST_100);
+  for (m of membersToAddFirst100) {
+    const member = await m.roles.add(HALOFUNTIME_ID_ROLE_FIRST_100);
+    const message = await channel.send(
+      `<@${member.user.id}>, you now qualify as one of the <#${HALOFUNTIME_ID_CHANNEL_FIRST_100}> members of the server by join date.`
+    );
+    message.react("💯");
+  }
 };
 
 const updateNewHereRoles = async (client) => {
@@ -260,6 +293,7 @@ const updatePartyTimerRoles = async (client) => {
 module.exports = {
   kickLurkers: kickLurkers,
   postHelpfulHintToNewHereChannel: postHelpfulHintToNewHereChannel,
+  updateFirst100Roles: updateFirst100Roles,
   updateNewHereRoles: updateNewHereRoles,
   updatePartyTimerRoles: updatePartyTimerRoles,
 };

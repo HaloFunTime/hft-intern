@@ -6,6 +6,7 @@ const dotenv = require("dotenv");
 const {
   kickLurkers,
   postHelpfulHintToNewHereChannel,
+  updateFirst100Roles,
   updateNewHereRoles,
   updatePartyTimerRoles,
 } = require("./cron/membership");
@@ -97,6 +98,7 @@ client.on("ready", () => {
     postHelpfulHintToNewHereChannel,
     client
   ); // at the 30 minute mark, ten times per day
+  scheduleFunc("0 5 * * * *", updateFirst100Roles, client); // every hour on the fifth minute
   scheduleFunc("0 0 * * * *", updateNewHereRoles, client); // every hour
   scheduleFunc("0 0 11 * * 2", updatePartyTimerRoles, client); // every Tuesday at 11AM
 
