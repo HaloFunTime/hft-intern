@@ -15,13 +15,12 @@ const {
   HALOFUNTIME_ID_ROLE_PARTYTIMER,
   HALOFUNTIME_ID_ROLE_STAFF,
   HALOFUNTIME_ID,
+  PARTYTIMER_CAP,
+  PARTYTIMER_TOTAL_REP_MINIMUM,
+  PARTYTIMER_UNIQUE_REP_MINIMUM,
 } = require("../constants.js");
 dayjs.extend(utc);
 dayjs.extend(timezone);
-
-const PARTYTIMER_CAP = 5;
-const PARTYTIMER_TOTAL_REP_MINIMUM = 100;
-const PARTYTIMER_UNIQUE_REP_MINIMUM = 50;
 
 const kickLurkers = async (client) => {
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);

@@ -47,7 +47,7 @@ module.exports = {
         const valueStrings = [];
         for (receiver of receivers) {
           valueStrings.push(
-            `<@${receiver.discordId}>: ${receiver.pastYearTotalRep} (${receiver.pastYearUniqueRep} unique)`
+            `<@${receiver.discordId}>: ${receiver.pastYearTotalRep} (${receiver.pastYearUniqueRep} people)`
           );
         }
         fields.push({

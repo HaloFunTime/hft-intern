@@ -86,8 +86,19 @@ const focusFunTimeFridayEvent = async (client) => {
       client,
       HALOFUNTIME_ID,
       HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY,
-      HALOFUNTIME_ID_ROLE_MEMBER
+      HALOFUNTIME_ID_ROLE_MEMBER,
+      "🎉 Fun Time Friday 🎉"
     );
+    const category = client.channels.cache.get(
+      HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY
+    );
+    const childChannelIds = category.children.cache.map(
+      (channel) => channel.id
+    );
+    for (const channelId of childChannelIds) {
+      const channel = client.channels.cache.get(channelId);
+      channel.lockPermissions();
+    }
   } catch (e) {
     console.error(e);
   }
@@ -99,8 +110,19 @@ const unfocusFunTimeFridayEvent = async (client) => {
       client,
       HALOFUNTIME_ID,
       HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY,
-      HALOFUNTIME_ID_ROLE_MEMBER
+      HALOFUNTIME_ID_ROLE_MEMBER,
+      "Fun Time Friday"
     );
+    const category = client.channels.cache.get(
+      HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY
+    );
+    const childChannelIds = category.children.cache.map(
+      (channel) => channel.id
+    );
+    for (const channelId of childChannelIds) {
+      const channel = client.channels.cache.get(channelId);
+      channel.lockPermissions();
+    }
   } catch (e) {
     console.error(e);
   }
