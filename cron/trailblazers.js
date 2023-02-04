@@ -16,7 +16,7 @@ const createTrailblazerTuesdayEvent = async (client) => {
   const now = dayjs();
   const nextTuesday = now.day(2).add(1, "week");
   const eventStart = dayjs.tz(
-    `${nextTuesday.format("YYYY-MM-DD")} 17:01:00`,
+    `${nextTuesday.format("YYYY-MM-DD")} 17:00:00`,
     "America/Denver"
   );
   try {
