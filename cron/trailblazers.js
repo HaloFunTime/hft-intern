@@ -28,6 +28,7 @@ const createTrailblazerTuesdayEvent = async (client) => {
       "Trailblazer Tuesday",
       HALOFUNTIME_ID_CHANNEL_TRAILBLAZERS_VC_1,
       eventStart.toISOString(),
+      null,
       "Lesson TBD.",
       "https://i.imgur.com/HrEmKSC.jpg"
     );

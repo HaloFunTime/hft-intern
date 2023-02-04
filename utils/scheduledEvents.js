@@ -8,6 +8,7 @@ const createVoiceEvent = async (
   eventName,
   eventVoiceChannelId,
   eventStartTimeISO,
+  eventEndTimeISO,
   eventDescription,
   eventImage
 ) => {
@@ -36,6 +37,7 @@ const createVoiceEvent = async (
     entityType: GuildScheduledEventEntityType.Voice,
     channel: eventVoiceChannelId,
     scheduledStartTime: eventStartTimeISO,
+    scheduledEndTime: eventEndTimeISO,
     description: eventDescription,
     image: eventImage,
   });

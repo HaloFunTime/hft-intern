@@ -25,6 +25,11 @@ const createFunTimeFridayEvent = async (client) => {
     `${thisFriday.format("YYYY-MM-DD")} 17:00:00`,
     "America/Denver"
   );
+  const thisSaturday = now.day(6);
+  const eventEnd = dayjs.tz(
+    `${thisSaturday.format("YYYY-MM-DD")} 05:00:00`,
+    "America/Denver"
+  );
   const ftfNumber =
     eventStart.diff(dayjs.tz("2022-11-11 17:00:00", "America/Denver"), "week") +
     1;
@@ -52,6 +57,7 @@ const createFunTimeFridayEvent = async (client) => {
       `Fun Time Friday #${ftfNumber}`,
       HALOFUNTIME_ID_CHANNEL_WAITING_ROOM,
       eventStart.toISOString(),
+      eventEnd.toISOString(),
       "Join your party-up pals at HaloFunTime for an evening of custom games, matchmaking, and all sorts of other shenanigans.",
       "https://i.imgur.com/g704sdo.jpg"
     );
