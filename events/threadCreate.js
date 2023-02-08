@@ -1,7 +1,7 @@
 const { EmbedBuilder } = require("discord.js");
 const {
+  HALOFUNTIME_ID_CHANNEL_FILE_SHARE,
   HALOFUNTIME_ID_CHANNEL_LFG,
-  HALOFUNTIME_ID_CHANNEL_RELEASES,
   HALOFUNTIME_ID_CHANNEL_WELCOME,
 } = require("../constants.js");
 
@@ -33,9 +33,9 @@ async function attemptLfgHelp(thread) {
   }
 }
 
-async function attemptReleasesEnforcement(thread) {
-  // Do not enforce post restrictions if the thread is not in the Releases channel
-  if (thread.parentId !== HALOFUNTIME_ID_CHANNEL_RELEASES) return;
+async function attemptFileShareEnforcement(thread) {
+  // Do not enforce post restrictions if the thread is not in the File Share channel
+  if (thread.parentId !== HALOFUNTIME_ID_CHANNEL_FILE_SHARE) return;
   let starterMessage;
   while (!starterMessage) {
     starterMessage = await thread
@@ -107,6 +107,6 @@ module.exports = {
   async execute(thread) {
     await attemptWelcome(thread);
     await attemptLfgHelp(thread);
-    await attemptReleasesEnforcement(thread);
+    await attemptFileShareEnforcement(thread);
   },
 };
