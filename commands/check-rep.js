@@ -48,7 +48,7 @@ module.exports = {
     }
     const repLine = `<@${checkee.id}> has **${
       response.pastYearTotalRep
-    } total rep** (from ${response.pastYearUniqueRep} unique ${
+    } total rep** (from ${response.pastYearUniqueRep} ${
       response.pastYearUniqueRep === 1 ? "person" : "people"
     })`;
     const repResetLine = `_You can give ${
