@@ -1,6 +1,9 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
+const { HALOFUNTIME_ID_ROLE_STAFF } = require("../constants");
 
+const CHOICE_EVERYONE = "everyone";
+const CHOICE_NON_STAFF = "non-staff";
 const TOP_REP_COUNT = 10;
 
 module.exports = {
@@ -8,15 +11,45 @@ module.exports = {
     .setName("top-rep")
     .setDescription(
       `View the top ${TOP_REP_COUNT} members by party hosting rep`
+    )
+    .addStringOption((option) =>
+      option
+        .setName("who")
+        .setDescription("Who to include on the leaderboard")
+        .setRequired(true)
+        .addChoices(
+          { name: "Everyone", value: CHOICE_EVERYONE },
+          { name: "Non-Staff", value: CHOICE_NON_STAFF }
+        )
     ),
   async execute(interaction) {
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+    const who = interaction.options.getString("who");
+    let excludeIds = "";
+    if (who === CHOICE_NON_STAFF) {
+      const guild = interaction.client.guilds.cache.get(interaction.guildId);
+      const allMembersMap = await guild.members.fetch({
+        cache: true,
+        withUserCount: true,
+      });
+      const allMembers = Array.from(allMembersMap.values()).filter(
+        (m) => !m.user.bot
+      );
+      const currentStaff = allMembers.filter((m) =>
+        m.roles.cache.has(HALOFUNTIME_ID_ROLE_STAFF)
+      );
+      const staffIds = currentStaff.map((member) => member.user.id);
+      excludeIds = `&excludeIds=${staffIds.join(",")}`;
+    }
     const response = await axios
-      .get(`${HALOFUNTIME_API_URL}/reputation/top-rep?count=${TOP_REP_COUNT}`, {
-        headers: {
-          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
-        },
-      })
+      .get(
+        `${HALOFUNTIME_API_URL}/reputation/top-rep?count=${TOP_REP_COUNT}${excludeIds}`,
+        {
+          headers: {
+            Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+          },
+        }
+      )
       .then((response) => response.data)
       .catch(async (error) => {
         // Return the error payload directly if present
@@ -56,9 +89,17 @@ module.exports = {
         });
       }
     }
+    // prettier-ignore
+    const whoString =
+      who === CHOICE_EVERYONE
+        ? "Everyone"
+        : who === CHOICE_NON_STAFF
+          ? "Non-Staff"
+          : "";
+    const whoTitle = whoString !== "" ? ` (${whoString})` : "";
     const topEmbed = new EmbedBuilder()
       .setColor(0x1abc9c)
-      .setTitle("Party Hosting Rep Leaderboard")
+      .setTitle(`Host Rep Leaderboard${whoTitle}`)
       .setThumbnail("https://api.halofuntime.com/static/HFTLogo.png")
       .addFields(fields)
       .setTimestamp()
