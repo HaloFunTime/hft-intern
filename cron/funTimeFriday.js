@@ -18,6 +18,15 @@ const scheduledEvents = require("../utils/scheduledEvents");
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+const conditionalWednesdayPost = async (client) => {
+  // Do not Wednesday post if the random roll fails
+  if (Math.random() > 0.25) return;
+  const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_GENERAL);
+  await channel.send(
+    "Don't forget to tag <@219572030859771904> and let him know whether you're coming to Fun Time Friday this week!"
+  );
+};
+
 const createFunTimeFridayEvent = async (client) => {
   const now = dayjs();
   const thisFriday = now.day(5);
@@ -135,6 +144,7 @@ const unfocusFunTimeFridayEvent = async (client) => {
 };
 
 module.exports = {
+  conditionalWednesdayPost: conditionalWednesdayPost,
   createFunTimeFridayEvent: createFunTimeFridayEvent,
   focusFunTimeFridayEvent: focusFunTimeFridayEvent,
   unfocusFunTimeFridayEvent: unfocusFunTimeFridayEvent,

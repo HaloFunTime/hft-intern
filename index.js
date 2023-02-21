@@ -11,6 +11,7 @@ const {
   updatePartyTimerRoles,
 } = require("./cron/membership");
 const {
+  conditionalWednesdayPost,
   createFunTimeFridayEvent,
   focusFunTimeFridayEvent,
   unfocusFunTimeFridayEvent,
@@ -104,6 +105,7 @@ client.on("ready", () => {
 
   // Fun Time Friday
   scheduleFunc("0 0 10 * * 2", createFunTimeFridayEvent, client); // every Tuesday at 10AM
+  scheduleFunc("0 0 6 * * 3", conditionalWednesdayPost, client); // every Wednesday at 6AM
   scheduleFunc("0 0 12 * * 5", focusFunTimeFridayEvent, client); // every Friday at noon
   scheduleFunc("0 0 5 * * 6", unfocusFunTimeFridayEvent, client); // every Saturday at 5AM
 
