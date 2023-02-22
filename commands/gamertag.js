@@ -32,15 +32,19 @@ module.exports = {
         console.error(error);
       });
     if ("error" in response) {
+      // Send a reply that pings the user if they haven't linked a gamertag
       await interaction.reply({
         content:
           `<@${member.id}> hasn't linked a gamertag on HaloFunTime. ` +
           "They can use `/link-gamertag` at any time to do so.",
-        allowedMentions: { parse: [] },
+        allowedMentions: { users: [member.id] },
       });
     } else {
+      // Send a reply that doesn't ping the user if they have linked a gamertag
       await interaction.reply({
-        content: `<@${response.discordUserId}>'s linked gamertag is \`${response.xboxLiveGamertag}\`.`,
+        content: `<@${response.discordUserId}>'s linked gamertag is \`${
+          response.xboxLiveGamertag
+        }\`${response.verified ? " (verified ✅)" : ""}.`,
         allowedMentions: { parse: [] },
       });
     }
