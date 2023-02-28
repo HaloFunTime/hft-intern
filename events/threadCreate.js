@@ -1,34 +1,157 @@
 const { EmbedBuilder } = require("discord.js");
+const axios = require("axios");
 const {
   HALOFUNTIME_ID_CHANNEL_FILE_SHARE,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_8S,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_BTB,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_CUSTOMS,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_EVENTS,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_CO_OP,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_CUSTOMS,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_MATCHMAKING,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_RANKED,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_SOCIAL,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_TESTING,
   HALOFUNTIME_ID_CHANNEL_LFG,
-  HALOFUNTIME_ID_CHANNEL_WELCOME,
+  HALOFUNTIME_ID_CHANNEL_NEW_HALO_VC,
+  HALOFUNTIME_ID_ROLE_8S,
+  HALOFUNTIME_ID_ROLE_BTB,
+  HALOFUNTIME_ID_ROLE_CUSTOMS,
+  HALOFUNTIME_ID_ROLE_EVENTS,
+  HALOFUNTIME_ID_ROLE_MCC_CO_OP,
+  HALOFUNTIME_ID_ROLE_MCC_CUSTOMS,
+  HALOFUNTIME_ID_ROLE_MCC_MATCHMAKING,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_BRONZE,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_DIAMOND,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_GOLD,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_ONYX,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_PLATINUM,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_SILVER,
+  HALOFUNTIME_ID_ROLE_RANKED,
+  HALOFUNTIME_ID_ROLE_SOCIAL,
+  HALOFUNTIME_ID_ROLE_TESTING,
 } = require("../constants.js");
 
-async function attemptWelcome(thread) {
-  // Do not send a welcome message if the thread is not in the Welcome channel
-  if (thread.parentId !== HALOFUNTIME_ID_CHANNEL_WELCOME) return;
-  if (thread.sendable) {
-    await thread.send({
-      content:
-        "https://tenor.com/view/halo-halo2-elite-sangheili-greetings-gif-25839730",
-    });
-  }
-}
+const LFG_TAG_IDS_TO_ROLE_IDS = {};
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_8S] =
+  HALOFUNTIME_ID_ROLE_8S;
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_BTB] =
+  HALOFUNTIME_ID_ROLE_BTB;
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_CUSTOMS] =
+  HALOFUNTIME_ID_ROLE_CUSTOMS;
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_EVENTS] =
+  HALOFUNTIME_ID_ROLE_EVENTS;
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_CO_OP] =
+  HALOFUNTIME_ID_ROLE_MCC_CO_OP;
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_CUSTOMS] =
+  HALOFUNTIME_ID_ROLE_MCC_CUSTOMS;
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_MATCHMAKING] =
+  HALOFUNTIME_ID_ROLE_MCC_MATCHMAKING;
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_RANKED] =
+  HALOFUNTIME_ID_ROLE_RANKED;
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_SOCIAL] =
+  HALOFUNTIME_ID_ROLE_SOCIAL;
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_TESTING] =
+  HALOFUNTIME_ID_ROLE_TESTING;
+
+const CSR_TIERS_TO_ROLE_IDS = {};
+CSR_TIERS_TO_ROLE_IDS["Onyx"] = HALOFUNTIME_ID_ROLE_RANKED_ARENA_ONYX;
+CSR_TIERS_TO_ROLE_IDS["Diamond"] = HALOFUNTIME_ID_ROLE_RANKED_ARENA_DIAMOND;
+CSR_TIERS_TO_ROLE_IDS["Platinum"] = HALOFUNTIME_ID_ROLE_RANKED_ARENA_PLATINUM;
+CSR_TIERS_TO_ROLE_IDS["Gold"] = HALOFUNTIME_ID_ROLE_RANKED_ARENA_GOLD;
+CSR_TIERS_TO_ROLE_IDS["Silver"] = HALOFUNTIME_ID_ROLE_RANKED_ARENA_SILVER;
+CSR_TIERS_TO_ROLE_IDS["Bronze"] = HALOFUNTIME_ID_ROLE_RANKED_ARENA_BRONZE;
 
 async function attemptLfgHelp(thread) {
   // Do not send an LFG Help message if the thread is not in the LFG forum channel
   if (thread.parentId !== HALOFUNTIME_ID_CHANNEL_LFG) return;
   if (thread.sendable) {
+    let messageContent = `Thanks for making an LFG post! You can make a new VC for your group at any time by joining the <#${HALOFUNTIME_ID_CHANNEL_NEW_HALO_VC}> channel.`;
+    // Get gamertag info
+    const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+    const linkResponse = await axios
+      .get(
+        `${HALOFUNTIME_API_URL}/link/discord-to-xbox-live?discordId=${thread.ownerId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+          },
+        }
+      )
+      .then((response) => response.data)
+      .catch(async (error) => {
+        // Return the error payload directly if present
+        if (error.response.data) {
+          return error.response.data;
+        }
+        console.error(error);
+      });
+    let gamertag = null;
+    let gamertagVerified = false;
+    if ("xboxLiveGamertag" in linkResponse) {
+      gamertag = linkResponse.xboxLiveGamertag;
+      gamertagVerified = linkResponse.verified;
+    }
+    // Get game stats
+    let matchmadeGamesPlayed = null;
+    let customGamesPlayed = null;
+    if (gamertag && gamertagVerified) {
+      const statsResponse = await axios
+        .get(
+          `${HALOFUNTIME_API_URL}/halo-infinite/summary-stats?gamertag=${gamertag}`,
+          {
+            headers: {
+              Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+            },
+          }
+        )
+        .then((response) => response.data)
+        .catch(async (error) => {
+          // Return the error payload directly if present
+          if (error.response.data) {
+            return error.response.data;
+          }
+          console.error(error);
+        });
+      if ("matchmaking" in statsResponse) {
+        matchmadeGamesPlayed = statsResponse.matchmaking?.gamesPlayed;
+      }
+      if ("custom" in statsResponse) {
+        customGamesPlayed = statsResponse.custom?.gamesPlayed;
+      }
+    }
+    // Add gamertag blurb
+    if (
+      gamertag &&
+      matchmadeGamesPlayed !== null &&
+      customGamesPlayed !== null
+    ) {
+      messageContent += `\n\n<@${thread.ownerId}>'s linked gamertag is \`${gamertag}\`, which has played **${matchmadeGamesPlayed}** matchmade games and **${customGamesPlayed}** custom games in Halo Infinite.`;
+    } else if (gamertag) {
+      messageContent += `\n\n<@${thread.ownerId}>'s linked gamertag is \`${gamertag}\`.`;
+    } else {
+      messageContent += `\n\n<@${thread.ownerId}>, you have not linked your gamertag on HaloFunTime. Please do so with \`/link-gamertag\` so others can use \`/gamertag\` to check your gamertag!`;
+    }
+    // Add tag blurb
+    const pingRecommendations = [];
+    for (const tag of thread.appliedTags) {
+      pingRecommendations.push(`<@&${LFG_TAG_IDS_TO_ROLE_IDS[tag]}>`);
+    }
+    if (pingRecommendations.length > 0) {
+      const roleText =
+        pingRecommendations.length === 1
+          ? "this LFG role"
+          : "any of these LFG roles";
+      messageContent +=
+        "\n\n> **NOTE:** To get more eyes on your LFG post, try mentioning ";
+      messageContent += `${roleText}: ${pingRecommendations.join(" ")}`;
+      messageContent +=
+        "\n> __***Each LFG role mention will ping hundreds of users, so please use this power responsibly!***__";
+    }
+    // Send the LFG Help message
     await thread.send({
-      content:
-        `Thanks for making an LFG post, <@${thread.ownerId}>!\n\n` +
-        "Your post is now visible to everyone. Anyone may __**follow**__ this post by commenting on it or clicking " +
-        "the *Follow* bell, which will allow them to see activity updates for this post in their Discord sidebar and " +
-        "get notifications from messages here that @mention them directly or @mention a role that they have.\n\n" +
-        "You can force your friends to follow this post by @mentioning them directly, but keep in mind that Discord " +
-        "will not force people from a role to follow your post if you @mention a role that 100 or more people have. " +
-        "If Discord warns you that `Some roles were not mentioned or added to the thread`, that's what that's about.",
+      content: messageContent,
+      allowedMentions: { users: [thread.ownerId] },
     });
   }
 }
@@ -105,7 +228,6 @@ async function attemptFileShareEnforcement(thread) {
 module.exports = {
   name: "threadCreate",
   async execute(thread) {
-    await attemptWelcome(thread);
     await attemptLfgHelp(thread);
     await attemptFileShareEnforcement(thread);
   },
