@@ -74,10 +74,13 @@ module.exports = {
         }
       }
       if (rankEmbeds.length === 0) {
+        let description = `\`${response.gamertag}\` is currently unranked.`;
+        if (response.gamertag === "HFT Intern") {
+          description +=
+            "\n\nThis is because quantifying my greatness is impossible. You mortals wouldn't understand.";
+        }
         rankEmbeds.push(
-          new EmbedBuilder()
-            .setTitle("Unranked")
-            .setDescription(`\`${response.gamertag}\` is currently unranked.`)
+          new EmbedBuilder().setTitle("Unranked").setDescription(description)
         );
       }
       await interaction.reply({
