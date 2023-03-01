@@ -4,6 +4,7 @@ const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
 const members = require("../utils/members");
 const {
+  HALO_INFINITE_RANKED_ARENA_PLAYLIST_ID,
   HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS,
   HALOFUNTIME_ID_CHANNEL_FIRST_100,
   HALOFUNTIME_ID_CHANNEL_LOGS,
@@ -13,6 +14,13 @@ const {
   HALOFUNTIME_ID_ROLE_MEMBER,
   HALOFUNTIME_ID_ROLE_NEW_HERE,
   HALOFUNTIME_ID_ROLE_PARTYTIMER,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_BRONZE,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_DIAMOND,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_GOLD,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_ONYX,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_PLATINUM,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_SILVER,
+  HALOFUNTIME_ID_ROLE_RANKED,
   HALOFUNTIME_ID_ROLE_STAFF,
   HALOFUNTIME_ID,
   PARTYTIMER_CAP,
@@ -21,6 +29,15 @@ const {
 } = require("../constants.js");
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
+const ROLE_ID_FOR_CSR_TIER = {
+  onyx: HALOFUNTIME_ID_ROLE_RANKED_ARENA_ONYX,
+  diamond: HALOFUNTIME_ID_ROLE_RANKED_ARENA_DIAMOND,
+  platinum: HALOFUNTIME_ID_ROLE_RANKED_ARENA_PLATINUM,
+  gold: HALOFUNTIME_ID_ROLE_RANKED_ARENA_GOLD,
+  silver: HALOFUNTIME_ID_ROLE_RANKED_ARENA_SILVER,
+  bronze: HALOFUNTIME_ID_ROLE_RANKED_ARENA_BRONZE,
+};
 
 const kickLurkers = async (client) => {
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
@@ -289,10 +306,87 @@ const updatePartyTimerRoles = async (client) => {
   });
 };
 
+const updateRankedRoles = async (client) => {
+  const guild = client.guilds.cache.get(HALOFUNTIME_ID);
+  const allMembersMap = await guild.members.fetch({
+    cache: true,
+    withUserCount: true,
+  });
+  const allMembers = Array.from(allMembersMap.values()).filter(
+    (m) => !m.user.bot
+  );
+  const allMembersWithRankedRole = Array.from(allMembersMap.values()).filter(
+    (m) => !m.user.bot && m.roles.cache.has(HALOFUNTIME_ID_ROLE_RANKED)
+  );
+  const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+  const response = await axios
+    .post(
+      `${HALOFUNTIME_API_URL}/discord/ranked-role-check`,
+      {
+        discordUserIds: allMembersWithRankedRole.map((m) => m.user.id),
+        playlistId: HALO_INFINITE_RANKED_ARENA_PLAYLIST_ID,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+        },
+      }
+    )
+    .then((response) => response.data)
+    .catch(async (error) => {
+      // Return the error payload directly if present
+      if (error.response.data) {
+        return error.response.data;
+      }
+      console.error(error);
+    });
+  if ("error" in response) {
+    console.error("Ran into an error checking ranked roles.");
+  } else {
+    // Add and remove the specific role for each rank
+    for (rank of Object.keys(ROLE_ID_FOR_CSR_TIER)) {
+      const roleId = ROLE_ID_FOR_CSR_TIER[rank];
+      const membersIdsEarnedRank = response[rank];
+      const membersToRemoveRank = allMembers.filter(
+        (m) =>
+          m.roles.cache.has(roleId) && !membersIdsEarnedRank.includes(m.user.id)
+      );
+      const membersToAddRank = allMembers.filter(
+        (m) =>
+          m.roles.cache.has(HALOFUNTIME_ID_ROLE_RANKED) &&
+          !m.roles.cache.has(roleId) &&
+          membersIdsEarnedRank.includes(m.user.id)
+      );
+      for (m of membersToAddRank) {
+        const member = await m.roles.add(roleId);
+        const congratsMessage =
+          `Congratulations - you earned the **RANKED ARENA ${rank.toUpperCase()}** role on HaloFunTime!` +
+          "\n\nI check your linked gamertag's CSR in the Ranked Arena playlist every hour if you have the **Ranked** LFG role." +
+          `\n\nRemoving the **Ranked** LFG role or changing your linked gamertag will remove your **RANKED ARENA ${rank.toUpperCase()}** role.`;
+        await member.send(congratsMessage);
+        console.log(
+          `ADDED ${rank.toUpperCase()} role to ${m.user.username}#${
+            m.user.discriminator
+          }`
+        );
+      }
+      for (m of membersToRemoveRank) {
+        await m.roles.remove(roleId);
+        console.log(
+          `REMOVED ${rank.toUpperCase()} role from ${m.user.username}#${
+            m.user.discriminator
+          }`
+        );
+      }
+    }
+  }
+};
+
 module.exports = {
   kickLurkers: kickLurkers,
   postHelpfulHintToNewHereChannel: postHelpfulHintToNewHereChannel,
   updateFirst100Roles: updateFirst100Roles,
   updateNewHereRoles: updateNewHereRoles,
   updatePartyTimerRoles: updatePartyTimerRoles,
+  updateRankedRoles: updateRankedRoles,
 };
