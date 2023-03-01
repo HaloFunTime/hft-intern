@@ -359,22 +359,22 @@ const updateRankedRoles = async (client) => {
       );
       for (m of membersToAddRank) {
         const member = await m.roles.add(roleId);
+        console.log(
+          `ADDED ${rank.toUpperCase()} role to ${member.user.username}#${
+            member.user.discriminator
+          }`
+        );
         const congratsMessage =
           `Congratulations - you earned the **RANKED ARENA ${rank.toUpperCase()}** role on HaloFunTime!` +
           "\n\nI check your linked gamertag's CSR in the Ranked Arena playlist every hour if you have the **Ranked** LFG role." +
           `\n\nRemoving the **Ranked** LFG role or changing your linked gamertag will remove your **RANKED ARENA ${rank.toUpperCase()}** role.`;
         await member.send(congratsMessage);
-        console.log(
-          `ADDED ${rank.toUpperCase()} role to ${m.user.username}#${
-            m.user.discriminator
-          }`
-        );
       }
       for (m of membersToRemoveRank) {
-        await m.roles.remove(roleId);
+        const member = await m.roles.remove(roleId);
         console.log(
-          `REMOVED ${rank.toUpperCase()} role from ${m.user.username}#${
-            m.user.discriminator
+          `REMOVED ${rank.toUpperCase()} role from ${member.user.username}#${
+            member.user.discriminator
           }`
         );
       }
