@@ -17,7 +17,11 @@ const {
   focusFunTimeFridayEvent,
   unfocusFunTimeFridayEvent,
 } = require("./cron/funTimeFriday");
-const { createTrailblazerTuesdayEvent } = require("./cron/trailblazers");
+const { updatePathfinderRoles } = require("./cron/pathfinders");
+const {
+  createTrailblazerTuesdayEvent,
+  updateTrailblazerRoles,
+} = require("./cron/trailblazers");
 
 dotenv.config();
 
@@ -111,6 +115,10 @@ client.on("ready", () => {
   scheduleFunc("0 0 12 * * 5", focusFunTimeFridayEvent, client); // every Friday at noon
   scheduleFunc("0 0 5 * * 6", unfocusFunTimeFridayEvent, client); // every Saturday at 5AM
 
+  // Pathfinders
+  scheduleFunc("0 0 9 * * 2", updatePathfinderRoles, client); // every Tuesday at 9AM
+
   // Trailblazers
+  scheduleFunc("0 0 9 * * 2", updateTrailblazerRoles, client); // every Tuesday at 9AM
   scheduleFunc("0 0 10 * * 3", createTrailblazerTuesdayEvent, client); // every Wednesday at 10AM
 });
