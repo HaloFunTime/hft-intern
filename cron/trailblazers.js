@@ -147,11 +147,11 @@ const updateTrailblazerRoles = async (client) => {
       }
       if (trailblazersToAddRole.length > 0) {
         await trailblazerAnnouncementChannel.send(
-          "That wraps it up for this week's promotions. Congratulations! We'll check again this time next week."
+          "That wraps it up for this week's promotions. Congratulations! We'll check again this time next week. Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command!"
         );
       } else {
         await trailblazerAnnouncementChannel.send(
-          "Looks like no one new earned a promotion this week. We'll check again this time next week."
+          "Looks like no one new earned a promotion this week. We'll check again this time next week. Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command!"
         );
       }
     }
