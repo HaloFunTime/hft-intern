@@ -188,6 +188,17 @@ const updateNewHereRoles = async (client) => {
       `Welcome to the <#${HALOFUNTIME_ID_CHANNEL_NEW_HERE}> channel, <@${member.user.id}>! ${quip}`
     );
     message.react("👋");
+    let welcomeDM = "";
+    welcomeDM += `Welcome to HaloFunTime, <@${member.user.id}>! I'm the Intern, HaloFunTime's favorite bot.\n\n`;
+    welcomeDM += `I've added you to the <#${HALOFUNTIME_ID_CHANNEL_NEW_HERE}> channel for the next month. `;
+    welcomeDM +=
+      "It's a great place to meet people, learn about the server, and chat directly with the Staff.\n\n";
+    welcomeDM +=
+      "When you get a chance, please use the `/link-gamertag` command to link your Xbox Live gamertag. ";
+    welcomeDM +=
+      "HaloFunTime uses your linked gamertag to pull data from Halo Infinite, assign special roles, and ";
+    welcomeDM += "otherwise make sure everyone has a fun time!";
+    await member.send(welcomeDM);
   }
   for (m of membersToRemoveNewHere) {
     const member = await m.roles.remove(HALOFUNTIME_ID_ROLE_NEW_HERE);
