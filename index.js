@@ -17,7 +17,10 @@ const {
   focusFunTimeFridayEvent,
   unfocusFunTimeFridayEvent,
 } = require("./cron/funTimeFriday");
-const { updatePathfinderRoles } = require("./cron/pathfinders");
+const {
+  updatePathfinderRoles,
+  createPathfinderHikesEvent,
+} = require("./cron/pathfinders");
 const {
   createTrailblazerTuesdayEvent,
   updateTrailblazerRoles,
@@ -117,6 +120,7 @@ client.on("ready", () => {
 
   // Pathfinders
   scheduleFunc("0 0 9 * * 2", updatePathfinderRoles, client); // every Tuesday at 9AM
+  scheduleFunc("0 0 10 * * 4", createPathfinderHikesEvent, client); // every Thursday at 10AM
 
   // Trailblazers
   scheduleFunc("0 0 9 * * 2", updateTrailblazerRoles, client); // every Tuesday at 9AM

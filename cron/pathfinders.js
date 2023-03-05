@@ -1,6 +1,7 @@
 const axios = require("axios");
 const {
   HALOFUNTIME_ID_CHANNEL_SPOTLIGHT,
+  HALOFUNTIME_ID_CHANNEL_PATHFINDERS_VC_1,
   HALOFUNTIME_ID_ROLE_PATHFINDER,
   HALOFUNTIME_ID_ROLE_S3_PATHFINDER_DYNAMO,
   HALOFUNTIME_ID_ROLE_S3_PATHFINDER_ILLUMINATED,
@@ -13,6 +14,36 @@ const ROLE_ID_BY_NAME_AND_SEASON = {
     illuminated: HALOFUNTIME_ID_ROLE_S3_PATHFINDER_ILLUMINATED,
     dynamo: HALOFUNTIME_ID_ROLE_S3_PATHFINDER_DYNAMO,
   },
+};
+
+const createPathfinderHikesEvent = async (client) => {
+  const now = dayjs();
+  const nextWednesday = now.day(3).add(1, "week");
+  const eventStart = dayjs.tz(
+    `${nextWednesday.format("YYYY-MM-DD")} 18:00:00`,
+    "America/Denver"
+  );
+  try {
+    const message = await scheduledEvents.createVoiceEvent(
+      client,
+      HALOFUNTIME_ID,
+      HALOFUNTIME_ID_CHANNEL_SPOTLIGHT,
+      `<@&${HALOFUNTIME_ID_ROLE_PATHFINDER}>\n\nPathfinder Hikes - our weekly Forge map testing session - has been scheduled for next week.\n\nClick the \"Interested\" bell below to get notified when it starts. We'll do our best to play as many maps as we can, but maps whose owners are present for the playtest will have priority!`,
+      "Pathfinder Hikes",
+      HALOFUNTIME_ID_CHANNEL_PATHFINDERS_VC_1,
+      eventStart.toISOString(),
+      null,
+      "Playtest Forge maps with the Pathfinders club! Submit a map using the `/pathfinder-hikes-submit` command in your map's <#1039171549682470982> post.",
+      "https://i.imgur.com/qItmOhr.jpg"
+    );
+    if (message) {
+      await message.react("🏞");
+      await message.react("🥾");
+      await message.react("⛺️");
+    }
+  } catch (e) {
+    console.error(e);
+  }
 };
 
 const updatePathfinderRoles = async (client) => {
@@ -122,5 +153,6 @@ const updatePathfinderRoles = async (client) => {
 };
 
 module.exports = {
+  createPathfinderHikesEvent: createPathfinderHikesEvent,
   updatePathfinderRoles: updatePathfinderRoles,
 };
