@@ -38,7 +38,9 @@ module.exports = {
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
     const response = await axios
       .get(
-        `${HALOFUNTIME_API_URL}/season-03/check-stamps?discordId=${interaction.user.id}&discordTag=${interaction.user.tag}`,
+        `${HALOFUNTIME_API_URL}/season-03/check-stamps?discordId=${
+          interaction.user.id
+        }&discordTag=${encodeURIComponent(interaction.user.tag)}`,
         {
           headers: {
             Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,

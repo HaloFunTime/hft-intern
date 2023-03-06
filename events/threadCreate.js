@@ -58,7 +58,9 @@ async function attemptLfgHelp(thread) {
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
     const linkResponse = await axios
       .get(
-        `${HALOFUNTIME_API_URL}/link/discord-to-xbox-live?discordId=${threadOwner.user.id}&discordTag=${threadOwner.user.tag}`,
+        `${HALOFUNTIME_API_URL}/link/discord-to-xbox-live?discordId=${
+          threadOwner.user.id
+        }&discordTag=${encodeURIComponent(threadOwner.user.tag)}`,
         {
           headers: {
             Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,

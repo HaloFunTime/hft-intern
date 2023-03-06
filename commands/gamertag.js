@@ -16,7 +16,9 @@ module.exports = {
     const member = interaction.options.getUser("member");
     const response = await axios
       .get(
-        `${HALOFUNTIME_API_URL}/link/discord-to-xbox-live?discordId=${member.id}&discordTag=${member.tag}`,
+        `${HALOFUNTIME_API_URL}/link/discord-to-xbox-live?discordId=${
+          member.id
+        }&discordTag=${encodeURIComponent(member.tag)}`,
         {
           headers: {
             Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
