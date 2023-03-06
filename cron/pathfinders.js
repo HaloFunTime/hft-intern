@@ -1,4 +1,7 @@
 const axios = require("axios");
+const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+const timezone = require("dayjs/plugin/timezone");
 const {
   HALOFUNTIME_ID_CHANNEL_SPOTLIGHT,
   HALOFUNTIME_ID_CHANNEL_PATHFINDERS_VC_1,
@@ -7,7 +10,11 @@ const {
   HALOFUNTIME_ID_ROLE_S3_PATHFINDER_ILLUMINATED,
   HALOFUNTIME_ID,
 } = require("../constants.js");
+const scheduledEvents = require("../utils/scheduledEvents");
 const { getCurrentSeason, SEASON_03 } = require("../utils/seasons");
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const ROLE_ID_BY_NAME_AND_SEASON = {
   [SEASON_03]: {
