@@ -64,8 +64,8 @@ module.exports = {
       return;
     }
     const now = dayjs();
-    const comingThursday = now.day(4);
-    const scheduledPlaytestDate = comingThursday.format("YYYY-MM-DD");
+    const comingWednesday = now.day(3);
+    const scheduledPlaytestDate = comingWednesday.format("YYYY-MM-DD");
     const scheduledPlaytestDateTime = dayjs.tz(
       `${scheduledPlaytestDate} 18:00:00`,
       "America/Denver"
