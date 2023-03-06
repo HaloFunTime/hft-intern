@@ -64,7 +64,7 @@ const updatePathfinderRoles = async (client) => {
   const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
   const response = await axios
     .post(
-      `${HALOFUNTIME_API_URL}/pathfinders/seasonal-role-check`,
+      `${HALOFUNTIME_API_URL}/pathfinder/seasonal-role-check`,
       {
         discordUserIds: allMembersWithPathfinderRole.map((m) => m.user.id),
       },

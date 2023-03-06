@@ -71,7 +71,7 @@ const updateTrailblazerRoles = async (client) => {
   const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
   const response = await axios
     .post(
-      `${HALOFUNTIME_API_URL}/trailblazers/seasonal-role-check`,
+      `${HALOFUNTIME_API_URL}/trailblazer/seasonal-role-check`,
       {
         discordUserIds: allMembersWithTrailblazerRole.map((m) => m.user.id),
       },
