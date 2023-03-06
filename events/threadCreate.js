@@ -53,11 +53,12 @@ async function attemptLfgHelp(thread) {
   if (thread.parentId !== HALOFUNTIME_ID_CHANNEL_LFG) return;
   if (thread.sendable) {
     let messageContent = `Thanks for making an LFG post! You can make a new VC for your group at any time by joining the <#${HALOFUNTIME_ID_CHANNEL_NEW_HALO_VC}> channel.`;
+    const threadOwner = await thread.fetchOwner();
     // Get gamertag info
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
     const linkResponse = await axios
       .get(
-        `${HALOFUNTIME_API_URL}/link/discord-to-xbox-live?discordId=${thread.ownerId}`,
+        `${HALOFUNTIME_API_URL}/link/discord-to-xbox-live?discordId=${threadOwner.user.id}&discordTag=${threadOwner.user.tag}`,
         {
           headers: {
             Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
