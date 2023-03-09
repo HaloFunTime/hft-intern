@@ -318,6 +318,7 @@ const updatePartyTimerRoles = async (client) => {
 };
 
 const updateRankedRoles = async (client) => {
+  console.log("Checking Ranked roles...");
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
   const allMembersMap = await guild.members.fetch({
     cache: true,
@@ -354,6 +355,7 @@ const updateRankedRoles = async (client) => {
   if ("error" in response) {
     console.error("Ran into an error checking ranked roles.");
   } else {
+    console.log(JSON.stringify(response));
     // Add and remove the specific role for each rank
     for (rank of Object.keys(ROLE_ID_FOR_CSR_TIER)) {
       const roleId = ROLE_ID_FOR_CSR_TIER[rank];
@@ -390,6 +392,7 @@ const updateRankedRoles = async (client) => {
         );
       }
     }
+    console.log("Finished checking Ranked roles.");
   }
 };
 
