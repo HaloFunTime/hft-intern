@@ -100,11 +100,11 @@ module.exports = {
       )
       .then((response) => response.data)
       .catch(async (error) => {
+        console.error(error);
         // Return the error payload directly if present
         if (error.response.data) {
           return error.response.data;
         }
-        console.error(error);
       });
     if (response.success) {
       await interaction.reply({
