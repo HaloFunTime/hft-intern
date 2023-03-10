@@ -110,7 +110,7 @@ module.exports = {
       await interaction.reply({
         content: `<@${
           interaction.user.id
-        }> successfully submitted **${map}** for **Pathfinder Hikes** playtesting on <t:${scheduledPlaytestDateTime.unix()}:f>!`,
+        }> successfully submitted **${map}** for **Pathfinder Hikes** playtesting on <t:${scheduledPlaytestDateTime.unix()}:D> at <t:${scheduledPlaytestDateTime.unix()}:t>!`,
       });
     } else if ("error" in response) {
       // Try to figure out a "friendly" rejection message
@@ -120,13 +120,13 @@ module.exports = {
           response?.error?.details?.detail ===
           "A Pathfinder Hike submission already exists for this post."
         ) {
-          friendlyMessage = `\n\nThe map referenced by this post has already been submitted for playtesting on <t:${scheduledPlaytestDateTime.unix()}:f>.`;
+          friendlyMessage = `\n\nThe map referenced by this post has already been submitted for playtesting on <t:${scheduledPlaytestDateTime.unix()}:D> at <t:${scheduledPlaytestDateTime.unix()}:t>.`;
         }
         if (
           response?.error?.details?.detail ===
           "A Pathfinder Hike submission has already been created by this Discord user."
         ) {
-          friendlyMessage = `\n\nYou have already submitted another map for playtesting on <t:${scheduledPlaytestDateTime.unix()}:f>. Users may submit a maximum of one map per week.`;
+          friendlyMessage = `\n\nYou have already submitted another map for playtesting on <t:${scheduledPlaytestDateTime.unix()}:D> at <t:${scheduledPlaytestDateTime.unix()}:t>. Users may submit a maximum of one map per week.`;
         }
       }
       await interaction.reply({
