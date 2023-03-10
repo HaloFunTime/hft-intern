@@ -54,6 +54,7 @@ async function attemptLfgHelp(thread) {
   if (thread.sendable) {
     let messageContent = `Thanks for making an LFG post! You can make a new VC for your group at any time by joining the <#${HALOFUNTIME_ID_CHANNEL_NEW_HALO_VC}> channel.`;
     const threadOwner = await thread.fetchOwner();
+    await thread.fetchStarterMessage(); // Kludge to ensure starter message has been posted before attempting the help response
     // Get gamertag info
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
     const linkResponse = await axios
