@@ -12,6 +12,7 @@ const {
 } = require("../constants.js");
 const scheduledEvents = require("../utils/scheduledEvents");
 const { getCurrentSeason, SEASON_03 } = require("../utils/seasons");
+const { getDateTimeForPathfinderEventStart } = require("../utils/pathfinders");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -26,10 +27,7 @@ const ROLE_ID_BY_NAME_AND_SEASON = {
 const createPathfinderHikesEvent = async (client) => {
   const now = dayjs();
   const nextWednesday = now.day(3).add(1, "week");
-  const eventStart = dayjs.tz(
-    `${nextWednesday.format("YYYY-MM-DD")} 18:00:00`,
-    "America/Denver"
-  );
+  const eventStart = getDateTimeForPathfinderEventStart(nextWednesday);
   try {
     const message = await scheduledEvents.createVoiceEvent(
       client,
@@ -46,7 +44,7 @@ const createPathfinderHikesEvent = async (client) => {
     if (message) {
       await message.react("🏞");
       await message.react("🥾");
-      await message.react("⛺️");
+      await message.react("🏕");
     }
   } catch (e) {
     console.error(e);

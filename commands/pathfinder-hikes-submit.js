@@ -8,6 +8,7 @@ const {
   HALOFUNTIME_ID_CHANNEL_CLUBS,
   HALOFUNTIME_ID_CHANNEL_WAYWO,
 } = require("../constants.js");
+const { getDateTimeForPathfinderEventStart } = require("../utils/pathfinders");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -64,11 +65,15 @@ module.exports = {
       return;
     }
     const now = dayjs();
-    const comingWednesday = now.day(3);
-    const scheduledPlaytestDate = comingWednesday.format("YYYY-MM-DD");
-    const scheduledPlaytestDateTime = dayjs.tz(
-      `${scheduledPlaytestDate} 18:00:00`,
-      "America/Denver"
+    const thisWeekWednesday = now.day(3);
+    const nextWeekWednesday = thisWeekWednesday.add(1, "week");
+    const thisWeekEventStart =
+      getDateTimeForPathfinderEventStart(thisWeekWednesday);
+    // If this command is issued AFTER the start time of this week's event, schedule the submission for next week
+    const scheduledPlaytestDate =
+      now > thisWeekEventStart ? nextWeekWednesday : thisWeekWednesday;
+    const scheduledPlaytestDateTime = getDateTimeForPathfinderEventStart(
+      scheduledPlaytestDate
     );
     const map = interaction.options.getString("map");
     const mode1 = interaction.options.getString("mode1");
@@ -82,7 +87,7 @@ module.exports = {
           waywoPostId: interaction.channelId,
           mapSubmitterDiscordId: interaction.user.id,
           mapSubmitterDiscordTag: interaction.user.tag,
-          scheduledPlaytestDate: scheduledPlaytestDate,
+          scheduledPlaytestDate: scheduledPlaytestDate.format("YYYY-MM-DD"),
           map: map,
           mode1: mode1,
           mode2: mode2,
@@ -105,7 +110,7 @@ module.exports = {
       await interaction.reply({
         content: `<@${
           interaction.user.id
-        }> successfully submitted **${map}** for **Pathfinder Hikes** playtesting on <t:${scheduledPlaytestDateTime.unix()}:D>!`,
+        }> successfully submitted **${map}** for **Pathfinder Hikes** playtesting on <t:${scheduledPlaytestDateTime.unix()}:f>!`,
       });
     } else if ("error" in response) {
       // Try to figure out a "friendly" rejection message
@@ -115,13 +120,13 @@ module.exports = {
           response?.error?.details?.detail ===
           "A Pathfinder Hike submission already exists for this post."
         ) {
-          friendlyMessage = `\n\nThe map referenced by this post has already been submitted for playtesting on <t:${scheduledPlaytestDateTime.unix()}:D>.`;
+          friendlyMessage = `\n\nThe map referenced by this post has already been submitted for playtesting on <t:${scheduledPlaytestDateTime.unix()}:f>.`;
         }
         if (
           response?.error?.details?.detail ===
           "A Pathfinder Hike submission has already been created by this Discord user."
         ) {
-          friendlyMessage = `\n\nYou have already submitted another map for playtesting on <t:${scheduledPlaytestDateTime.unix()}:D>. Users may submit a maximum of one map per week.`;
+          friendlyMessage = `\n\nYou have already submitted another map for playtesting on <t:${scheduledPlaytestDateTime.unix()}:f>. Users may submit a maximum of one map per week.`;
         }
       }
       await interaction.reply({
