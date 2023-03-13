@@ -44,7 +44,7 @@ module.exports = {
     if ("error" in response) {
       await interaction.reply({
         content:
-          "Could not check your progress toward Trailblazer Scout at this time.",
+          "Could not check your progress toward the Trailblazer Scout role at this time.",
         ephemeral: true,
       });
     } else {
