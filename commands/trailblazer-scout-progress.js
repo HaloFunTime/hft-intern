@@ -12,7 +12,6 @@ module.exports = {
     .setDescription("Check your progress toward the Trailblazer Scout role"),
   async execute(interaction) {
     // Command may only be executed by someone with the Trailblazer role
-    /*
     if (!interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_TRAILBLAZER)) {
       await interaction.reply({
         content: `You must have the <@&${HALOFUNTIME_ID_ROLE_TRAILBLAZER}> role to use this command. You can get it in the <#${HALOFUNTIME_ID_CHANNEL_CLUBS}> channel.`,
@@ -20,7 +19,6 @@ module.exports = {
       });
       return;
     }
-    */
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
     const response = await axios
       .post(
