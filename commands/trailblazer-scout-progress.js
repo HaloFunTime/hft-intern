@@ -81,7 +81,7 @@ module.exports = {
           })
           .addFields({
             name: "🔥 Hot Streak",
-            value: `> *Finish 3 straight Ranked Arena games on top of the scoreboard. Earnable once.*\n> **${
+            value: `> *Win 3 consecutive Ranked Arena games and finish on top of the scoreboard each time. Earnable once.*\n> **${
               response.pointsHotStreak
             }/100 points** ${response.pointsHotStreak === 100 ? "✅" : ""}`,
           })
