@@ -14,6 +14,7 @@ const {
   HALOFUNTIME_ID_CHANNEL_LFG_TAG_TESTING,
   HALOFUNTIME_ID_CHANNEL_LFG,
   HALOFUNTIME_ID_CHANNEL_NEW_HALO_VC,
+  HALOFUNTIME_ID_CHANNEL_WAYWO,
   HALOFUNTIME_ID_ROLE_8S,
   HALOFUNTIME_ID_ROLE_BTB,
   HALOFUNTIME_ID_ROLE_CUSTOMS,
@@ -215,10 +216,46 @@ async function attemptFileShareEnforcement(thread) {
   }
 }
 
+async function recordWaywoPost(thread) {
+  // Do record a WAYWO post if the thread is not in the WAYWO forum channel
+  if (thread.parentId !== HALOFUNTIME_ID_CHANNEL_WAYWO) return;
+  const threadOwner = await thread.fetchOwner();
+  // Get gamertag info
+  const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+  const response = await axios
+    .post(
+      `${HALOFUNTIME_API_URL}/pathfinder/waywo-post`,
+      {
+        posterDiscordId: threadOwner.user.id,
+        posterDiscordTag: threadOwner.user.tag,
+        postId: thread.id,
+        postTitle: thread.name,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+        },
+      }
+    )
+    .then((response) => response.data)
+    .catch(async (error) => {
+      console.error(error);
+      // Return the error payload directly if present
+      if (error.response.data) {
+        return error.response.data;
+      }
+    });
+  // Log if an error happens
+  if (response.success === false || "error" in response) {
+    console.log(response.error);
+  }
+}
+
 module.exports = {
   name: "threadCreate",
   async execute(thread) {
     await attemptLfgHelp(thread);
     await attemptFileShareEnforcement(thread);
+    await recordWaywoPost(thread);
   },
 };
