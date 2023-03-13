@@ -61,7 +61,9 @@ module.exports = {
         })
         .addFields({
           name: "🫶 Sharing is Caring",
-          value: `> *Bring someone new to Trailblazer Tuesday! 50 points per referral.*\n> **${response.pointsSharingIsCaring} points**`,
+          value: `> *Bring someone new to Trailblazer Tuesday! 50 points per referral.*\n> **${
+            response.pointsSharingIsCaring
+          }/150 points** ${response.pointsSharingIsCaring === 150 ? "✅" : ""}`,
         })
         .addFields({
           name: "📚 Bookworm",
