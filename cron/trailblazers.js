@@ -84,8 +84,8 @@ const updateTrailblazerRoles = async (client) => {
     .then((response) => response.data)
     .catch(async (error) => {
       // Return the error payload directly if present
-      if (error.response.data) {
-        return error.response.data;
+      if (error.response?.data) {
+        return error.response?.data;
       }
       console.error(error);
     });
