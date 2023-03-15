@@ -68,6 +68,11 @@ const updateTrailblazerRoles = async (client) => {
   ).filter(
     (m) => !m.user.bot && m.roles.cache.has(HALOFUNTIME_ID_ROLE_TRAILBLAZER)
   );
+  // Horrible kludge to prevent Axios socket hang up: https://stackoverflow.com/a/43439886
+  delete process.env["http_proxy"];
+  delete process.env["HTTP_PROXY"];
+  delete process.env["https_proxy"];
+  delete process.env["HTTPS_PROXY"];
   const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
   const response = await axios
     .post(
@@ -83,11 +88,13 @@ const updateTrailblazerRoles = async (client) => {
     )
     .then((response) => response.data)
     .catch(async (error) => {
+      console.error(error);
       // Return the error payload directly if present
       if (error.response?.data) {
         return error.response?.data;
+      } else {
+        return {};
       }
-      console.error(error);
     });
   if ("error" in response) {
     console.error("Ran into an error checking Trailblazer seasonal roles.");
@@ -99,6 +106,13 @@ const updateTrailblazerRoles = async (client) => {
       console.log(`Early exiting - no Trailblazer entry for ${season}.`);
       return;
     }
+    const trailblazerAnnouncementChannel = client.channels.cache.get(
+      HALOFUNTIME_ID_CHANNEL_TRAILBLAZER_ANNOUNCEMENTS
+    );
+    await trailblazerAnnouncementChannel.send(
+      `<@&${HALOFUNTIME_ID_ROLE_TRAILBLAZER}>\n\nIt's promotion time! Let's see if any Trailblazers have earned special recognition this week...`
+    );
+    let promotedTrailblazerCount = 0;
     for (let title of ["sherpa", "scout"]) {
       // Validate that a "sherpa" or a "scout" role are defined for this Season
       const roleId = seasonTitles[title];
@@ -119,12 +133,6 @@ const updateTrailblazerRoles = async (client) => {
           !m.roles.cache.has(roleId) &&
           trailblazerIdsEarnedRole.includes(m.user.id)
       );
-      const trailblazerAnnouncementChannel = client.channels.cache.get(
-        HALOFUNTIME_ID_CHANNEL_TRAILBLAZER_ANNOUNCEMENTS
-      );
-      await trailblazerAnnouncementChannel.send(
-        `<@&${HALOFUNTIME_ID_ROLE_TRAILBLAZER}>\n\nIt's promotion time! Let's see if any Trailblazers have earned special recognition this week...`
-      );
       for (let m of trailblazersToAddRole) {
         const trailblazer = await m.roles.add(roleId);
         console.log(
@@ -132,10 +140,12 @@ const updateTrailblazerRoles = async (client) => {
             trailblazer.user.username
           }#${trailblazer.user.discriminator}`
         );
-        await trailblazerAnnouncementChannel.send({
-          content: `<@${trailblazer.user.id}> has earned the <@&${roleId}> role!`,
-          allowedMentions: { users: [trailblazer.user.id] },
-        });
+        const trailblazerPromotionMessage =
+          await trailblazerAnnouncementChannel.send({
+            content: `<@${trailblazer.user.id}> has earned the <@&${roleId}> role!`,
+            allowedMentions: { users: [trailblazer.user.id] },
+          });
+        await trailblazerPromotionMessage.react("🎉");
       }
       for (let m of trailblazersToRemoveRole) {
         const trailblazer = await m.roles.remove(roleId);
@@ -145,15 +155,16 @@ const updateTrailblazerRoles = async (client) => {
           }#${trailblazer.user.discriminator}`
         );
       }
-      if (trailblazersToAddRole.length > 0) {
-        await trailblazerAnnouncementChannel.send(
-          "That wraps it up for this week's promotions. Congratulations! We'll check again this time next week. Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command!"
-        );
-      } else {
-        await trailblazerAnnouncementChannel.send(
-          "Looks like no one new earned a promotion this week. We'll check again this time next week. Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command!"
-        );
-      }
+      promotedTrailblazerCount += trailblazersToAddRole.length;
+    }
+    if (promotedTrailblazerCount) {
+      await trailblazerAnnouncementChannel.send(
+        "That wraps it up for this week's promotions. Congratulations! We'll check again this time next week. Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command!"
+      );
+    } else {
+      await trailblazerAnnouncementChannel.send(
+        "Looks like no one new earned a promotion this week. We'll check again this time next week. Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command!"
+      );
     }
   }
   console.log("Finished checking Trailblazer roles.");

@@ -66,6 +66,11 @@ const updatePathfinderRoles = async (client) => {
   ).filter(
     (m) => !m.user.bot && m.roles.cache.has(HALOFUNTIME_ID_ROLE_PATHFINDER)
   );
+  // Horrible kludge to prevent Axios socket hang up: https://stackoverflow.com/a/43439886
+  delete process.env["http_proxy"];
+  delete process.env["HTTP_PROXY"];
+  delete process.env["https_proxy"];
+  delete process.env["HTTPS_PROXY"];
   const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
   const response = await axios
     .post(
@@ -81,11 +86,13 @@ const updatePathfinderRoles = async (client) => {
     )
     .then((response) => response.data)
     .catch(async (error) => {
+      console.error(error);
       // Return the error payload directly if present
       if (error.response?.data) {
         return error.response?.data;
+      } else {
+        return {};
       }
-      console.error(error);
     });
   if ("error" in response) {
     console.error("Ran into an error checking Pathfinder seasonal roles.");
@@ -97,6 +104,13 @@ const updatePathfinderRoles = async (client) => {
       console.log(`Early exiting - no Pathfinder entry for ${season}.`);
       return;
     }
+    const pathfinderAnnouncementChannel = client.channels.cache.get(
+      HALOFUNTIME_ID_CHANNEL_SPOTLIGHT
+    );
+    await pathfinderAnnouncementChannel.send(
+      `<@&${HALOFUNTIME_ID_ROLE_PATHFINDER}>\n\nIt's promotion time! Let's see if any Pathfinders have earned special recognition this week...`
+    );
+    let promotedPathfinderCount = 0;
     for (let title of ["illuminated", "dynamo"]) {
       // Validate that an "illuminated" or a "dynamo" role are defined for this Season
       const roleId = seasonTitles[title];
@@ -117,12 +131,6 @@ const updatePathfinderRoles = async (client) => {
           !m.roles.cache.has(roleId) &&
           pathfinderIdsEarnedRole.includes(m.user.id)
       );
-      const pathfinderAnnouncementChannel = client.channels.cache.get(
-        HALOFUNTIME_ID_CHANNEL_SPOTLIGHT
-      );
-      await pathfinderAnnouncementChannel.send(
-        `<@&${HALOFUNTIME_ID_ROLE_PATHFINDER}>\n\nIt's promotion time! Let's see if any Pathfinders have earned special recognition this week...`
-      );
       for (let m of pathfindersToAddRole) {
         const pathfinder = await m.roles.add(roleId);
         console.log(
@@ -130,10 +138,12 @@ const updatePathfinderRoles = async (client) => {
             pathfinder.user.username
           }#${pathfinder.user.discriminator}`
         );
-        await pathfinderAnnouncementChannel.send({
-          content: `<@${pathfinder.user.id}> has earned the <@&${roleId}> role!`,
-          allowedMentions: { users: [pathfinder.user.id] },
-        });
+        const pathfinderPromotionMessage =
+          await pathfinderAnnouncementChannel.send({
+            content: `<@${pathfinder.user.id}> has earned the <@&${roleId}> role!`,
+            allowedMentions: { users: [pathfinder.user.id] },
+          });
+        await pathfinderPromotionMessage.react("🎉");
       }
       for (let m of pathfindersToRemoveRole) {
         const pathfinder = await m.roles.remove(roleId);
@@ -143,15 +153,16 @@ const updatePathfinderRoles = async (client) => {
           }#${pathfinder.user.discriminator}`
         );
       }
-      if (pathfindersToAddRole.length > 0) {
-        await pathfinderAnnouncementChannel.send(
-          "That wraps it up for this week's promotions. Congratulations! We'll check again this time next week. Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command!"
-        );
-      } else {
-        await pathfinderAnnouncementChannel.send(
-          "Looks like no one new earned a promotion this week. We'll check again this time next week. Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command!"
-        );
-      }
+      promotedPathfinderCount += pathfindersToAddRole.length;
+    }
+    if (promotedPathfinderCount > 0) {
+      await pathfinderAnnouncementChannel.send(
+        "That wraps it up for this week's promotions. Congratulations! We'll check again this time next week. Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command!"
+      );
+    } else {
+      await pathfinderAnnouncementChannel.send(
+        "Looks like no one new earned a promotion this week. We'll check again this time next week. Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command!"
+      );
     }
   }
   console.log("Finished checking Pathfinder roles.");
