@@ -33,7 +33,11 @@ const createPathfinderHikesEvent = async (client) => {
       client,
       HALOFUNTIME_ID,
       HALOFUNTIME_ID_CHANNEL_SPOTLIGHT,
-      `<@&${HALOFUNTIME_ID_ROLE_PATHFINDER}>\n\nPathfinder Hikes - our weekly Forge map testing session - has been scheduled for next week.\n\nClick the \"Interested\" bell below to get notified when it starts. We'll do our best to play as many maps as we can, but maps whose owners are present for the playtest will have priority!`,
+      `<@&${HALOFUNTIME_ID_ROLE_PATHFINDER}>\n\n` +
+        "Pathfinder Hikes - our weekly Forge map testing session - has been scheduled for next week.\n\n" +
+        "Click the 'Interested' bell below to get notified when it starts. " +
+        "Attending this event will earn you points toward the **Pathfinder Dynamo** role. " +
+        "We'll do our best to play as many maps as we can, but maps whose owners are present for the playtest will have priority!",
       "Pathfinder Hikes",
       HALOFUNTIME_ID_CHANNEL_PATHFINDERS_VC_1,
       eventStart.toISOString(),
@@ -155,13 +159,19 @@ const updatePathfinderRoles = async (client) => {
       }
       promotedPathfinderCount += pathfindersToAddRole.length;
     }
+    const promotionCommandsText =
+      " We'll check again this time next week.\n\n" +
+      "Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command. " +
+      "Check your progress toward this season's **Pathfinder Dynamo** role at any time with the `/pathfinder-dynamo-progress` command.";
     if (promotedPathfinderCount > 0) {
       await pathfinderAnnouncementChannel.send(
-        "That wraps it up for this week's promotions. Congratulations! We'll check again this time next week. Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command!"
+        "That wraps it up for this week's promotions. Congratulations!" +
+          promotionCommandsText
       );
     } else {
       await pathfinderAnnouncementChannel.send(
-        "Looks like no one new earned a promotion this week. We'll check again this time next week. Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command!"
+        "Looks like no one new earned a promotion this week." +
+          promotionCommandsText
       );
     }
   }

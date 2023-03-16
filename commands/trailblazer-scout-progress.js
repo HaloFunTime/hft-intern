@@ -87,7 +87,7 @@ module.exports = {
           })
           .addFields({
             name: "💀 Oddly Effective",
-            value: `> *Win 25 or more Oddball games in Ranked Arena. Earnable once.*\n> **${
+            value: `> *Win Oddball games in Ranked Arena. 4 points per win.*\n> **${
               response.pointsOddlyEffective
             }/100 points** ${
               response.pointsOddlyEffective === 100 ? "✅" : ""
@@ -95,7 +95,7 @@ module.exports = {
           })
           .addFields({
             name: "💪 Too Stronk",
-            value: `> *Win 25 or more Strongholds games in Ranked Arena. Earnable once.*\n> **${
+            value: `> *Win Strongholds games in Ranked Arena. 4 points per win.*\n> **${
               response.pointsTooStronk
             }/100 points** ${response.pointsTooStronk === 100 ? "✅" : ""}`,
           });

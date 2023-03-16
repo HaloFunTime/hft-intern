@@ -35,7 +35,11 @@ const createTrailblazerTuesdayEvent = async (client) => {
       client,
       HALOFUNTIME_ID,
       HALOFUNTIME_ID_CHANNEL_TRAILBLAZER_ANNOUNCEMENTS,
-      `<@&${HALOFUNTIME_ID_ROLE_TRAILBLAZER}>\n\nTrailblazer Tuesday - our weekly practice and learning session - has been scheduled for next week.\n\nClick the \"Interested\" bell below to get notified when it starts. All skill levels are welcome as long as you have the desire to improve!`,
+      `<@&${HALOFUNTIME_ID_ROLE_TRAILBLAZER}>\n\n` +
+        "Trailblazer Tuesday - our weekly practice and learning session - has been scheduled for next week.\n\n" +
+        "Click the 'Interested' bell below to get notified when it starts. " +
+        "Attending this event will earn you points toward the **Trailblazer Scout** role." +
+        "All skill levels are welcome as long as you have the desire to improve!",
       "Trailblazer Tuesday",
       HALOFUNTIME_ID_CHANNEL_TRAILBLAZERS_VC_1,
       eventStart.toISOString(),
@@ -157,13 +161,19 @@ const updateTrailblazerRoles = async (client) => {
       }
       promotedTrailblazerCount += trailblazersToAddRole.length;
     }
+    const promotionCommandsText =
+      " We'll check again this time next week.\n\n" +
+      "Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command. " +
+      "Check your progress toward this season's **Trailblazer Scout** role at any time with the `/trailblazer-scout-progress` command.";
     if (promotedTrailblazerCount) {
       await trailblazerAnnouncementChannel.send(
-        "That wraps it up for this week's promotions. Congratulations! We'll check again this time next week. Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command!"
+        "That wraps it up for this week's promotions. Congratulations!" +
+          promotionCommandsText
       );
     } else {
       await trailblazerAnnouncementChannel.send(
-        "Looks like no one new earned a promotion this week. We'll check again this time next week. Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command!"
+        "Looks like no one new earned a promotion this week." +
+          promotionCommandsText
       );
     }
   }
