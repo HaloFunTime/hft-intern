@@ -119,6 +119,7 @@ module.exports = {
         .setTimestamp();
       await interaction.reply({
         embeds: [progressEmbed],
+        ephemeral: true
       });
     }
   },
