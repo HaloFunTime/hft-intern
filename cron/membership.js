@@ -379,7 +379,7 @@ const updateRankedRoles = async (client) => {
         );
         const congratsMessage =
           `Congratulations - you earned the **RANKED ARENA ${rank.toUpperCase()}** role on HaloFunTime!` +
-          "\n\nI check your linked gamertag's CSR in the Ranked Arena playlist every hour if you have the **Ranked** LFG role." +
+          "\n\nI check your linked gamertag's CSR in the Ranked Arena playlist every 15 minutes if you have the **Ranked** LFG role." +
           `\n\nRemoving the **Ranked** LFG role or changing your linked gamertag will remove your **RANKED ARENA ${rank.toUpperCase()}** role.`;
         await member.send(congratsMessage);
       }
