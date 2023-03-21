@@ -55,7 +55,7 @@ module.exports = {
         .setDescription("**Season 3**")
         .addFields({
           name: "🦀 Church of the Crab",
-          value: `> *Attend Trailblazer Tuesday! 50 points per attendance.*\n> **${
+          value: `> *Attend Trailblazer Tuesday! 50 points per session attended.*\n> **${
             response.pointsChurchOfTheCrab
           }/250 points** ${response.pointsChurchOfTheCrab === 250 ? "✅" : ""}`,
         })
