@@ -120,7 +120,7 @@ client.on("ready", () => {
   scheduleFunc("0 0 5 * * 6", unfocusFunTimeFridayEvent, client); // every Saturday at 5AM
 
   // Pathfinders
-  scheduleFunc("0 15 9 * * 2", updatePathfinderRoles, client); // every Tuesday at 9:15AM
+  scheduleFunc("0 35 9 * * 2", updatePathfinderRoles, client); // every Tuesday at 9:35AM
   scheduleFunc("0 0 10 * * 4", createPathfinderHikesEvent, client); // every Thursday at 10AM
 
   // Trailblazers
