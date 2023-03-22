@@ -12,16 +12,12 @@ module.exports = {
     .setName("Get User's CSR")
     .setType(ApplicationCommandType.User),
   async execute(interaction) {
-    console.log(
-      "Running \"Get User's CSR\" as a UserCommand. Attempting to lookup gamertag."
-    );
 
     try {
       const gamertag_response = await getGamertagFromDiscordInteraction(
         interaction
       );
-      // console.log(`The value of gamertag_response is:`)
-      // console.log(gamertag_response)
+
       if (gamertag_response.message?.error == "Not found.") {
         await interaction.reply({
           content:
@@ -33,9 +29,7 @@ module.exports = {
       }
 
       const gamertag = gamertag_response.data.xboxLiveGamertag;
-      console.log(`The value of gamertag is: ${gamertag}`);
-
-      console.log("csr-user.js - About to set const: csr_response ");
+    
       const csr_response = await getCSR(gamertag);
 
       if (csr_response.error) {
@@ -49,7 +43,7 @@ module.exports = {
       let response_embeds = [];
 
       if ("error" in csr_response) {
-        // console.log(`csr-user.js - Attempting to check for an error in the csr_response`)
+    
         if (csr_response.error.details?.detail) {
           await interaction.reply({
             content: csr_response.error.details.detail,
@@ -62,12 +56,9 @@ module.exports = {
           });
         }
       } else {
-        // console.log(`csr-user.js - No error in csr_response. Attempting to set response_embeds to result of buildRankEmbeds`)
+        
         response_embeds = buildRankEmbeds(csr_response);
       }
-
-      //   console.log(`csr-user.js - About to log value of response_embeds:`)
-      //   console.log(response_embeds)
 
       await interaction.reply({
         embeds: response_embeds,

@@ -1,10 +1,9 @@
 const { EmbedBuilder } = require("discord.js");
 
+// Receive the response from the request in getCSR.js
+// Return an array of Discord embed objects that are formatted to display an Xbox Live Gamertag along with the Halo Infinite CSR ranks for each playlist
 function buildRankEmbeds(csr_data) {
-  const rankEmbeds = [];
-  console.log("Now running function \"buildRankEmbeds\"");
-  // console.log(`About to log value of csr_data that was passed into the function:`)
-  // console.log(csr_data)
+  const rank_embeds = [];
 
   for (let playlist of csr_data.playlists) {
     const current_csr = playlist.current.csr;
@@ -22,21 +21,21 @@ function buildRankEmbeds(csr_data) {
         })
         .setTimestamp()
         .setFooter({ text: "Current CSR" });
-      rankEmbeds.push(rankEmbed);
+      rank_embeds.push(rankEmbed);
     }
   }
-  if (rankEmbeds.length === 0) {
+  if (rank_embeds.length === 0) {
     let description = `\`${csr_data.gamertag}\` is currently unranked.`;
     if (csr_data.gamertag === "HFT Intern") {
       description +=
         "\n\nThis is because quantifying my greatness is impossible. You mortals wouldn't understand.";
     }
-    rankEmbeds.push(
+    rank_embeds.push(
       new EmbedBuilder().setTitle("Unranked").setDescription(description)
     );
   }
 
-  return rankEmbeds;
+  return rank_embeds;
 }
 
 module.exports = buildRankEmbeds;

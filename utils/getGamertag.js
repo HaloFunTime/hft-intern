@@ -5,12 +5,15 @@ if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 
+// Receive an interaction from Discord.
 async function getGamertagFromDiscordInteraction(interaction) {
 
   const HALOFUNTIME_API_KEY = process.env.HALOFUNTIME_API_KEY;
   const HALOFUNTIME_API_URL = process.env.HALOFUNTIME_API_URL;
 
-  // Create a Discord ID & Tag for the user selected in the UserCommand
+  // Create a Discord ID & Tag for the user selected in the UserCommand. There is an ID but not a tag within the interaction. We need to make it.
+  // Example id = 315984901826412545
+  // Example tag = Jaxasaurous#4767
   const target_discord_id = interaction.targetUser.id;
   const target_discord_tag = interaction.targetUser.username + "#" + interaction.targetUser.discriminator;
 
