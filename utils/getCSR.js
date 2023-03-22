@@ -15,9 +15,8 @@ async function getCSR(xboxLiveGamertag) {
         },
       }
     );
-    
-    return response.data;
 
+    return response.data;
   } catch (error) {
     if (error.response && error.response.data) {
       return error.response.data;

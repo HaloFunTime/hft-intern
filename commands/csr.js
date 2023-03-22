@@ -15,7 +15,6 @@ module.exports = {
     ),
   async execute(interaction) {
     try {
-
       const gamertag = interaction.options.getString("gamertag");
 
       const csr_response = await getCSR(gamertag);
@@ -23,7 +22,6 @@ module.exports = {
       let response_embeds = [];
 
       if ("error" in csr_response) {
-
         if (csr_response.error.details?.detail) {
           await interaction.reply({
             content: csr_response.error.details.detail,

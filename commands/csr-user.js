@@ -12,7 +12,6 @@ module.exports = {
     .setName("Get User's CSR")
     .setType(ApplicationCommandType.User),
   async execute(interaction) {
-
     try {
       const gamertag_response = await getGamertagFromDiscordInteraction(
         interaction
@@ -29,12 +28,13 @@ module.exports = {
       }
 
       const gamertag = gamertag_response.data.xboxLiveGamertag;
-    
+
       const csr_response = await getCSR(gamertag);
 
       if (csr_response.error) {
         await interaction.reply({
-          content: "There was an error retrieving the rank for the gamertag associated to this user",
+          content:
+            "There was an error retrieving the rank for the gamertag associated to this user",
           ephemeral: true,
         });
         return;
@@ -43,7 +43,6 @@ module.exports = {
       let response_embeds = [];
 
       if ("error" in csr_response) {
-    
         if (csr_response.error.details?.detail) {
           await interaction.reply({
             content: csr_response.error.details.detail,
@@ -56,7 +55,6 @@ module.exports = {
           });
         }
       } else {
-        
         response_embeds = buildRankEmbeds(csr_response);
       }
 

@@ -7,7 +7,6 @@ if (process.env.NODE_ENV !== "production") {
 
 // Receive an interaction from Discord.
 async function getGamertagFromDiscordInteraction(interaction) {
-
   const HALOFUNTIME_API_KEY = process.env.HALOFUNTIME_API_KEY;
   const HALOFUNTIME_API_URL = process.env.HALOFUNTIME_API_URL;
 
@@ -15,7 +14,10 @@ async function getGamertagFromDiscordInteraction(interaction) {
   // Example id = 315984901826412545
   // Example tag = Jaxasaurous#4767
   const target_discord_id = interaction.targetUser.id;
-  const target_discord_tag = interaction.targetUser.username + "#" + interaction.targetUser.discriminator;
+  const target_discord_tag =
+    interaction.targetUser.username +
+    "#" +
+    interaction.targetUser.discriminator;
 
   const request_url = `${HALOFUNTIME_API_URL}/link/discord-to-xbox-live?discordId=${target_discord_id}&discordTag=${encodeURIComponent(
     target_discord_tag
