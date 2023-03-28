@@ -30,10 +30,13 @@ if (GUILD_ID) {
         `Successfully deleted all guild commands for server ${GUILD_ID}.`
       );
       const guildCommands = commands.map((command) => {
-        return {
-          ...command,
-          description: `${command.description} (LOCAL TO THIS SERVER)`,
-        };
+        if (command.description) {
+          return {
+            ...command,
+            description: `${command.description} (LOCAL TO THIS SERVER)`,
+          };
+        }
+        return command;
       });
       rest
         .put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
