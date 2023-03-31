@@ -4,6 +4,7 @@ const {
   HALOFUNTIME_ID_ROLE_TRAILBLAZER,
   HALOFUNTIME_ID_CHANNEL_VOD_REVIEW,
   HALOFUNTIME_ID_CHANNEL_CLUBS,
+  HALOFUNTIME_ID_CHANNEL_TRAILBLAZERS_ANNOUNCEMENTS_BOT_COMMANDS,
 } = require("../constants.js");
 
 module.exports = {
@@ -19,6 +20,19 @@ module.exports = {
       });
       return;
     }
+
+    // Command can only be used in the channel/thread "Trailblazer Bot Commands"
+    if (
+      interaction.channelId !=
+      HALOFUNTIME_ID_CHANNEL_TRAILBLAZERS_ANNOUNCEMENTS_BOT_COMMANDS
+    ) {
+      await interaction.reply({
+        content: `You may only use this command in the <#${HALOFUNTIME_ID_CHANNEL_TRAILBLAZERS_ANNOUNCEMENTS_BOT_COMMANDS}> channel.`,
+        ephemeral: true,
+      });
+      return;
+    }
+
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
     const response = await axios
       .post(
