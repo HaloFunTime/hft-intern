@@ -19,7 +19,7 @@ module.exports = {
       });
       return;
     }
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply();
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
     const response = await axios
       .post(
