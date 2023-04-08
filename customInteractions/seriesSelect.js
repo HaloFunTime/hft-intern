@@ -24,7 +24,7 @@ module.exports = {
           .setStyle(ButtonStyle.Primary);
       })
     );
-    await interaction.editReply({
+    await interaction.update({
       content: "",
       components: [row],
     });
