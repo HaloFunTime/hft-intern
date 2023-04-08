@@ -13,6 +13,7 @@ module.exports = {
       "Generate a randomized series of maps and modes for a chosen ruleset"
     ),
   async execute(interaction) {
+    await interaction.deferReply();
     const seriesRulesets = await axios
       .get(`${HALOFUNTIME_API_URL}/series/`, {
         headers: {
@@ -38,7 +39,7 @@ module.exports = {
           })
         )
     );
-    await interaction.reply({
+    await interaction.editReply({
       content: "",
       components: [row],
     });

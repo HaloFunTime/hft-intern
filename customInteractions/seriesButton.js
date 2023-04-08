@@ -11,6 +11,7 @@ module.exports = {
     const seriesLength = parseInt(
       seriesIdAndEndpoint.charAt(seriesIdAndEndpoint.length - 1)
     );
+    await interaction.deferUpdate();
     const series = await axios
       .get(`${HALOFUNTIME_API_URL}/series/${seriesIdAndEndpoint}`, {
         headers: {
