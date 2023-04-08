@@ -5,7 +5,6 @@ module.exports = {
   async process(interaction) {
     if (!interaction.isStringSelectMenu()) return;
     if (!interaction.customId.startsWith("seriesSelect")) return;
-    await interaction.deferUpdate();
     const selectedRulesetId = interaction.values[0];
     // NOTE: Each seriesUrl is a max of 36 characters
     const bestOfs = [
