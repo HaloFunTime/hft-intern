@@ -3,7 +3,7 @@ const { ButtonBuilder, ActionRowBuilder, ButtonStyle } = require("discord.js");
 module.exports = {
   name: "seriesSelect",
   async process(interaction) {
-    if (!interaction.isSelectMenu()) return;
+    if (!interaction.isStringSelectMenu()) return;
     if (!interaction.customId.startsWith("seriesSelect")) return;
     await interaction.deferUpdate();
     const selectedRulesetId = interaction.values[0];
@@ -24,7 +24,7 @@ module.exports = {
           .setStyle(ButtonStyle.Primary);
       })
     );
-    await interaction.update({
+    await interaction.editReply({
       content: "",
       components: [row],
     });
