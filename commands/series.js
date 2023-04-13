@@ -1,7 +1,7 @@
 const {
-  SlashCommandBuilder,
   ActionRowBuilder,
-  SelectMenuBuilder,
+  SlashCommandBuilder,
+  StringSelectMenuBuilder,
 } = require("discord.js");
 const axios = require("axios");
 const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
@@ -24,7 +24,7 @@ module.exports = {
         console.error(error);
       });
     const row = new ActionRowBuilder().addComponents(
-      new SelectMenuBuilder()
+      new StringSelectMenuBuilder()
         .setCustomId(`seriesSelect:${interaction.user.id}`)
         .setPlaceholder("Choose a ruleset")
         .setMinValues(1)

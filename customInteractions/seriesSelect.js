@@ -3,7 +3,7 @@ const { ButtonBuilder, ActionRowBuilder, ButtonStyle } = require("discord.js");
 module.exports = {
   name: "seriesSelect",
   async process(interaction) {
-    if (!interaction.isSelectMenu()) return;
+    if (!interaction.isStringSelectMenu()) return;
     if (!interaction.customId.startsWith("seriesSelect")) return;
     const selectedRulesetId = interaction.values[0];
     // NOTE: Each seriesUrl is a max of 36 characters

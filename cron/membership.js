@@ -95,7 +95,7 @@ const postHelpfulHintToNewHereChannel = async (client) => {
     .catch(async (error) => {
       console.error(error);
       // Return the error payload directly if present
-      if (error.response.data) {
+      if (error?.response?.data) {
         return error.response.data;
       }
     });
@@ -171,11 +171,11 @@ const updateNewHereRoles = async (client) => {
       })
       .then((response) => response.data)
       .catch(async (error) => {
+        console.error(error);
         // Return the error payload directly if present
-        if (error.response.data) {
+        if (error?.response?.data) {
           return error.response.data;
         }
-        console.error(error);
       });
     // Return a default quip if an error is present
     let quip = "";
@@ -210,11 +210,11 @@ const updateNewHereRoles = async (client) => {
       })
       .then((response) => response.data)
       .catch(async (error) => {
+        console.error(error);
         // Return the error payload directly if present
-        if (error.response.data) {
+        if (error?.response?.data) {
           return error.response.data;
         }
-        console.error(error);
       });
     // Return a default quip if an error is present
     let quip = "";
@@ -257,11 +257,11 @@ const updatePartyTimerRoles = async (client) => {
     )
     .then((response) => response.data)
     .catch(async (error) => {
+      console.error(error);
       // Return the error payload directly if present
-      if (error.response.data) {
+      if (error?.response?.data) {
         return error.response.data;
       }
-      console.error(error);
     });
   // Members with `PARTYTIMER_TOTAL_REP_MINIMUM` total rep and at least `PARTYTIMER_UNIQUE_REP_MINIMUM` unique givers qualify.
   // The top `PARTYTIMER_CAP` of that cohort by total rep (who are not Staff) receive the role.
@@ -346,11 +346,11 @@ const updateRankedRoles = async (client) => {
     )
     .then((response) => response.data)
     .catch(async (error) => {
+      console.error(error);
       // Return the error payload directly if present
-      if (error.response.data) {
+      if (error?.response?.data) {
         return error.response.data;
       }
-      console.error(error);
     });
   if ("error" in response) {
     console.error("Ran into an error checking ranked roles.");

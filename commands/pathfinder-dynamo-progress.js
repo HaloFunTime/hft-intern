@@ -19,6 +19,7 @@ module.exports = {
       });
       return;
     }
+    await interaction.deferReply();
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
     const response = await axios
       .post(
@@ -42,7 +43,7 @@ module.exports = {
         }
       });
     if ("error" in response) {
-      await interaction.reply({
+      await interaction.editReply({
         content:
           "Could not check your progress toward the Pathfinder Dynamo role at this time.",
         ephemeral: true,
@@ -122,7 +123,7 @@ module.exports = {
           text: "Pathfinder Dynamo Progress",
         })
         .setTimestamp();
-      await interaction.reply({
+      await interaction.editReply({
         embeds: [progressEmbed],
       });
     }
