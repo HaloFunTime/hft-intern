@@ -73,38 +73,31 @@ module.exports = {
           }/100 points** ${response.pointsShowAndTell === 100 ? "✅" : ""}`,
         });
       if (response.linkedGamertag) {
-        progressEmbed.addFields({
-          name: "🤔 In-Game Challenges",
-          value:
-            "> Four additional Pathfinder Dynamo challenges tied to in-game stats are still in the works. They will launch when they're ready!",
-        });
-        // progressEmbed
-        //   .addFields({
-        //     name: "🔖 Bookmarked",
-        //     value: `> *Publish a map that receives 100 or more bookmarks. Earnable once.*\n> **${
-        //       response.pointsBookmarked
-        //     }/100 points** ${response.pointsBookmarked === 100 ? "✅" : ""}`,
-        //   })
-        //   .addFields({
-        //     name: "🎮 Playtime",
-        //     value: `> *Publish a map that receives 500 or more plays. Earnable once.*\n> **${
-        //       response.pointsPlaytime
-        //     }/100 points** ${response.pointsPlaytime === 100 ? "✅" : ""}`,
-        //   })
-        //   .addFields({
-        //     name: "🏷 Tagtacular",
-        //     value: `> *Tag one of your published files with \`HaloFunTime\`. 25 points per tag.*\n> **${
-        //       response.pointsTagtacular
-        //     }/100 points** ${
-        //       response.pointsTagtacular === 100 ? "✅" : ""
-        //     }`,
-        //   })
-        //   .addFields({
-        //     name: "🔥 Forged in Fire",
-        //     value: `> *Spend time playing Custom Games on Forge maps. 1 point per full hour played.*\n> **${
-        //       response.pointsForgedInFire
-        //     }/200 points** ${response.pointsForgedInFire === 200 ? "✅" : ""}`,
-        //   });
+        progressEmbed
+          .addFields({
+            name: "🔖 Bookmarked",
+            value: `> *Publish a map that receives 100 or more bookmarks. Earnable once.*\n> **${
+              response.pointsBookmarked
+            }/100 points** ${response.pointsBookmarked === 100 ? "✅" : ""}`,
+          })
+          .addFields({
+            name: "🎮 Playtime",
+            value: `> *Publish a map that receives 500 or more plays. Earnable once.*\n> **${
+              response.pointsPlaytime
+            }/100 points** ${response.pointsPlaytime === 100 ? "✅" : ""}`,
+          })
+          .addFields({
+            name: "🏷 Tagtacular",
+            value: `> *Tag one of your published files with \`HaloFunTime\`. 25 points per tag.*\n> **${
+              response.pointsTagtacular
+            }/100 points** ${response.pointsTagtacular === 100 ? "✅" : ""}`,
+          })
+          .addFields({
+            name: "🔥 Forged in Fire",
+            value: `> *Spend time playing Custom Games on Forge maps. 1 point per full hour played.*\n> **${
+              response.pointsForgedInFire
+            }/200 points** ${response.pointsForgedInFire === 200 ? "✅" : ""}`,
+          });
       } else {
         progressEmbed.addFields({
           name: "🔗 Link your gamertag!",
