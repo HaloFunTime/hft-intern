@@ -110,9 +110,9 @@ module.exports = {
       progressEmbed
         .addFields({
           name: "Your Total Trailblazer Scout Points",
-          value: `> *Remember: promotions run every Tuesday morning!*\n> **${
-            response.totalPoints
-          }/500 points** ${response.totalPoints >= 500 ? "✅" : ""}`,
+          value: `> **${response.totalPoints}/500 points** ${
+            response.totalPoints >= 500 ? "✅" : ""
+          }\n> *Remember: promotions run every Tuesday morning!*\n`,
         })
         .setFooter({
           text: "Trailblazer Scout Progress",

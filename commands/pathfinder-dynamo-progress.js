@@ -88,7 +88,7 @@ module.exports = {
           })
           .addFields({
             name: "🏷 Tagtacular",
-            value: `> *Tag one of your published files with \`HaloFunTime\`. 25 points per tag.*\n> **${
+            value: `> *Tag one of your published maps with 'HaloFunTime'. 25 points per tag.*\n> **${
               response.pointsTagtacular
             }/100 points** ${response.pointsTagtacular === 100 ? "✅" : ""}`,
           })
@@ -108,9 +108,9 @@ module.exports = {
       progressEmbed
         .addFields({
           name: "Your Total Pathfinder Dynamo Points",
-          value: `> *Remember: promotions run every Tuesday morning!*\n> **${
-            response.totalPoints
-          }/500 points** ${response.totalPoints >= 500 ? "✅" : ""}`,
+          value: `> **${response.totalPoints}/500 points** ${
+            response.totalPoints >= 500 ? "✅" : ""
+          }\n> *Remember: promotions run every Tuesday morning!*\n`,
         })
         .setFooter({
           text: "Pathfinder Dynamo Progress",
