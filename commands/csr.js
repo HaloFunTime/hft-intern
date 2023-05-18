@@ -4,17 +4,80 @@ const axios = require("axios");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("csr")
-    .setDescription("Check the CSR for a gamertag")
-    .addStringOption((option) =>
-      option
+    .setDescription("Check a player's CSR")
+    .addSubcommand((subcommand) =>
+      subcommand
         .setName("gamertag")
-        .setDescription("A valid Xbox Live gamertag")
-        .setMaxLength(15)
-        .setRequired(true)
+        .setDescription("Get CSR for an Xbox Live gamertag")
+        .addStringOption((option) =>
+          option
+            .setName("gamertag")
+            .setDescription("A valid Xbox Live gamertag")
+            .setMaxLength(15)
+            .setRequired(true)
+        )
+        .addBooleanOption((option) =>
+          option
+            .setName("quiet")
+            .setDescription("Should I post the result quietly?")
+            .setRequired(false)
+        )
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName("member")
+        .setDescription("Get CSR for a Discord member")
+        .addUserOption((option) =>
+          option
+            .setName("member")
+            .setDescription("A member of HaloFunTime")
+            .setRequired(true)
+        )
+        .addBooleanOption((option) =>
+          option
+            .setName("quiet")
+            .setDescription("Should I post the result quietly?")
+            .setRequired(false)
+        )
     ),
   async execute(interaction) {
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
-    const gamertag = interaction.options.getString("gamertag");
+    const quiet = interaction.options.getBoolean("quiet") ?? false;
+    let gamertag = interaction.options.getString("gamertag");
+    if (!gamertag) {
+      const member = interaction.options.getUser("member");
+      const response = await axios
+        .get(
+          `${HALOFUNTIME_API_URL}/link/discord-to-xbox-live?discordId=${
+            member.id
+          }&discordTag=${encodeURIComponent(member.tag)}`,
+          {
+            headers: {
+              Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+            },
+          }
+        )
+        .then((response) => response.data)
+        .catch(async (error) => {
+          // Return the error payload directly if present
+          if (error.response.data) {
+            return error.response.data;
+          }
+          console.error(error);
+        });
+      if ("error" in response) {
+        // Send a reply that potentially pings the member if they haven't linked a gamertag
+        await interaction.reply({
+          content:
+            `<@${member.id}> hasn't linked a gamertag on HaloFunTime. ` +
+            "They can use `/link-gamertag` at any time to do so.",
+          allowedMentions: { users: [member.id] },
+          ephemeral: quiet,
+        });
+      } else {
+        gamertag = response.xboxLiveGamertag;
+      }
+    }
     const response = await axios
       .get(
         `${HALOFUNTIME_API_URL}/halo-infinite/csr?gamertag=${encodeURIComponent(
@@ -77,7 +140,7 @@ module.exports = {
         let description = `\`${response.gamertag}\` is currently unranked.`;
         if (response.gamertag === "HFT Intern") {
           description +=
-            "\n\nThis is because quantifying my greatness is impossible. You mortals wouldn't understand.";
+            "\n\nThis is because quantifying my greatness is impossible.\nYou mortals wouldn't understand.";
         }
         rankEmbeds.push(
           new EmbedBuilder().setTitle("Unranked").setDescription(description)
@@ -85,6 +148,7 @@ module.exports = {
       }
       await interaction.reply({
         embeds: rankEmbeds,
+        ephemeral: quiet,
       });
     }
   },
