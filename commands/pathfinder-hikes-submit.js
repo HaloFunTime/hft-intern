@@ -5,7 +5,7 @@ const {
   HALOFUNTIME_ID_CHANNEL_CLUBS,
   HALOFUNTIME_ID_CHANNEL_WAYWO,
 } = require("../constants.js");
-const { CATEGORY_CHOICES } = require("../utils/pathfinders.js");
+const { MAX_PLAYER_COUNT_CHOICES } = require("../utils/pathfinders.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -15,30 +15,30 @@ module.exports = {
     )
     .addStringOption((option) =>
       option
-        .setName("category")
-        .setDescription("The appropriate category")
+        .setName("players")
+        .setDescription("The maximum number of players to test with")
         .setMaxLength(32)
         .setRequired(true)
-        .addChoices(...CATEGORY_CHOICES)
+        .addChoices(...MAX_PLAYER_COUNT_CHOICES)
     )
     .addStringOption((option) =>
       option
         .setName("map")
-        .setDescription("The name of the map you want to submit")
+        .setDescription("The name of the map")
         .setMaxLength(32)
         .setRequired(true)
     )
     .addStringOption((option) =>
       option
         .setName("mode1")
-        .setDescription("The name of the first mode to test the map with")
+        .setDescription("The name of the first mode to test")
         .setMaxLength(32)
         .setRequired(true)
     )
     .addStringOption((option) =>
       option
         .setName("mode2")
-        .setDescription("The name of the second mode to test the map with")
+        .setDescription("The name of the second mode to test")
         .setMaxLength(32)
         .setRequired(true)
     ),
@@ -66,7 +66,7 @@ module.exports = {
       });
       return;
     }
-    const category = interaction.options.getString("category");
+    const players = interaction.options.getString("players");
     const map = interaction.options.getString("map");
     const mode1 = interaction.options.getString("mode1");
     const mode2 = interaction.options.getString("mode2");
@@ -79,7 +79,7 @@ module.exports = {
           waywoPostId: interaction.channelId,
           mapSubmitterDiscordId: interaction.user.id,
           mapSubmitterDiscordTag: interaction.user.tag,
-          category: category,
+          maxPlayerCount: players,
           map: map,
           mode1: mode1,
           mode2: mode2,

@@ -7,20 +7,16 @@ dayjs.extend(isBetween);
 dayjs.extend(timezone);
 dayjs.extend(utc);
 
-const CATEGORY_CHOICE_DOUBLES = "Doubles";
-const CATEGORY_CHOICE_ARENA = "Arena";
-const CATEGORY_CHOICE_BTB = "BTB";
-const CATEGORY_CHOICE_INFECTION = "Infection";
-const CATEGORY_CHOICE_RACE = "Race";
-const CATEGORY_CHOICE_MINIGAME = "Minigame";
+const MAX_PLAYER_COUNT_CHOICE_SMALL = "4 players";
+const MAX_PLAYER_COUNT_CHOICE_MEDIUM = "8 players";
+const MAX_PLAYER_COUNT_CHOICE_LARGE = "16 players";
+const MAX_PLAYER_COUNT_CHOICE_EXTRA_LARGE = "24 players";
 
-const CATEGORY_CHOICES = [
-  { name: "Doubles (2v2)", value: CATEGORY_CHOICE_DOUBLES },
-  { name: "Arena (4v4)", value: CATEGORY_CHOICE_ARENA },
-  { name: "BTB (12v12)", value: CATEGORY_CHOICE_BTB },
-  { name: "Infection", value: CATEGORY_CHOICE_INFECTION },
-  { name: "Minigame", value: CATEGORY_CHOICE_MINIGAME },
-  { name: "Race", value: CATEGORY_CHOICE_RACE },
+const MAX_PLAYER_COUNT_CHOICES = [
+  { name: "SM (4 players)", value: MAX_PLAYER_COUNT_CHOICE_SMALL },
+  { name: "MD (8 players)", value: MAX_PLAYER_COUNT_CHOICE_MEDIUM },
+  { name: "LG (16 players)", value: MAX_PLAYER_COUNT_CHOICE_LARGE },
+  { name: "XL (24 players)", value: MAX_PLAYER_COUNT_CHOICE_EXTRA_LARGE },
 ];
 
 const getDateTimeForPathfinderEventStart = (dayjsDate) => {
@@ -32,5 +28,5 @@ const getDateTimeForPathfinderEventStart = (dayjsDate) => {
 
 module.exports = {
   getDateTimeForPathfinderEventStart: getDateTimeForPathfinderEventStart,
-  CATEGORY_CHOICES: CATEGORY_CHOICES,
+  MAX_PLAYER_COUNT_CHOICES: MAX_PLAYER_COUNT_CHOICES,
 };
