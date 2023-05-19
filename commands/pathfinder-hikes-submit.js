@@ -1,23 +1,25 @@
 const { SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
-const dayjs = require("dayjs");
-const utc = require("dayjs/plugin/utc");
-const timezone = require("dayjs/plugin/timezone");
 const {
   HALOFUNTIME_ID_ROLE_PATHFINDER,
   HALOFUNTIME_ID_CHANNEL_CLUBS,
   HALOFUNTIME_ID_CHANNEL_WAYWO,
 } = require("../constants.js");
-const { getDateTimeForPathfinderEventStart } = require("../utils/pathfinders");
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
+const { CATEGORY_CHOICES } = require("../utils/pathfinders.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("pathfinder-hikes-submit")
     .setDescription(
       "Submit a map to the Pathfinder Hikes weekly playtest session"
+    )
+    .addStringOption((option) =>
+      option
+        .setName("category")
+        .setDescription("The appropriate category")
+        .setMaxLength(32)
+        .setRequired(true)
+        .addChoices(...CATEGORY_CHOICES)
     )
     .addStringOption((option) =>
       option
@@ -64,17 +66,7 @@ module.exports = {
       });
       return;
     }
-    const now = dayjs();
-    const thisWeekWednesday = now.day(3);
-    const nextWeekWednesday = thisWeekWednesday.add(1, "week");
-    const thisWeekEventStart =
-      getDateTimeForPathfinderEventStart(thisWeekWednesday);
-    // If this command is issued AFTER the start time of this week's event, schedule the submission for next week
-    const scheduledPlaytestDate =
-      now > thisWeekEventStart ? nextWeekWednesday : thisWeekWednesday;
-    const scheduledPlaytestDateTime = getDateTimeForPathfinderEventStart(
-      scheduledPlaytestDate
-    );
+    const category = interaction.options.getString("category");
     const map = interaction.options.getString("map");
     const mode1 = interaction.options.getString("mode1");
     const mode2 = interaction.options.getString("mode2");
@@ -87,7 +79,7 @@ module.exports = {
           waywoPostId: interaction.channelId,
           mapSubmitterDiscordId: interaction.user.id,
           mapSubmitterDiscordTag: interaction.user.tag,
-          scheduledPlaytestDate: scheduledPlaytestDate.format("YYYY-MM-DD"),
+          category: category,
           map: map,
           mode1: mode1,
           mode2: mode2,
@@ -108,9 +100,7 @@ module.exports = {
       });
     if (response.success) {
       await interaction.reply({
-        content: `<@${
-          interaction.user.id
-        }> successfully submitted **${map}** for **Pathfinder Hikes** playtesting on <t:${scheduledPlaytestDateTime.unix()}:D> at <t:${scheduledPlaytestDateTime.unix()}:t>!`,
+        content: `<@${interaction.user.id}> successfully submitted **${map}** for **Pathfinder Hikes** playtesting! Use the \`/pathfinder-hikes-queue\` command to view the queue of maps submitted for playtesting.`,
       });
     } else if ("error" in response) {
       // Try to figure out a "friendly" rejection message
@@ -120,13 +110,15 @@ module.exports = {
           response?.error?.details?.detail ===
           "A Pathfinder Hike submission already exists for this post."
         ) {
-          friendlyMessage = `\n\nThe map referenced by this post has already been submitted for playtesting on <t:${scheduledPlaytestDateTime.unix()}:D> at <t:${scheduledPlaytestDateTime.unix()}:t>.`;
+          friendlyMessage =
+            "\n\nThe map referenced by this post has already been submitted for playtesting. It may be submitted again after the currently scheduled playtest has been completed.";
         }
         if (
           response?.error?.details?.detail ===
           "A Pathfinder Hike submission has already been created by this Discord user."
         ) {
-          friendlyMessage = `\n\nYou have already submitted another map for playtesting on <t:${scheduledPlaytestDateTime.unix()}:D> at <t:${scheduledPlaytestDateTime.unix()}:t>. Users may submit a maximum of one map per week.`;
+          friendlyMessage =
+            "\n\nYou have already submitted another map for playtesting. Until that map is playtested, you cannot submit more playtest requests.";
         }
       }
       await interaction.reply({
