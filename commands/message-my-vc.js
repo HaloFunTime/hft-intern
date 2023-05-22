@@ -30,7 +30,6 @@ module.exports = {
       const memberIds = [];
       const memberMentions = [];
       voiceChannel.members.forEach((member) => {
-        console.log(member);
         memberIds.push(member.user.id);
         if (member.user.id !== interaction.member.user.id) {
           memberMentions.push(`<@${member.user.id}>`);
