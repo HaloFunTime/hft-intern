@@ -23,6 +23,7 @@ const {
 } = require("./cron/pathfinders");
 const {
   createTrailblazerTuesdayEvent,
+  trailblazerDailyPassionReport,
   updateTrailblazerRoles,
 } = require("./cron/trailblazers");
 
@@ -126,4 +127,5 @@ client.on("ready", () => {
   // Trailblazers
   scheduleFunc("0 5 9 * * 2", updateTrailblazerRoles, client); // every Tuesday at 9:05AM
   scheduleFunc("0 0 10 * * 3", createTrailblazerTuesdayEvent, client); // every Wednesday at 10AM
+  scheduleFunc("0 0 9 * * *", trailblazerDailyPassionReport, client); // every day at 9AM
 });

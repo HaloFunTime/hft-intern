@@ -4,9 +4,12 @@ const https = require("node:https");
 const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
+const { EmbedBuilder } = require("discord.js");
 const {
+  HALO_INFINITE_RANKED_ARENA_PLAYLIST_ID,
   HALOFUNTIME_ID_CHANNEL_TRAILBLAZER_ANNOUNCEMENTS,
   HALOFUNTIME_ID_CHANNEL_TRAILBLAZERS_VC_1,
+  HALOFUNTIME_ID_CHANNEL_TRAILBLAZERS,
   HALOFUNTIME_ID_ROLE_TRAILBLAZER,
   HALOFUNTIME_ID_ROLE_S3_TRAILBLAZER_SCOUT,
   HALOFUNTIME_ID_ROLE_S3_TRAILBLAZER_SHERPA,
@@ -57,6 +60,153 @@ const createTrailblazerTuesdayEvent = async (client) => {
   } catch (e) {
     console.error(e);
   }
+};
+
+const trailblazerDailyPassionReport = async (client) => {
+  console.log("Running daily passion report...");
+  const now = dayjs();
+  const guild = client.guilds.cache.get(HALOFUNTIME_ID);
+  const allMembersMap = await guild.members.fetch({
+    cache: true,
+    withUserCount: true,
+  });
+  const allMembers = Array.from(allMembersMap.values()).filter(
+    (m) => !m.user.bot
+  );
+  const allMembersWithTrailblazerRole = Array.from(
+    allMembersMap.values()
+  ).filter(
+    (m) => !m.user.bot && m.roles.cache.has(HALOFUNTIME_ID_ROLE_TRAILBLAZER)
+  );
+  const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+  const response = await axios
+    .post(
+      `${HALOFUNTIME_API_URL}/discord/csr-snapshot`,
+      {
+        discordUserIds: allMembersWithTrailblazerRole.map((m) => m.user.id),
+        playlistId: HALO_INFINITE_RANKED_ARENA_PLAYLIST_ID,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+        },
+      }
+    )
+    .then((response) => response.data)
+    .catch(async (error) => {
+      console.error(error);
+      // Return the error payload directly if present
+      if (error.response?.data) {
+        return error.response?.data;
+      }
+    });
+  if ("error" in response) {
+    return;
+  } else {
+    const players = [...response.players];
+    players.sort((a, b) => (a.currentCSR < b.currentCSR ? 1 : -1));
+    const passionFields = [];
+    const tiersList = [
+      "Onyx",
+      "Diamond",
+      "Platinum",
+      "Gold",
+      "Silver",
+      "Bronze",
+    ];
+    const tiers = {
+      Onyx: [Infinity, 1500],
+      Diamond: [1499, 1200],
+      Platinum: [1199, 900],
+      Gold: [899, 600],
+      Silver: [599, 300],
+      Bronze: [299, 0],
+    };
+    const emojiStrings = {
+      Onyx: "<:rank_onyx:967450514923065384>",
+      Diamond: "<:rank_diamond:967450514570739722>",
+      Platinum: "<:rank_platinum:974064566004760627>",
+      Gold: "<:rank_gold:967450514092609557>",
+      Silver: "<:rank_silver:967450514419752960>",
+      Bronze: "<:rank_bronze:967450514482675822>",
+    };
+    const representedTiers = new Set(); // Onyx, Diamond 6, etc.
+    const representedCSRsByTier = {}; // key: Onyx, Diamond 6, etc.; value: Set of CSRs
+    const playersByCSR = {}; // key: CSR integer; value: player object
+    for (const player of players) {
+      let playerTier;
+      for (let i = 0; i < 6; i++) {
+        const tierMax = tiers[tiersList[i]][0];
+        const tierMin = tiers[tiersList[i]][1];
+        if (player.currentCSR <= tierMax && player.currentCSR >= tierMin) {
+          playerTier = tiersList[i];
+          break;
+        }
+      }
+      if (!playerTier) {
+        // Skip unranked players
+        continue;
+      }
+      let playerSubTier;
+      if (playerTier !== "Onyx") {
+        const tierMin = tiers[playerTier][1];
+        playerSubTier = Math.floor((player.currentCSR - tierMin) / 50) + 1;
+      }
+      let playerFullTier = playerTier;
+      if (playerSubTier) {
+        playerFullTier += ` ${playerSubTier}`;
+      }
+      representedTiers.add(playerFullTier);
+      if (playerFullTier in representedCSRsByTier) {
+        representedCSRsByTier[playerFullTier].add(player.currentCSR);
+      } else {
+        representedCSRsByTier[playerFullTier] = new Set([player.currentCSR]);
+      }
+      if (player.currentCSR in playersByCSR) {
+        playersByCSR[player.currentCSR].push(player);
+      } else {
+        playersByCSR[player.currentCSR] = [player];
+      }
+    }
+    for (const tierString of representedTiers) {
+      const csrStrings = [];
+      const csrSet = representedCSRsByTier[tierString];
+      for (const csr of csrSet) {
+        const csrPlayerIdStrings = playersByCSR[csr].map(
+          (csrPlayer) => `<@${csrPlayer.discordUserId}>`
+        );
+        csrStrings.push(`> \`${csr}\` ${csrPlayerIdStrings.join(" ")}`);
+      }
+      passionFields.push({
+        name: `${emojiStrings[tierString.split(" ")[0]]} ${tierString}`,
+        value: csrStrings.join("\n"),
+      });
+    }
+    const trailblazerPassionEmbed = new EmbedBuilder()
+      .setColor(0x3498db)
+      .setTitle(`__Daily Passion Report: <t:${now.unix()}:D>__`)
+      .addFields(passionFields)
+      .setFooter({
+        text: "Link your gamertag with `/link-gamertag` to be included.",
+        iconURL: "https://api.halofuntime.com/static/TrailblazerLogo.png",
+      });
+    const trailblazersChannel = client.channels.cache.get(
+      HALOFUNTIME_ID_CHANNEL_TRAILBLAZERS
+    );
+    const message = await trailblazersChannel.send({
+      allowedMentions: { parse: [] },
+      embeds: [trailblazerPassionEmbed],
+    });
+    const thread = await message.startThread({
+      name: now.format("MMMM D, YYYY"),
+      autoArchiveDuration: 60,
+      reason: "Passion.",
+    });
+    await thread.send({
+      content: "Discuss today's passion levels in this thread.",
+    });
+  }
+  console.log("Finished daily passion report.");
 };
 
 const updateTrailblazerRoles = async (client) => {
@@ -197,5 +347,6 @@ const updateTrailblazerRoles = async (client) => {
 
 module.exports = {
   createTrailblazerTuesdayEvent: createTrailblazerTuesdayEvent,
+  trailblazerDailyPassionReport: trailblazerDailyPassionReport,
   updateTrailblazerRoles: updateTrailblazerRoles,
 };
