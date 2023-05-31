@@ -140,7 +140,7 @@ const updateFirst100Roles = async (client) => {
 const updateNewHereRoles = async (client) => {
   const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
   const now = dayjs();
-  const oneMonthAgoUnix = now.subtract(1, "month").valueOf();
+  const twentyEightDaysAgoUnix = now.subtract(28, "day").valueOf();
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
   const allMembersMap = await guild.members.fetch({
     cache: true,
@@ -153,12 +153,12 @@ const updateNewHereRoles = async (client) => {
     (m) =>
       m.roles.cache.has(HALOFUNTIME_ID_ROLE_MEMBER) &&
       !m.roles.cache.has(HALOFUNTIME_ID_ROLE_NEW_HERE) &&
-      parseInt(m.joinedTimestamp) >= parseInt(oneMonthAgoUnix)
+      parseInt(m.joinedTimestamp) >= parseInt(twentyEightDaysAgoUnix)
   );
   const membersToRemoveNewHere = allMembers.filter(
     (m) =>
       m.roles.cache.has(HALOFUNTIME_ID_ROLE_NEW_HERE) &&
-      parseInt(m.joinedTimestamp) < parseInt(oneMonthAgoUnix)
+      parseInt(m.joinedTimestamp) < parseInt(twentyEightDaysAgoUnix)
   );
   const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_NEW_HERE);
   for (m of membersToAddNewHere) {
