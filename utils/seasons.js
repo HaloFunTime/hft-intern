@@ -11,14 +11,22 @@ const SEASON_01 = "season01";
 const SEASON_02 = "season02";
 const SEASON_WU = "seasonWU";
 const SEASON_03 = "season03";
+const SEASON_04 = "season04";
 
 const getCurrentSeason = () => {
   const now = dayjs();
 
   if (
     now.isBetween(
+      dayjs.tz("2023-06-20 11:00:00", "America/Denver"),
+      dayjs.tz("2023-09-26 11:00:00", "America/Denver")
+    )
+  ) {
+    return SEASON_04;
+  } else if (
+    now.isBetween(
       dayjs.tz("2023-03-07 11:00:00", "America/Denver"),
-      dayjs.tz("2023-06-27 11:00:00", "America/Denver")
+      dayjs.tz("2023-06-20 11:00:00", "America/Denver")
     )
   ) {
     return SEASON_03;
@@ -52,4 +60,5 @@ module.exports = {
   SEASON_02,
   SEASON_WU,
   SEASON_03,
+  SEASON_04,
 };
