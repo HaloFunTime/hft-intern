@@ -5,6 +5,7 @@ const {
   HALOFUNTIME_ID_CHANNEL_WAYWO,
   HALOFUNTIME_ID_CHANNEL_CLUBS,
 } = require("../constants.js");
+const { getCurrentSeason, SEASON_03, SEASON_04 } = require("../utils/seasons");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -49,62 +50,83 @@ module.exports = {
         ephemeral: true,
       });
     } else {
+      const currentSeason = getCurrentSeason();
+      if (!currentSeason) {
+        await interaction.editReply({
+          content:
+            "Could not check your progress toward the Trailblazer Scout role at this time.",
+          ephemeral: true,
+        });
+      }
+      // Create the base progress embed
       const progressEmbed = new EmbedBuilder()
         .setColor(0x9b59b6)
         .setTitle("Pathfinder Dynamo Progress")
-        .setThumbnail("https://api.halofuntime.com/static/PathfinderLogo.png")
-        .setDescription("**Season 3**")
-        .addFields({
-          name: "🥾 Gone Hiking",
-          value: `> *Attend Pathfinder Hikes playtesting! 50 points per session attended.*\n> **${
-            response.pointsGoneHiking
-          }/250 points** ${response.pointsGoneHiking === 250 ? "✅" : ""}`,
-        })
-        .addFields({
-          name: "🗺 Map Maker",
-          value: `> *Submit a map to Pathfinder Hikes playtesting! 50 points per submission.*\n> **${
-            response.pointsMapMaker
-          }/150 points** ${response.pointsMapMaker === 150 ? "✅" : ""}`,
-        })
-        .addFields({
-          name: "🧱 Show and Tell",
-          value: `> *Create a <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> post for a project you're working on! 50 points per post.*\n> **${
-            response.pointsShowAndTell
-          }/100 points** ${response.pointsShowAndTell === 100 ? "✅" : ""}`,
-        });
-      if (response.linkedGamertag) {
+        .setThumbnail("https://api.halofuntime.com/static/PathfinderLogo.png");
+      // Add the appropriate description and fields for the current season
+      if (currentSeason == SEASON_03) {
         progressEmbed
+          .setDescription("**Season 3**")
           .addFields({
-            name: "🔖 Bookmarked",
-            value: `> *Publish a map that receives 100 or more bookmarks. Earnable once.*\n> **${
-              response.pointsBookmarked
-            }/100 points** ${response.pointsBookmarked === 100 ? "✅" : ""}`,
+            name: "🥾 Gone Hiking",
+            value: `> *Attend Pathfinder Hikes playtesting! 50 points per session attended.*\n> **${
+              response.pointsGoneHiking
+            }/250 points** ${response.pointsGoneHiking === 250 ? "✅" : ""}`,
           })
           .addFields({
-            name: "🎮 Playtime",
-            value: `> *Publish a map that receives 500 or more plays. Earnable once.*\n> **${
-              response.pointsPlaytime
-            }/100 points** ${response.pointsPlaytime === 100 ? "✅" : ""}`,
+            name: "🗺 Map Maker",
+            value: `> *Submit a map to Pathfinder Hikes playtesting! 50 points per submission.*\n> **${
+              response.pointsMapMaker
+            }/150 points** ${response.pointsMapMaker === 150 ? "✅" : ""}`,
           })
           .addFields({
-            name: "🏷 Tagtacular",
-            value: `> *Tag one of your published maps with 'HaloFunTime'. 25 points per tag.*\n> **${
-              response.pointsTagtacular
-            }/100 points** ${response.pointsTagtacular === 100 ? "✅" : ""}`,
-          })
-          .addFields({
-            name: "🔥 Forged in Fire",
-            value: `> *Spend time playing Custom Games on Forge maps. 1 point per full hour played.*\n> **${
-              response.pointsForgedInFire
-            }/200 points** ${response.pointsForgedInFire === 200 ? "✅" : ""}`,
+            name: "🧱 Show and Tell",
+            value: `> *Create a <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> post for a project you're working on! 50 points per post.*\n> **${
+              response.pointsShowAndTell
+            }/100 points** ${response.pointsShowAndTell === 100 ? "✅" : ""}`,
           });
-      } else {
+        if (response.linkedGamertag) {
+          progressEmbed
+            .addFields({
+              name: "🔖 Bookmarked",
+              value: `> *Publish a map that receives 100 or more bookmarks. Earnable once.*\n> **${
+                response.pointsBookmarked
+              }/100 points** ${response.pointsBookmarked === 100 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "🎮 Playtime",
+              value: `> *Publish a map that receives 500 or more plays. Earnable once.*\n> **${
+                response.pointsPlaytime
+              }/100 points** ${response.pointsPlaytime === 100 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "🏷 Tagtacular",
+              value: `> *Tag one of your published maps with 'HaloFunTime'. 25 points per tag.*\n> **${
+                response.pointsTagtacular
+              }/100 points** ${response.pointsTagtacular === 100 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "🔥 Forged in Fire",
+              value: `> *Spend time playing Custom Games on Forge maps. 1 point per full hour played.*\n> **${
+                response.pointsForgedInFire
+              }/200 points** ${
+                response.pointsForgedInFire === 200 ? "✅" : ""
+              }`,
+            });
+        } else if (currentSeason == SEASON_04) {
+          progressEmbed.setDescription("**Season 4**");
+          // TODO: Add fields for Season 4 Pathfinder Dynamo challenges here
+        }
+      }
+      // Add the gamertag link prompt field if needed
+      if (!response.linkedGamertag) {
         progressEmbed.addFields({
           name: "🔗 Link your gamertag!",
           value:
             "> Link your Xbox Live Gamertag to HaloFunTime with the `/link-gamertag` command to unlock additional challenges tied to your in-game stats! Once your gamertag is verified by Staff, you'll see additional challenges in this section.",
         });
       }
+      // Add the total field, footer, and timestamp
       progressEmbed
         .addFields({
           name: "Your Total Pathfinder Dynamo Points",
