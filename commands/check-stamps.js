@@ -77,6 +77,7 @@ module.exports = {
         }
         return { error: "Unhandled error." };
       });
+    console.log(JSON.stringify(response));
     if ("error" in response) {
       await interaction.editReply({
         content: "I couldn't check your stamps. Sorry about that.",
