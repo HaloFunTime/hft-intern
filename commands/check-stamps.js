@@ -75,6 +75,7 @@ module.exports = {
         if (error.response.data) {
           return error.response.data;
         }
+        return { error: "Unhandled error." };
       });
     if ("error" in response) {
       await interaction.editReply({
