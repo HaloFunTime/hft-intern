@@ -40,7 +40,7 @@ async function pauseChatter(message) {
         `${HALOFUNTIME_API_URL}/intern/pause-chatter`,
         {
           discordUserId: message.author.id,
-          discordUserTag: message.author.tag,
+          discordUsername: message.author.username,
         },
         {
           headers: {
@@ -149,7 +149,7 @@ module.exports = {
   async execute(message) {
     if (message.inGuild()) {
       console.log(
-        `${message.guild?.name}: ${message.author?.tag} sent a message in the #${message.channel?.name} channel.`
+        `${message.guild?.name}: ${message.author?.username} sent a message in the #${message.channel?.name} channel.`
       );
       await attemptChatterPause(message);
       await attemptChatter(message);

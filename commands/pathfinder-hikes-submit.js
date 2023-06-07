@@ -78,7 +78,7 @@ module.exports = {
           waywoPostTitle: interaction.channel.name,
           waywoPostId: interaction.channelId,
           mapSubmitterDiscordId: interaction.user.id,
-          mapSubmitterDiscordTag: interaction.user.tag,
+          mapSubmitterDiscordUsername: interaction.user.username,
           maxPlayerCount: players,
           map: map,
           mode1: mode1,

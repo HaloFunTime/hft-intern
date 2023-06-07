@@ -20,7 +20,7 @@ module.exports = {
         `${HALOFUNTIME_API_URL}/link/discord-to-xbox-live`,
         {
           discordUserId: interaction.user.id,
-          discordUserTag: interaction.user.tag,
+          discordUsername: interaction.user.username,
           xboxLiveGamertag: gamertag,
         },
         {

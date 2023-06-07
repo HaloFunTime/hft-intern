@@ -252,7 +252,7 @@ const updateTrailblazerRoles = async (client) => {
         `${HALOFUNTIME_API_URL}/trailblazer/seasonal-role-check`,
         {
           discordUserId: m.user.id,
-          discordUserTag: m.user.tag,
+          discordUsername: m.user.username,
         },
         {
           headers: {

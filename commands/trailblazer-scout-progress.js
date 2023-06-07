@@ -27,7 +27,7 @@ module.exports = {
         `${HALOFUNTIME_API_URL}/trailblazer/scout-progress`,
         {
           discordUserId: interaction.user.id,
-          discordUserTag: interaction.user.tag,
+          discordUsername: interaction.user.username,
         },
         {
           headers: {

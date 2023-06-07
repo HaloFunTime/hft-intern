@@ -50,7 +50,7 @@ module.exports = {
         .get(
           `${HALOFUNTIME_API_URL}/link/discord-to-xbox-live?discordId=${
             member.id
-          }&discordTag=${encodeURIComponent(member.tag)}`,
+          }&discordUsername=${encodeURIComponent(member.username)}`,
           {
             headers: {
               Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,

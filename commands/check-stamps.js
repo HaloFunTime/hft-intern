@@ -60,7 +60,7 @@ module.exports = {
         `${HALOFUNTIME_API_URL}/season-04/check-stamps`,
         {
           discordUserId: interaction.user.id,
-          discordUserTag: interaction.user.tag,
+          discordUsername: interaction.user.username,
         },
         {
           headers: {

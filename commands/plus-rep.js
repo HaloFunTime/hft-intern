@@ -37,9 +37,9 @@ module.exports = {
         `${HALOFUNTIME_API_URL}/reputation/plus-rep`,
         {
           giverDiscordId: interaction.user.id,
-          giverDiscordTag: interaction.user.tag,
+          giverDiscordUsername: interaction.user.username,
           receiverDiscordId: receiver.id,
-          receiverDiscordTag: receiver.tag,
+          receiverDiscordUsername: receiver.username,
           message: repMessage,
         },
         {

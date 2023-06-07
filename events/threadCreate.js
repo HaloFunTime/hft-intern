@@ -62,7 +62,7 @@ async function attemptLfgHelp(thread) {
       .get(
         `${HALOFUNTIME_API_URL}/link/discord-to-xbox-live?discordId=${
           threadOwner.user.id
-        }&discordTag=${encodeURIComponent(threadOwner.user.tag)}`,
+        }&discordUsername=${encodeURIComponent(threadOwner.user.username)}`,
         {
           headers: {
             Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
@@ -227,7 +227,7 @@ async function recordWaywoPost(thread) {
       `${HALOFUNTIME_API_URL}/pathfinder/waywo-post`,
       {
         posterDiscordId: threadOwner.user.id,
-        posterDiscordTag: threadOwner.user.tag,
+        posterDiscordUsername: threadOwner.user.username,
         postId: thread.id,
         postTitle: thread.name,
       },

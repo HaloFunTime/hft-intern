@@ -11,7 +11,7 @@ async function attemptFunTimeFridayVoiceConnect(voiceState) {
       `${HALOFUNTIME_API_URL}/fun-time-friday/voice-connect`,
       {
         connectorDiscordId: voiceState.member.user.id,
-        connectorDiscordTag: voiceState.member.user.tag,
+        connectorDiscordUsername: voiceState.member.user.username,
         connectedAt: dayjs().toISOString(),
         channelId: voiceState.channelId,
         channelName: voiceState.channel.name,
@@ -45,7 +45,7 @@ async function attemptFunTimeFridayVoiceDisconnect(voiceState) {
       `${HALOFUNTIME_API_URL}/fun-time-friday/voice-disconnect`,
       {
         disconnectorDiscordId: voiceState.member.user.id,
-        disconnectorDiscordTag: voiceState.member.user.tag,
+        disconnectorDiscordUsername: voiceState.member.user.username,
         disconnectedAt: dayjs().toISOString(),
         channelId: voiceState.channelId,
         channelName: voiceState.channel.name,
@@ -72,14 +72,14 @@ async function attemptFunTimeFridayVoiceDisconnect(voiceState) {
 
 async function joinedChannel(voiceState) {
   console.log(
-    `${voiceState.guild?.name}: ${voiceState.member?.user?.tag} joined the ${voiceState.channel?.name} voice channel.`
+    `${voiceState.guild?.name}: ${voiceState.member?.user?.username} joined the ${voiceState.channel?.name} voice channel.`
   );
   attemptFunTimeFridayVoiceConnect(voiceState);
 }
 
 async function leftChannel(voiceState) {
   console.log(
-    `${voiceState.guild?.name}: ${voiceState.member?.user?.tag} left the ${voiceState.channel?.name} voice channel.`
+    `${voiceState.guild?.name}: ${voiceState.member?.user?.username} left the ${voiceState.channel?.name} voice channel.`
   );
   attemptFunTimeFridayVoiceDisconnect(voiceState);
 }

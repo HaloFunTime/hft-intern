@@ -100,7 +100,7 @@ const updatePathfinderRoles = async (client) => {
         `${HALOFUNTIME_API_URL}/pathfinder/seasonal-role-check`,
         {
           discordUserId: m.user.id,
-          discordUserTag: m.user.tag,
+          discordUsername: m.user.username,
         },
         {
           headers: {
@@ -173,7 +173,7 @@ const updatePathfinderRoles = async (client) => {
     for (let m of pathfindersToRemoveRole) {
       const pathfinder = await m.roles.remove(roleId);
       console.log(
-        `Removed PATHFINDER ${rank.toUpperCase()} role from ${
+        `Removed PATHFINDER ${title.toUpperCase()} role from ${
           pathfinder.user.username
         }#${pathfinder.user.discriminator}`
       );
