@@ -96,7 +96,7 @@ module.exports = {
           return error.response.data;
         }
       });
-    if (response.status !== 200 || "error" in response) {
+    if ("error" in response) {
       await interaction.editReply({
         content: "I couldn't check your stamps. Sorry about that.",
         ephemeral: true,
