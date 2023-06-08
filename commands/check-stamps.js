@@ -62,7 +62,7 @@ module.exports = {
     funTimerRoles.forEach((role) => {
       funTimerRank = parseInt(role.name.split(" ")[1]);
     });
-    const guild = client.guilds.cache.get(HALOFUNTIME_ID);
+    const guild = interaction.client.guilds.cache.get(HALOFUNTIME_ID);
     const invites = await guild.invites.fetch({ cache: true, force: true });
     let inviteUses = 0;
     invites.forEach((invite) => {
@@ -178,7 +178,7 @@ module.exports = {
         {
           name: "🤖 Bot Bullying",
           value: `> *Earn Perfection medals in the Bot Bootcamp playlist.*\n> **${
-            response.scoreRobotRoaster
+            response.scoreBotBullying
           }/1** Bot Bootcamp Perfection${
             response.scoreBotBullying < 2 ? "" : "s"
           } ${response.scoreBotBullying >= 1 ? "✅" : "❌"}`,
