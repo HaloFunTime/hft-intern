@@ -68,7 +68,7 @@ module.exports = {
     let inviteUses = 0;
     invites.forEach((invite) => {
       if (invite.maxAge === 0 && invite.inviterId === interaction.user.id) {
-        inviteUses++;
+        inviteUses += invite.uses;
       }
     });
     // Hit the HFT API for the remaining challenge completion info
