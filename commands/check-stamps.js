@@ -64,10 +64,10 @@ module.exports = {
     });
     const guild = client.guilds.cache.get(HALOFUNTIME_ID);
     const invites = await guild.invites.fetch({ cache: true, force: true });
-    let invitesSent = 0;
+    let inviteUses = 0;
     invites.forEach((invite) => {
       if (invite.maxAge === 0 && invite.inviterId === interaction.user.id) {
-        invitesSent++;
+        inviteUses++;
       }
     });
     // Hit the HFT API for the remaining challenge completion info
@@ -79,7 +79,7 @@ module.exports = {
           discordUserId: interaction.user.id,
           discordUsername: interaction.user.username,
           funTimerRank: funTimerRank,
-          invitesSent: 0,
+          inviteUses: inviteUses,
         },
         {
           headers: {
