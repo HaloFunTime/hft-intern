@@ -4,6 +4,7 @@ const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
 const {
+  HALOFUNTIME_ID,
   HALOFUNTIME_ID_ROLE_S4_STAMP_CHAMP,
   HALOFUNTIME_ID_ROLE_STAFF,
   HALOFUNTIME_ID_CHANNEL_STAMP_CHALLENGE,
