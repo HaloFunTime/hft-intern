@@ -54,6 +54,23 @@ module.exports = {
       return;
     }
     await interaction.deferReply();
+    // Calculate data for the first two challenges
+    const funTimerRoles = (interaction.member?.roles?.cache || []).filter(
+      (role) => /FunTimer/.test(role.name)
+    );
+    let funTimerRank = 0;
+    funTimerRoles.forEach((role) => {
+      funTimerRank = parseInt(role.name.split(" ")[1]);
+    });
+    const guild = client.guilds.cache.get(HALOFUNTIME_ID);
+    const invites = await guild.invites.fetch({ cache: true, force: true });
+    let invitesSent = 0;
+    invites.forEach((invite) => {
+      if (invite.maxAge === 0 && invite.inviterId === interaction.user.id) {
+        invitesSent++;
+      }
+    });
+    // Hit the HFT API for the remaining challenge completion info
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
     const response = await axios
       .post(
@@ -61,6 +78,8 @@ module.exports = {
         {
           discordUserId: interaction.user.id,
           discordUsername: interaction.user.username,
+          funTimerRank: funTimerRank,
+          invitesSent: 0,
         },
         {
           headers: {
