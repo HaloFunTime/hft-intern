@@ -229,21 +229,21 @@ module.exports = {
           }**`,
         },
         {
-          name: "🅰️ A-Team",
+          name: "🅰️ Type A",
           value: `> *In any BTB Total Control variant, capture and do not lose zone A for the entire game. Do not capture zone B or zone C during regulation time. During overtime, capture zone B and zone C for the victory.*\n> **${
-            response.completedATeam ? "COMPLETE ✅" : "INCOMPLETE ❌"
+            response.completedTypeA ? "COMPLETE ✅" : "INCOMPLETE ❌"
           }**`,
         },
         {
-          name: "🧑‍🌾 Sneed's Seed Greed",
+          name: "🧑‍🌾 Formerly Chuck's",
           value: `> *In any BTB Stockpile variant, take the initial Power Seeds to a defensible location on the map. Defend them for the entire game, ensuring that this stash still has more than half of the initial Power Seeds in it when the game reaches overtime. In overtime, capture enough Power Seeds to win.*\n> **${
-            response.completedSneedsSeedGreed ? "COMPLETE ✅" : "INCOMPLETE ❌"
+            response.completedFormerlyChucks ? "COMPLETE ✅" : "INCOMPLETE ❌"
           }**`,
         },
         {
-          name: "👺 Fuck That Guy",
+          name: "👺 In Particular",
           value: `> *In any BTB Slayer variant, only kill one single player on the enemy team all game (at least 10 times).*\n> **${
-            response.completedFuckThatGuy ? "COMPLETE ✅" : "INCOMPLETE ❌"
+            response.completedInParticular ? "COMPLETE ✅" : "INCOMPLETE ❌"
           }**`,
         }
       );
