@@ -105,8 +105,9 @@ module.exports = {
     }
     // Create the base progress embed
     const progressEmbed = new EmbedBuilder()
-      .setColor(response.stampsCompleted >= 16 ? 0x2ecc71 : 0xe91e63)
-      .setTitle(`<@${response.discordUserId}>'s Fun Passport`)
+      .setColor(response.stampsCompleted >= 16 ? 0x2ecc71 : 0xe74c3c)
+      .setTitle("Season 4 Fun Passport")
+      .setDescription(`*Prepared for <@${response.discordUserId}>*`)
       .addFields({
         name: "Stamp Challenge Status",
         value: `> **${response.stampsCompleted}/16 stamps earned** ${
