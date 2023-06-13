@@ -105,11 +105,20 @@ module.exports = {
     }
     // Create the base progress embed
     const progressEmbed = new EmbedBuilder()
-      .setColor(0x2ecc71)
-      .setTitle("Fun Passport")
-      .setThumbnail("https://api.halofuntime.com/static/HFTLogo.png");
+      .setColor(response.stampsCompleted >= 16 ? 0x2ecc71 : 0xe91e63)
+      .setTitle(`<@${response.discordUserId}>'s Fun Passport`)
+      .addFields({
+        name: "Stamp Challenge Status",
+        value: `> **${response.stampsCompleted}/16 stamps earned** ${
+          response.stampsCompleted >= 16 ? "✅" : "❌"
+        }`,
+      });
     // Add the stamps that don't require a gamertag
     progressEmbed.addFields(
+      {
+        name: "__**HaloFunTime Discord Challenges**__",
+        value: "*Earned by using the HaloFunTime Discord server!*",
+      },
       {
         name: "💬 Chatterbox",
         value: `> *Level up your FunTimer rank by text chatting on HaloFunTime.*\n> **${
@@ -149,20 +158,25 @@ module.exports = {
     if (response.linkedGamertag) {
       progressEmbed.addFields(
         {
+          name: "__**Halo Infinite Matchmaking Challenges**__",
+          value:
+            "*⚠️ Make sure you are sharing matchmaking data! ⚠️\nIn-game: Settings -> Accessibility -> Matchmade Games = Share*",
+        },
+        {
           name: "🥞 Stacking Dubs",
-          value: `> *Win games in social playlists.*\n> **${
+          value: `> *Win games in matchmaking playlists.*\n> **${
             response.scoreStackingDubs
           }/200** wins ${response.scoreStackingDubs >= 200 ? "✅" : "❌"}`,
         },
         {
           name: "💀 License to Kill",
-          value: `> *Get kills in social playlists.*\n> **${
+          value: `> *Get kills in matchmaking playlists.*\n> **${
             response.scoreLicenseToKill
           }/5000** kills ${response.scoreLicenseToKill >= 5000 ? "✅" : "❌"}`,
         },
         {
           name: "🎯 Aim for the Head",
-          value: `> *Get headshot kills in social playlists.*\n> **${
+          value: `> *Get headshot kills in matchmaking playlists.*\n> **${
             response.scoreAimForTheHead
           }/3000** headshot kills ${
             response.scoreAimForTheHead >= 3000 ? "✅" : "❌"
@@ -170,7 +184,7 @@ module.exports = {
         },
         {
           name: "💥 Power Trip",
-          value: `> *Get power weapon kills in social playlists.*\n> **${
+          value: `> *Get power weapon kills in matchmaking playlists.*\n> **${
             response.scorePowerTrip
           }/1500** power weapon kills ${
             response.scorePowerTrip >= 1500 ? "✅" : "❌"
@@ -183,6 +197,11 @@ module.exports = {
           }/1** Bot Bootcamp Perfection${
             response.scoreBotBullying < 2 ? "" : "s"
           } ${response.scoreBotBullying >= 1 ? "✅" : "❌"}`,
+        },
+        {
+          name: "__**Halo Infinite Custom Game Challenges**__",
+          value:
+            "*⚠️ Make sure you are sharing custom game data! ⚠️\n Settings -> Accessibility -> Non-Matchmade Games = Share*",
         },
         {
           name: "💯 One Fundo",
@@ -215,6 +234,11 @@ module.exports = {
           value: `> *Play custom games where at least 24 players are present simultaneously.*\n> **${
             response.scorePackedHouse
           }/10** full lobbies ${response.scorePackedHouse >= 10 ? "✅" : "❌"}`,
+        },
+        {
+          name: "__**HaloFunTime BTB Challenges**__",
+          value:
+            "*Full-game video evidence is **required** for credit toward completion of these challenges if Staff is not present.*",
         },
         {
           name: "🖐 Finish in Five",
@@ -256,16 +280,11 @@ module.exports = {
           "> Link your Xbox Live Gamertag to HaloFunTime with the `/link-gamertag` command to unlock additional stamps tied to your in-game stats! Once your gamertag is verified by Staff, you'll see additional stamps in this section.",
       });
     }
-    // Add the total field, footer, and timestamp
+    // Add the total footer and timestamp
     progressEmbed
-      .addFields({
-        name: "Stamp Challenge Status",
-        value: `> **${response.stampsCompleted}/16 stamps earned** ${
-          response.stampsCompleted >= 16 ? "✅" : "❌"
-        }`,
-      })
       .setFooter({
         text: "HaloFunTime Stamp Challenge",
+        iconURL: "https://api.halofuntime.com/static/HFTLogo.png",
       })
       .setTimestamp();
     await interaction.editReply({
