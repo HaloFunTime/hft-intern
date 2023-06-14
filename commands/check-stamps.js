@@ -8,6 +8,12 @@ const {
   HALOFUNTIME_ID_ROLE_S4_STAMP_CHAMP,
   HALOFUNTIME_ID_ROLE_STAFF,
   HALOFUNTIME_ID_CHANNEL_STAMP_CHALLENGE,
+  HALOFUNTIME_ID_ROLE_BOT_WRANGLER,
+  HALOFUNTIME_ID_ROLE_SERVER_BOOSTER,
+  HALOFUNTIME_ID_ROLE_TEAM_FOXTROT,
+  HALOFUNTIME_ID_ROLE_TEAM_HOTEL,
+  HALOFUNTIME_ID_ROLE_TEAM_TANGO,
+  HALOFUNTIME_ID_ROLE_FIRST_100,
 } = require("../constants.js");
 
 dayjs.extend(utc);
@@ -54,8 +60,10 @@ module.exports = {
       });
       return;
     }
-    await interaction.deferReply();
-    // Calculate data for the first two challenges
+    await interaction.deferReply({
+      allowedMentions: { users: [interaction.user.id] },
+    });
+    // Calculate data for the Discord challenges
     const funTimerRoles = (interaction.member?.roles?.cache || []).filter(
       (role) => /FunTimer/.test(role.name)
     );
@@ -71,6 +79,31 @@ module.exports = {
         inviteUses += invite.uses;
       }
     });
+    let societiesJoined = 0;
+    if (
+      interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_SERVER_BOOSTER)
+    ) {
+      societiesJoined++;
+    }
+    if (interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_BOT_WRANGLER)) {
+      societiesJoined++;
+    }
+    if (
+      interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_TEAM_FOXTROT) ||
+      interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_TEAM_HOTEL) ||
+      interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_TEAM_TANGO)
+    ) {
+      societiesJoined++;
+    }
+    if (interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_FIRST_100)) {
+      societiesJoined++;
+    }
+    if (funTimerRank >= 10) {
+      societiesJoined++;
+    }
+    if (funTimerRank == 20) {
+      societiesJoined++;
+    }
     // Hit the HFT API for the remaining challenge completion info
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
     const response = await axios
@@ -81,6 +114,7 @@ module.exports = {
           discordUsername: interaction.user.username,
           funTimerRank: funTimerRank,
           inviteUses: inviteUses,
+          societiesJoined: societiesJoined,
         },
         {
           headers: {
@@ -106,8 +140,10 @@ module.exports = {
     // Create the base progress embed
     const progressEmbed = new EmbedBuilder()
       .setColor(response.stampsCompleted >= 16 ? 0x2ecc71 : 0xe74c3c)
-      .setTitle("Season 4 Fun Passport")
-      .setDescription(`*Prepared for <@${response.discordUserId}>*`)
+      .setTitle("Season 4 Fun Time Passport")
+      .setDescription(
+        `*<@${response.discordUserId}>'s Stamp Challenge Progress*`
+      )
       .addFields({
         name: "Stamp Challenge Status",
         value: `> **${response.stampsCompleted}/16 stamps earned** ${
@@ -117,7 +153,7 @@ module.exports = {
     // Add the stamps that don't require a gamertag
     progressEmbed.addFields(
       {
-        name: "__**HaloFunTime Discord Challenges**__",
+        name: "\n__**HaloFunTime Discord Challenges**__",
         value: "*Earned by using the HaloFunTime Discord server!*",
       },
       {
@@ -128,7 +164,7 @@ module.exports = {
       },
       {
         name: "🦠 Funtagious",
-        value: `> *Recruit someone new to HaloFunTime via a non-expiring personal invite link.*\n> **${
+        value: `> *Invite new members to HaloFunTime via a non-expiring personal invite link.*\n> **${
           response.scoreFuntagious
         }/1** invitee${response.scoreFuntagious < 2 ? "" : "s"} ${
           response.scoreFuntagious >= 1 ? "✅" : "❌"
@@ -142,24 +178,24 @@ module.exports = {
       },
       {
         name: "🏃 Fundurance",
-        value: `> *Participate in Fun Time Friday voice chats for consecutive hours.*\n> **${
+        value: `> *Stay connected to a single Fun Time Friday voice channel for consecutive hours.*\n> **${
           response.scoreFundurance
-        }/5** ${response.scoreFundurance >= 3 ? "✅" : "❌"}`,
+        }/3** consecutive hours ${response.scoreFundurance >= 3 ? "✅" : "❌"}`,
       },
       {
-        name: "🍻 Gang's All Here",
-        value: `> *Be present in a 24-person Fun Time Friday voice channel.*\n> **${
-          response.scoreGangsAllHere
-        }/1** full VC${response.scoreGangsAllHere < 2 ? "" : "s"} joined ${
-          response.scoreGangsAllHere >= 1 ? "✅" : "❌"
-        }`,
+        name: "🤐 Secret Socialite",
+        value: `> *Gain admission to secret Fun Time Societies.*\n> **${
+          response.scoreSecretSocialite
+        }/1** Fun Time Societ${
+          response.scoreSecretSocialite < 2 ? "y" : "ies"
+        } joined ${response.scoreSecretSocialite >= 1 ? "✅" : "❌"}`,
       }
     );
     // Add the stamps that do require a gamertag
     if (response.linkedGamertag) {
       progressEmbed.addFields(
         {
-          name: "__**Halo Infinite Matchmaking Challenges**__",
+          name: "\n__**Halo Infinite Matchmaking Challenges**__",
           value:
             "*⚠️ Make sure you are sharing matchmaking data! ⚠️\nIn-game: Settings -> Accessibility -> Matchmade Games = Share*",
         },
@@ -200,13 +236,13 @@ module.exports = {
           } ${response.scoreBotBullying >= 1 ? "✅" : "❌"}`,
         },
         {
-          name: "__**Halo Infinite Custom Game Challenges**__",
+          name: "\n__**Halo Infinite Custom Game Challenges**__",
           value:
-            "*⚠️ Make sure you are sharing custom game data! ⚠️\n Settings -> Accessibility -> Non-Matchmade Games = Share*",
+            "*⚠️ Make sure you are sharing custom game data! ⚠️\n In-game: Settings -> Accessibility -> Non-Matchmade Games = Share*",
         },
         {
           name: "💯 One Fundo",
-          value: `> *Play custom games from start to finish.*\n> **${
+          value: `> *Play custom games to completion.*\n> **${
             response.scoreOneFundo
           }/100** custom games played ${
             response.scoreOneFundo >= 100 ? "✅" : "❌"
@@ -231,13 +267,15 @@ module.exports = {
           }/25** modes ${response.scoreMoModesMoFun >= 25 ? "✅" : "❌"}`,
         },
         {
-          name: "🏠 Packed House",
-          value: `> *Play custom games where at least 24 players are present simultaneously.*\n> **${
-            response.scorePackedHouse
-          }/10** full lobbies ${response.scorePackedHouse >= 10 ? "✅" : "❌"}`,
+          name: "☣️ Epidemic",
+          value: `> *Play custom Infection games to completion.*\n> **${
+            response.scoreEpidemic
+          }/50** custom Infection games played ${
+            response.scoreEpidemic >= 50 ? "✅" : "❌"
+          }`,
         },
         {
-          name: "__**HaloFunTime BTB Challenges**__",
+          name: "\n__**HaloFunTime BTB Challenges**__",
           value:
             "*Full-game video evidence is **required** for credit toward completion of these challenges if Staff is not present.*",
         },
@@ -289,7 +327,11 @@ module.exports = {
       })
       .setTimestamp();
     await interaction.editReply({
+      allowedMentions: { users: [interaction.user.id] },
       embeds: [progressEmbed],
     });
+    // TODO: Award the Stamp Champ role if the member has earned it and does not yet have it.
+    //       Send a POST to the backend to record their role earn date.
+    //       Finally, post a congratulations message to #announcements.
   },
 };

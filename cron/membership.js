@@ -6,7 +6,7 @@ const members = require("../utils/members");
 const {
   HALO_INFINITE_RANKED_ARENA_PLAYLIST_ID,
   HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS,
-  HLAOFUNTIME_ID_CHANNEL_BANTER,
+  HALOFUNTIME_ID_CHANNEL_BANTER,
   HALOFUNTIME_ID_CHANNEL_FIRST_100,
   HALOFUNTIME_ID_CHANNEL_LOGS,
   HALOFUNTIME_ID_CHANNEL_NEW_HERE,
@@ -397,7 +397,7 @@ const updateRankedRoles = async (client) => {
         `\n\n> *To be eligible for a rank-specific role, get the* <@&${HALOFUNTIME_ID_ROLE_RANKED}> *role and link ` +
         `your gamertag with the \`/link-gamertag\` command. If you remove the* <@&${HALOFUNTIME_ID_ROLE_RANKED}> ` +
         "*role or change your linked gamertag, you will lose your rank-specific role.*";
-      const channel = client.channels.cache.get(HLAOFUNTIME_ID_CHANNEL_BANTER);
+      const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_BANTER);
       await channel.send({
         content: congratsMessage,
         allowedMentions: { parse: [] },
