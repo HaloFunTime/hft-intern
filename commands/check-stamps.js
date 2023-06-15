@@ -281,31 +281,31 @@ module.exports = {
         },
         {
           name: "🖐 Finish in Five",
-          value: `> *In any BTB game mode, win the game in five minutes or less.*\n> **${
+          value: `> *In any matchmade, non-Fiesta BTB game mode, win the game in less than five minutes.*\n> **${
             response.completedFinishInFive ? "COMPLETE ✅" : "INCOMPLETE ❌"
           }**`,
         },
         {
           name: "🏁 Victory Lap",
-          value: `> *In any BTB CTF variant, take a flag from the enemy flag stand to your team's capture point but don't capture it - you must first take it all the way back to the enemy base's flag stand, and then finally back to your team's capture point for the score.*\n> **${
+          value: `> *In any matchmade, non-Fiesta BTB CTF variant, take the final flag from the enemy flag stand to your team's capture point but don't capture it - you must first take it all the way back to the enemy base's flag stand, and then finally back to your team's capture point for the score and the win.*\n> **${
             response.completedVictoryLap ? "COMPLETE ✅" : "INCOMPLETE ❌"
           }**`,
         },
         {
           name: "🅰️ Type A",
-          value: `> *In any BTB Total Control variant, capture and do not lose zone A for the entire game. Do not capture zone B or zone C during regulation time. During overtime, capture zone B and zone C for the victory.*\n> **${
+          value: `> *In any matchmade, non-Fiesta BTB Total Control variant, capture and do not lose zone A for the entire game. Do not capture zone B or zone C during regulation time. During overtime, capture zone B and zone C to win the game.*\n> **${
             response.completedTypeA ? "COMPLETE ✅" : "INCOMPLETE ❌"
           }**`,
         },
         {
           name: "🧑‍🌾 Formerly Chuck's",
-          value: `> *In any BTB Stockpile variant, take the initial Power Seeds to a defensible location on the map. Defend them for the entire game, ensuring that this stash still has more than half of the initial Power Seeds in it when the game reaches overtime. In overtime, capture enough Power Seeds to win.*\n> **${
+          value: `> *In any matchmade, non-Fiesta BTB Stockpile variant, take the initial Power Seeds to a defensible location on the map. Defend them for the entire game, ensuring that this stash still has more than half of the initial Power Seeds in it when the game reaches overtime. In overtime, capture enough Power Seeds to win the game.*\n> **${
             response.completedFormerlyChucks ? "COMPLETE ✅" : "INCOMPLETE ❌"
           }**`,
         },
         {
           name: "👺 In Particular",
-          value: `> *In any BTB Slayer variant, only kill one single player on the enemy team all game (at least 10 times).*\n> **${
+          value: `> *In any matchmade, non-Fiesta BTB Slayer variant, only kill one single player on the enemy team all game, at least 10 times. Your team does not need to win the game.*\n> **${
             response.completedInParticular ? "COMPLETE ✅" : "INCOMPLETE ❌"
           }**`,
         }
