@@ -262,7 +262,7 @@ module.exports = {
         },
         {
           name: "🕹 Mo' Modes Mo' Fun",
-          value: `> *Play unique, non-developer made modes in custom games.*\n> **${
+          value: `> *Play unique modes in custom games.*\n> **${
             response.scoreMoModesMoFun
           }/25** modes ${response.scoreMoModesMoFun >= 25 ? "✅" : "❌"}`,
         },
