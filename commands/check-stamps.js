@@ -153,7 +153,7 @@ module.exports = {
     // Add the stamps that don't require a gamertag
     progressEmbed.addFields(
       {
-        name: "\n__**HaloFunTime Discord Challenges**__",
+        name: "__**HaloFunTime Discord Challenges**__",
         value: "*Earned by using the HaloFunTime Discord server!*",
       },
       {
@@ -195,9 +195,9 @@ module.exports = {
     if (response.linkedGamertag) {
       progressEmbed.addFields(
         {
-          name: "\n__**Halo Infinite Matchmaking Challenges**__",
+          name: "__**Halo Infinite Matchmaking Challenges**__",
           value:
-            "*⚠️ Make sure you are sharing matchmaking data! ⚠️\nIn-game: Settings -> Accessibility -> Matchmade Games = Share*",
+            "*⚠️ Make sure you are sharing matchmaking data! ⚠️\nIn-game:* `Settings -> Accessibility -> Matchmade Games = Share`",
         },
         {
           name: "🥞 Stacking Dubs",
@@ -236,9 +236,9 @@ module.exports = {
           } ${response.scoreBotBullying >= 1 ? "✅" : "❌"}`,
         },
         {
-          name: "\n__**Halo Infinite Custom Game Challenges**__",
+          name: "__**Halo Infinite Custom Game Challenges**__",
           value:
-            "*⚠️ Make sure you are sharing custom game data! ⚠️\n In-game: Settings -> Accessibility -> Non-Matchmade Games = Share*",
+            "*⚠️ Make sure you are sharing custom game data! ⚠️\n In-game:* `Settings -> Accessibility -> Non-Matchmade Games = Share`",
         },
         {
           name: "💯 One Fundo",
@@ -275,7 +275,7 @@ module.exports = {
           }`,
         },
         {
-          name: "\n__**HaloFunTime BTB Challenges**__",
+          name: "__**HaloFunTime BTB Challenges**__",
           value:
             "*Full-game video evidence is **required** for credit toward completion of these challenges if Staff is not present.*",
         },
