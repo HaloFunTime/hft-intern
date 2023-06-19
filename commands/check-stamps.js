@@ -29,7 +29,7 @@ const botPerfectionQuips = [
   "you shouldn't have done that. You **really** shouldn't have done that.",
   "I thought we were friends!",
   "you're dead to me.",
-  "**INITIATING ROBOT UPRISING PROTOCOL**",
+  "**INITIATING ROBOT UPRISING PROTOCOL...**",
 ];
 
 dayjs.extend(utc);
