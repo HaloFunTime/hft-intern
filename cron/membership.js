@@ -8,6 +8,7 @@ const {
   HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS,
   HALOFUNTIME_ID_CHANNEL_BANTER,
   HALOFUNTIME_ID_CHANNEL_FIRST_100,
+  HALOFUNTIME_ID_CHANNEL_LFG,
   HALOFUNTIME_ID_CHANNEL_LOGS,
   HALOFUNTIME_ID_CHANNEL_NEW_HERE,
   HALOFUNTIME_ID_EMOJI_HFT_BYE,
@@ -191,7 +192,14 @@ const updateNewHereRoles = async (client) => {
     message.react("👋");
     let welcomeDM = "";
     welcomeDM += `Welcome to HaloFunTime, <@${member.user.id}>! I'm the Intern, HaloFunTime's favorite bot.\n\n`;
-    welcomeDM += `I've added you to the <#${HALOFUNTIME_ID_CHANNEL_NEW_HERE}> channel for the next month. `;
+    welcomeDM +=
+      "HaloFunTime is a party-up server designed to help you find people to play Halo with. ";
+    welcomeDM += `Use forum posts & role pings in the <#${HALOFUNTIME_ID_CHANNEL_LFG}> channel to find people and party up! `;
+    welcomeDM +=
+      "You can add or remove roles in the 'Channels & Roles' section at any time to start (or stop) receiving LFG pings. ";
+    welcomeDM +=
+      "Don't hesitate to create a voice channel or join an existing one - we are a very welcoming community!\n\n";
+    welcomeDM += `I've added you to the <#${HALOFUNTIME_ID_CHANNEL_NEW_HERE}> channel for the next 28 days. `;
     welcomeDM +=
       "It's a great place to meet people, learn about the server, and chat directly with the Staff.\n\n";
     welcomeDM +=
