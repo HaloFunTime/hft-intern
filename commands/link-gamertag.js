@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
+const { HALOFUNTIME_ID_CHANNEL_STAFF } = require("../constants.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -47,6 +48,12 @@ module.exports = {
     } else {
       await interaction.reply(
         `<@${response.discordUserId}> linked gamertag \`${response.xboxLiveGamertag}\` on HaloFunTime!`
+      );
+      const staffChannel = interaction.client.channels.cache.get(
+        HALOFUNTIME_ID_CHANNEL_STAFF
+      );
+      await staffChannel.send(
+        `<@${interaction.user.id}> wants to link gamertag \`${gamertag}\`, please verify or delete the link here: https://api.halofuntime.com/staff/link/discordxboxlivelink/`
       );
     }
   },
