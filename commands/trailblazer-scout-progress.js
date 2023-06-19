@@ -64,7 +64,7 @@ module.exports = {
         .setTitle("Trailblazer Scout Progress")
         .setThumbnail("https://api.halofuntime.com/static/TrailblazerLogo.png");
       // Add the appropriate description and fields for the current season
-      if (currentSeason == SEASON_03) {
+      if (currentSeason === SEASON_03) {
         progressEmbed
           .setDescription("**Season 3**")
           .addFields({
@@ -120,7 +120,7 @@ module.exports = {
               }/100 points** ${response.pointsTooStronk === 100 ? "✅" : ""}`,
             });
         }
-      } else if (currentSeason == SEASON_04) {
+      } else if (currentSeason === SEASON_04) {
         progressEmbed
           .setDescription("**Season 4**")
           .addFields({

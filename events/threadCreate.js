@@ -20,6 +20,7 @@ const {
   HALOFUNTIME_ID_ROLE_MCC_CO_OP,
   HALOFUNTIME_ID_ROLE_MCC_CUSTOMS,
   HALOFUNTIME_ID_ROLE_MCC_MATCHMAKING,
+  HALOFUNTIME_ID_ROLE_PATHFINDER,
   HALOFUNTIME_ID_ROLE_RANKED,
   HALOFUNTIME_ID_ROLE_SOCIAL,
   HALOFUNTIME_ID_ROLE_TESTING,
@@ -212,11 +213,57 @@ async function attemptFileShareEnforcement(thread) {
   }
 }
 
+async function recordTestingLFGPost(thread) {
+  // Do not record a Testing LFG post if the thread is not in the LFG forum channel
+  if (thread.parentId !== HALOFUNTIME_ID_CHANNEL_LFG) return;
+  // Do not record a Testing LFG post if the thread does not have the Testing tag
+  let hasTestingTag = false;
+  for (const tag of thread.appliedTags) {
+    if (tag === HALOFUNTIME_ID_CHANNEL_LFG_TAG_TESTING) {
+      hasTestingTag = true;
+    }
+  }
+  if (!hasTestingTag) return;
+  // Do not record a Testing LFG post if the thread owner does not have the Pathfinder role
+  const threadOwner = await thread.fetchOwner();
+  if (!threadOwner.guildMember.roles.cache.has(HALOFUNTIME_ID_ROLE_PATHFINDER))
+    return;
+  // Record data in the backend
+  const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+  const response = await axios
+    .post(
+      `${HALOFUNTIME_API_URL}/pathfinder/testing-lfg-post`,
+      {
+        posterDiscordId: threadOwner.user.id,
+        posterDiscordUsername: threadOwner.user.username,
+        postId: thread.id,
+        postTitle: thread.name,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+        },
+      }
+    )
+    .then((response) => response.data)
+    .catch(async (error) => {
+      console.error(error);
+      // Return the error payload directly if present
+      if (error.response.data) {
+        return error.response.data;
+      }
+    });
+  // Log if an error happens
+  if (response.success === false || "error" in response) {
+    console.log(response.error);
+  }
+}
+
 async function recordWaywoPost(thread) {
-  // Do record a WAYWO post if the thread is not in the WAYWO forum channel
+  // Do not record a WAYWO post if the thread is not in the WAYWO forum channel
   if (thread.parentId !== HALOFUNTIME_ID_CHANNEL_WAYWO) return;
   const threadOwner = await thread.fetchOwner();
-  // Get gamertag info
+  // Record data in the backend
   const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
   const response = await axios
     .post(
@@ -252,6 +299,7 @@ module.exports = {
   async execute(thread) {
     await attemptLfgHelp(thread);
     await attemptFileShareEnforcement(thread);
+    await recordTestingLFGPost(thread);
     await recordWaywoPost(thread);
   },
 };

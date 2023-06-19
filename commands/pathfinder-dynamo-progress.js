@@ -1,9 +1,10 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
 const {
-  HALOFUNTIME_ID_ROLE_PATHFINDER,
-  HALOFUNTIME_ID_CHANNEL_WAYWO,
   HALOFUNTIME_ID_CHANNEL_CLUBS,
+  HALOFUNTIME_ID_CHANNEL_LFG,
+  HALOFUNTIME_ID_CHANNEL_WAYWO,
+  HALOFUNTIME_ID_ROLE_PATHFINDER,
 } = require("../constants.js");
 const { getCurrentSeason, SEASON_03, SEASON_04 } = require("../utils/seasons");
 
@@ -64,7 +65,7 @@ module.exports = {
         .setTitle("Pathfinder Dynamo Progress")
         .setThumbnail("https://api.halofuntime.com/static/PathfinderLogo.png");
       // Add the appropriate description and fields for the current season
-      if (currentSeason == SEASON_03) {
+      if (currentSeason === SEASON_03) {
         progressEmbed
           .setDescription("**Season 3**")
           .addFields({
@@ -113,9 +114,38 @@ module.exports = {
                 response.pointsForgedInFire === 200 ? "✅" : ""
               }`,
             });
-        } else if (currentSeason == SEASON_04) {
-          progressEmbed.setDescription("**Season 4**");
-          // TODO: Add fields for Season 4 Pathfinder Dynamo challenges here
+        }
+      } else if (currentSeason === SEASON_04) {
+        progressEmbed
+          .setDescription("**Season 4**")
+          .addFields({
+            name: "🥾 Gone Hiking",
+            value: `> *Attend Pathfinder Hikes playtesting! 50 points per session attended.*\n> **${
+              response.pointsGoneHiking
+            }/250 points** ${response.pointsGoneHiking === 250 ? "✅" : ""}`,
+          })
+          .addFields({
+            name: "🧭 The Road More Traveled",
+            value: `> *Submit a map to Pathfinder Hikes playtesting! 50 points per submission.*\n> **${
+              response.pointsTheRoadMoreTraveled
+            }/100 points** ${
+              response.pointsTheRoadMoreTraveled === 100 ? "✅" : ""
+            }`,
+          })
+          .addFields({
+            name: "🧱 Block Talk",
+            value: `> *Create a* <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> *post for a project you're working on! 25 points per post.*\n> **${
+              response.pointsBlockTalk
+            }/50 points** ${response.pointsBlockTalk === 50 ? "✅" : ""}`,
+          })
+          .addFields({
+            name: "🧪 Test Driven",
+            value: `> *Organize a Testing lobby by making an* <#${HALOFUNTIME_ID_CHANNEL_LFG}> *post! 50 points per post.*\n> **${
+              response.pointsTestDriven
+            }/100 points** ${response.pointsTestDriven === 10 ? "✅" : ""}`,
+          });
+        if (response.linkedGamertag) {
+          // TODO: Add S4 challenges requiring a linked gamertag here
         }
       }
       // Add the gamertag link prompt field if needed
