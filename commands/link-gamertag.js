@@ -49,12 +49,14 @@ module.exports = {
       await interaction.reply(
         `<@${response.discordUserId}> linked gamertag \`${response.xboxLiveGamertag}\` on HaloFunTime!`
       );
-      const staffChannel = interaction.client.channels.cache.get(
-        HALOFUNTIME_ID_CHANNEL_STAFF
-      );
-      await staffChannel.send(
-        `<@${interaction.user.id}> wants to link gamertag \`${gamertag}\`, please verify or delete the link here: https://api.halofuntime.com/staff/link/discordxboxlivelink/`
-      );
+      if (response.verified === false) {
+        const staffChannel = interaction.client.channels.cache.get(
+          HALOFUNTIME_ID_CHANNEL_STAFF
+        );
+        await staffChannel.send(
+          `<@${interaction.user.id}> wants to link gamertag \`${gamertag}\`, please verify or delete the link here: https://api.halofuntime.com/staff/link/discordxboxlivelink/`
+        );
+      }
     }
   },
 };
