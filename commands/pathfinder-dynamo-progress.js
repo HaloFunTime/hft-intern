@@ -145,7 +145,27 @@ module.exports = {
             }/100 points** ${response.pointsTestDriven === 10 ? "✅" : ""}`,
           });
         if (response.linkedGamertag) {
-          // TODO: Add S4 challenges requiring a linked gamertag here
+          progressEmbed
+            .addFields({
+              name: "✨ Showing Off",
+              value: `> *Add files to your Showcase with \`/showcase-add\`. 50 points per file.*\n> **${
+                response.pointsShowingOff
+              }/150 points** ${response.pointsShowingOff === 150 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "🕹 Play On",
+              value: `> *Accumulate plays across maps and modes in your Showcase. 1 point per 10 plays.*\n> **${
+                response.pointsPlayOn
+              }/150 points** ${response.pointsPlayOn === 150 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "🔥 Forged in Fire",
+              value: `> *Spend time playing Custom Games on Forge maps. 1 point per full hour played.*\n> **${
+                response.pointsForgedInFire
+              }/200 points** ${
+                response.pointsForgedInFire === 200 ? "✅" : ""
+              }`,
+            });
         }
       }
       // Add the gamertag link prompt field if needed
