@@ -1,10 +1,14 @@
 const axios = require("axios");
 const dayjs = require("dayjs");
-const { HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY } = require("../constants.js");
+const {
+  HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY,
+  HALOFUNTIME_ID_CHANNEL_WAITING_ROOM,
+} = require("../constants.js");
 
 async function attemptFunTimeFridayVoiceConnect(voiceState) {
   if (voiceState.channel.parentId !== HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY)
     return;
+  if (voiceState.channelId === HALOFUNTIME_ID_CHANNEL_WAITING_ROOM) return;
   const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
   const response = await axios
     .post(
@@ -39,6 +43,7 @@ async function attemptFunTimeFridayVoiceConnect(voiceState) {
 async function attemptFunTimeFridayVoiceDisconnect(voiceState) {
   if (voiceState.channel.parentId !== HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY)
     return;
+  if (voiceState.channelId === HALOFUNTIME_ID_CHANNEL_WAITING_ROOM) return;
   const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
   const response = await axios
     .post(

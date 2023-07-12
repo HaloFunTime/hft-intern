@@ -44,9 +44,6 @@ const createVoiceEvent = async (
   console.log(`${guild.name}: Created event \"${eventName}\".`);
   const channel = client.channels.cache.get(announcementChannelId);
   const message = await channel.send(`${announcementMessage}\n${event.url}`);
-  if (channel.type === "GUILD_ANNOUNCEMENT") {
-    await message.crosspost();
-  }
   return message;
 };
 

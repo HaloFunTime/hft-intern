@@ -48,7 +48,7 @@ const createTrailblazerTuesdayEvent = async (client) => {
       `<@&${HALOFUNTIME_ID_ROLE_TRAILBLAZER}>\n\n` +
         "Trailblazer Tuesday - our weekly practice and learning session - has been scheduled for next week.\n\n" +
         "Click the 'Interested' bell below to get notified when it starts. " +
-        "Attending this event will earn you points toward the **Trailblazer Scout** role." +
+        "Attending this event will earn you points toward the **Trailblazer Scout** role. " +
         "All skill levels are welcome as long as you have the desire to improve!",
       "Trailblazer Tuesday",
       HALOFUNTIME_ID_CHANNEL_TRAILBLAZERS_VC_1,

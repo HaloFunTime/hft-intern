@@ -329,10 +329,9 @@ const updatePartyTimerRoles = async (client) => {
     for (const member of qualifiedPartyTimers) {
       partyTimerMentions.push(`<@${member.id}>`);
     }
-    const currentPartyTimersLine = `This week's <@&${HALOFUNTIME_ID_ROLE_PARTYTIMER}>s are:\n${partyTimerMentions.join(
-      " "
-    )}`;
-    currentPartyTimersLine = `${currentPartyTimersLine}\n\n`;
+    currentPartyTimersLine = `This week's <@&${HALOFUNTIME_ID_ROLE_PARTYTIMER}>s are:\n${partyTimerMentions.join(
+      "\n"
+    )}\n\n`;
   }
   const cooldownLine =
     "All `/plus-rep` cooldowns have been reset for the week. Happy repping!";

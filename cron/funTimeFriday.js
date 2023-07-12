@@ -90,6 +90,7 @@ const createFunTimeFridayEvent = async (client) => {
       for (const emoji of emojis) {
         await message.react(emoji);
       }
+      await message.crosspost();
     }
   } catch (e) {
     console.error(e);
@@ -112,8 +113,10 @@ const focusFunTimeFridayEvent = async (client) => {
       (channel) => channel.id
     );
     for (const channelId of childChannelIds) {
-      const channel = client.channels.cache.get(channelId);
-      channel.lockPermissions();
+      if (channelId !== HALOFUNTIME_ID_CHANNEL_WAITING_ROOM) {
+        const channel = client.channels.cache.get(channelId);
+        channel.lockPermissions();
+      }
     }
   } catch (e) {
     console.error(e);
@@ -136,8 +139,10 @@ const unfocusFunTimeFridayEvent = async (client) => {
       (channel) => channel.id
     );
     for (const channelId of childChannelIds) {
-      const channel = client.channels.cache.get(channelId);
-      channel.lockPermissions();
+      if (channelId !== HALOFUNTIME_ID_CHANNEL_WAITING_ROOM) {
+        const channel = client.channels.cache.get(channelId);
+        channel.lockPermissions();
+      }
     }
   } catch (e) {
     console.error(e);

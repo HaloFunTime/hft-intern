@@ -188,7 +188,7 @@ module.exports = {
       },
       {
         name: "🏃 Fundurance",
-        value: `> *Stay connected to a single Fun Time Friday voice channel for consecutive hours.*\n> **${
+        value: `> *Stay connected to a single Fun Time Friday voice channel for consecutive hours. Waiting Room does not count.*\n> **${
           response.scoreFundurance
         }/3** consecutive hours ${response.scoreFundurance >= 3 ? "✅" : "❌"}`,
       },
@@ -377,7 +377,7 @@ module.exports = {
         );
       }
     }
-    if (response.scoreBotBullying >= 1 && Math.random() > 0.01) {
+    if (response.scoreBotBullying >= 1 && Math.random() < 0.01) {
       const botPerfectionQuip =
         botPerfectionQuips[(botPerfectionQuips.length * Math.random()) | 0];
       await interaction.followUp(
