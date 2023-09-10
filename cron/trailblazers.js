@@ -135,7 +135,6 @@ const trailblazerDailyPassionReport = async (client) => {
       Silver: "<:rank_silver:967450514419752960>",
       Bronze: "<:rank_bronze:967450514482675822>",
     };
-    const representedTiers = new Set(); // Onyx, Diamond 6, etc.
     const representedCSRsByTier = {}; // key: Onyx, Diamond 6, etc.; value: Set of CSRs
     const playersByCSR = {}; // key: CSR integer; value: player object
     for (const player of players) {
@@ -161,7 +160,6 @@ const trailblazerDailyPassionReport = async (client) => {
       if (playerSubTier) {
         playerFullTier += ` ${playerSubTier}`;
       }
-      representedTiers.add(playerFullTier);
       if (playerFullTier in representedCSRsByTier) {
         representedCSRsByTier[playerFullTier].add(player.currentCSR);
       } else {
@@ -173,36 +171,109 @@ const trailblazerDailyPassionReport = async (client) => {
         playersByCSR[player.currentCSR] = [player];
       }
     }
-    for (const tierString of representedTiers) {
+    let [
+      onyxFields,
+      diamondFields,
+      platinumFields,
+      goldFields,
+      silverFields,
+      bronzeFields,
+    ] = Array.from({ length: 6 }, () => []);
+    for (const [fullTier, csrSet] of Object.entries(representedCSRsByTier)) {
+      const tier = fullTier.split(" ")[0];
+      let fields;
+      if (tier === "Onyx") {
+        fields = onyxFields;
+      } else if (tier === "Diamond") {
+        fields = diamondFields;
+      } else if (tier === "Platinum") {
+        fields = platinumFields;
+      } else if (tier === "Gold") {
+        fields = goldFields;
+      } else if (tier === "Silver") {
+        fields = silverFields;
+      } else if (tier === "Bronze") {
+        fields = bronzeFields;
+      }
       const csrStrings = [];
-      const csrSet = representedCSRsByTier[tierString];
       for (const csr of csrSet) {
         const csrPlayerIdStrings = playersByCSR[csr].map(
           (csrPlayer) => `<@${csrPlayer.discordUserId}>`
         );
         csrStrings.push(`> \`${csr}\` ${csrPlayerIdStrings.join(" ")}`);
       }
-      passionFields.push({
-        name: `${emojiStrings[tierString.split(" ")[0]]} ${tierString}`,
+      fields.push({
+        name: `${emojiStrings[tier]} ${fullTier}`,
         value: csrStrings.join("\n"),
       });
     }
-    const trailblazerPassionEmbed = new EmbedBuilder()
-      .setColor(0x3498db)
-      .setTitle(`__Daily Passion Report: <t:${now.unix()}:D>__`)
-      .addFields(passionFields)
-      .setFooter({
-        text: "Link your gamertag with `/link-gamertag` to be included.",
-        iconURL: "https://api.halofuntime.com/static/TrailblazerLogo.png",
-      });
+    const passionEmbeds = [];
+    if (onyxFields.length > 0) {
+      passionEmbeds.push(
+        new EmbedBuilder()
+          .setColor(0x3498db)
+          .setTitle("__Onyx Passion__")
+          .addFields(onyxFields)
+      );
+    }
+    if (diamondFields.length > 0) {
+      passionEmbeds.push(
+        new EmbedBuilder()
+          .setColor(0x3498db)
+          .setTitle("__Diamond Passion__")
+          .addFields(diamondFields)
+      );
+    }
+    if (platinumFields.length > 0) {
+      passionEmbeds.push(
+        new EmbedBuilder()
+          .setColor(0x3498db)
+          .setTitle("__Platinum Passion__")
+          .addFields(platinumFields)
+      );
+    }
+    if (goldFields.length > 0) {
+      passionEmbeds.push(
+        new EmbedBuilder()
+          .setColor(0x3498db)
+          .setTitle("__Gold Passion__")
+          .addFields(goldFields)
+      );
+    }
+    if (silverFields.length > 0) {
+      passionEmbeds.push(
+        new EmbedBuilder()
+          .setColor(0x3498db)
+          .setTitle("__Silver Passion__")
+          .addFields(silverFields)
+      );
+    }
+    if (bronzeFields.length > 0) {
+      passionEmbeds.push(
+        new EmbedBuilder()
+          .setColor(0x3498db)
+          .setTitle("__Bronze Passion__")
+          .addFields(bronzeFields)
+      );
+    }
     const trailblazersChannel = client.channels.cache.get(
       HALOFUNTIME_ID_CHANNEL_TRAILBLAZERS
     );
-    const message = await trailblazersChannel.send({
+    const passionReportEmbed = new EmbedBuilder()
+      .setColor(0x3498db)
+      .setTitle(`__Daily Passion Report: <t:${now.unix()}:D>__`)
+      .setDescription(
+        "Every day we check each Trailblazer's passion in the Ranked Arena playlist. Link your gamertag with `/link-gamertag` to be included."
+      )
+      .setFooter({
+        text: "Passion. It's what's for breakfast.",
+        iconURL: "https://api.halofuntime.com/static/TrailblazerLogo.png",
+      });
+    const passionReportMessage = await trailblazersChannel.send({
       allowedMentions: { parse: [] },
-      embeds: [trailblazerPassionEmbed],
+      embeds: [passionReportEmbed],
     });
-    const thread = await message.startThread({
+    const thread = await passionReportMessage.startThread({
       name: now.format("MMMM D, YYYY"),
       autoArchiveDuration: 60,
       reason: "Passion.",
@@ -210,6 +281,12 @@ const trailblazerDailyPassionReport = async (client) => {
     await thread.send({
       content: "Discuss today's passion levels in this thread.",
     });
+    for (const embed of passionEmbeds) {
+      await trailblazersChannel.send({
+        allowedMentions: { parse: [] },
+        embeds: [embed],
+      });
+    }
   }
   console.log("Finished daily passion report.");
 };
