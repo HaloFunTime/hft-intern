@@ -301,7 +301,7 @@ const trailblazerDailyPassionReport = async (client) => {
       });
     }
     const thread = await trailblazersChannel.threads.create({
-      name: `Daily Passion Report: ${now.format("MMMM D, YYYY")}`,
+      name: now.format("MMMM D, YYYY"),
       autoArchiveDuration: 60,
       reason: "Passion.",
     });
