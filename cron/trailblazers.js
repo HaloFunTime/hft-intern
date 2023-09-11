@@ -108,6 +108,27 @@ const trailblazerDailyPassionReport = async (client) => {
   if ("error" in response) {
     return;
   } else {
+    const quipPayload = await axios
+      .get(`${HALOFUNTIME_API_URL}/intern/random-passion-report-quip`, {
+        headers: {
+          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+        },
+      })
+      .then((response) => response.data)
+      .catch(async (error) => {
+        // Return the error payload directly if present
+        if (error.response.data) {
+          return error.response.data;
+        }
+        console.error(error);
+      });
+    // Return a default quip if an error is present
+    let passionReportQuip = "";
+    if ("error" in quipPayload) {
+      passionReportQuip = "Passion. It's in fashion.";
+    } else {
+      passionReportQuip = quipPayload.quip;
+    }
     const players = [...response.players];
     players.sort((a, b) => (a.currentCSR < b.currentCSR ? 1 : -1));
     const passionFields = [];
@@ -211,7 +232,7 @@ const trailblazerDailyPassionReport = async (client) => {
     if (onyxFields.length > 0) {
       passionEmbeds.push(
         new EmbedBuilder()
-          .setColor(0x3498db)
+          .setColor(0x4f356b)
           .setTitle("__Onyx Passion__")
           .addFields(onyxFields)
       );
@@ -219,7 +240,7 @@ const trailblazerDailyPassionReport = async (client) => {
     if (diamondFields.length > 0) {
       passionEmbeds.push(
         new EmbedBuilder()
-          .setColor(0x3498db)
+          .setColor(0x81bbd5)
           .setTitle("__Diamond Passion__")
           .addFields(diamondFields)
       );
@@ -227,7 +248,7 @@ const trailblazerDailyPassionReport = async (client) => {
     if (platinumFields.length > 0) {
       passionEmbeds.push(
         new EmbedBuilder()
-          .setColor(0x3498db)
+          .setColor(0x8283c4)
           .setTitle("__Platinum Passion__")
           .addFields(platinumFields)
       );
@@ -235,7 +256,7 @@ const trailblazerDailyPassionReport = async (client) => {
     if (goldFields.length > 0) {
       passionEmbeds.push(
         new EmbedBuilder()
-          .setColor(0x3498db)
+          .setColor(0xe5d16f)
           .setTitle("__Gold Passion__")
           .addFields(goldFields)
       );
@@ -243,7 +264,7 @@ const trailblazerDailyPassionReport = async (client) => {
     if (silverFields.length > 0) {
       passionEmbeds.push(
         new EmbedBuilder()
-          .setColor(0x3498db)
+          .setColor(0xcccccc)
           .setTitle("__Silver Passion__")
           .addFields(silverFields)
       );
@@ -251,7 +272,7 @@ const trailblazerDailyPassionReport = async (client) => {
     if (bronzeFields.length > 0) {
       passionEmbeds.push(
         new EmbedBuilder()
-          .setColor(0x3498db)
+          .setColor(0x825538)
           .setTitle("__Bronze Passion__")
           .addFields(bronzeFields)
       );
@@ -260,26 +281,18 @@ const trailblazerDailyPassionReport = async (client) => {
       HALOFUNTIME_ID_CHANNEL_TRAILBLAZERS
     );
     const passionReportEmbed = new EmbedBuilder()
-      .setColor(0x3498db)
+      .setColor(0xf93a2f)
       .setTitle(`__Daily Passion Report: <t:${now.unix()}:D>__`)
       .setDescription(
         "Every day we check each Trailblazer's passion in the Ranked Arena playlist. Link your gamertag with `/link-gamertag` to be included."
       )
       .setFooter({
-        text: "Passion. It's what's for breakfast.",
+        text: `"${passionReportQuip}"`,
         iconURL: "https://api.halofuntime.com/static/TrailblazerLogo.png",
       });
-    const passionReportMessage = await trailblazersChannel.send({
+    await trailblazersChannel.send({
       allowedMentions: { parse: [] },
       embeds: [passionReportEmbed],
-    });
-    const thread = await passionReportMessage.startThread({
-      name: now.format("MMMM D, YYYY"),
-      autoArchiveDuration: 60,
-      reason: "Passion.",
-    });
-    await thread.send({
-      content: "Discuss today's passion levels in this thread.",
     });
     for (const embed of passionEmbeds) {
       await trailblazersChannel.send({
@@ -287,6 +300,14 @@ const trailblazerDailyPassionReport = async (client) => {
         embeds: [embed],
       });
     }
+    const thread = await trailblazersChannel.threads.create({
+      name: `Daily Passion Report: ${now.format("MMMM D, YYYY")}`,
+      autoArchiveDuration: 60,
+      reason: "Passion.",
+    });
+    await thread.send({
+      content: "Discuss today's passion levels in this thread.",
+    });
   }
   console.log("Finished daily passion report.");
 };
