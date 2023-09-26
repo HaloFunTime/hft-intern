@@ -19,7 +19,7 @@ const getCurrentSeason = () => {
   if (
     now.isBetween(
       dayjs.tz("2023-06-20 11:00:00", "America/Denver"),
-      dayjs.tz("2023-09-26 11:00:00", "America/Denver")
+      dayjs.tz("2023-10-17 11:00:00", "America/Denver")
     )
   ) {
     return SEASON_04;

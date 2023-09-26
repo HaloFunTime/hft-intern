@@ -48,7 +48,7 @@ module.exports = {
       "2023-06-27 11:00:00",
       "America/Denver"
     );
-    const stampChallengeEnd = dayjs.tz("2023-09-26 09:00:00", "America/Denver");
+    const stampChallengeEnd = dayjs.tz("2023-10-17 09:00:00", "America/Denver");
     if (now < stampChallengeStart) {
       await interaction.reply({
         content: `The **Stamp Challenge** hasn't started yet, but keep this command in mind if you want to earn the <@&${HALOFUNTIME_ID_ROLE_S4_STAMP_CHAMP}> role!`,
