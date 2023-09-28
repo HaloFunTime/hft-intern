@@ -48,9 +48,18 @@ module.exports = {
         ephemeral: true,
       });
     } else {
-      function mapEmbed(mapFile) {
+      function missingEmbed(missingFile, slot) {
         return new EmbedBuilder()
-          .setTitle("Map: " + mapFile.name)
+          .setTitle(`#${slot}: FILE MISSING`)
+          .setURL(missingFile.waypointURL)
+          .setDescription(
+            "*This Halo Infinite file could not be located. It may have been unpublished or deleted.*"
+          )
+          .setColor(0xe74c3c);
+      }
+      function mapEmbed(mapFile, slot) {
+        return new EmbedBuilder()
+          .setTitle(`#${slot}: ` + mapFile.name + " (Map)")
           .setURL(mapFile.waypointURL)
           .setDescription(`*${mapFile.description}*`)
           .setThumbnail(mapFile.thumbnailURL)
@@ -76,8 +85,9 @@ module.exports = {
             }
           );
       }
-      function modeEmbed(modeFile) {
+      function modeEmbed(modeFile, slot) {
         return new EmbedBuilder()
+          .setTitle(`#${slot}: ` + modeFile.name + " (Mode)")
           .setTitle("Mode: " + modeFile.name)
           .setURL(modeFile.waypointURL)
           .setDescription(`*${modeFile.description}*`)
@@ -104,9 +114,9 @@ module.exports = {
             }
           );
       }
-      function prefabEmbed(prefabFile) {
+      function prefabEmbed(prefabFile, slot) {
         return new EmbedBuilder()
-          .setTitle("Prefab: " + prefabFile.name)
+          .setTitle(`#${slot}: ` + prefabFile.name + " (Prefab)")
           .setURL(prefabFile.waypointURL)
           .setDescription(`*${prefabFile.description}*`)
           .setThumbnail(prefabFile.thumbnailURL)
@@ -141,12 +151,15 @@ module.exports = {
         );
         for (let i = 0; i < response.showcaseFiles.length; i++) {
           const showcaseFile = response.showcaseFiles[i];
-          if (showcaseFile.fileType === "map") {
-            allEmbeds.push(mapEmbed(showcaseFile));
+          const slot = i + 1;
+          if (showcaseFile.isMissing === true) {
+            allEmbeds.push(missingEmbed(showcaseFile, slot));
+          } else if (showcaseFile.fileType === "map") {
+            allEmbeds.push(mapEmbed(showcaseFile, slot));
           } else if (showcaseFile.fileType === "mode") {
-            allEmbeds.push(modeEmbed(showcaseFile));
+            allEmbeds.push(modeEmbed(showcaseFile, slot));
           } else if (showcaseFile.fileType === "prefab") {
-            allEmbeds.push(prefabEmbed(showcaseFile));
+            allEmbeds.push(prefabEmbed(showcaseFile, slot));
           }
         }
         await interaction.reply({
