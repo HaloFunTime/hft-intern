@@ -16,6 +16,7 @@ const {
   createFunTimeFridayEvent,
   focusFunTimeFridayEvent,
   unfocusFunTimeFridayEvent,
+  publishFunTimeFridayReport,
 } = require("./cron/funTimeFriday");
 const {
   updatePathfinderRoles,
@@ -119,6 +120,7 @@ client.on("ready", () => {
   scheduleFunc("0 0 6 * * 3", conditionalWednesdayPost, client); // every Wednesday at 6AM
   scheduleFunc("0 0 12 * * 5", focusFunTimeFridayEvent, client); // every Friday at noon
   scheduleFunc("0 0 5 * * 6", unfocusFunTimeFridayEvent, client); // every Saturday at 5AM
+  scheduleFunc("0 0 12 * * 6", publishFunTimeFridayReport, client); // every Saturday at noon
 
   // Pathfinders
   scheduleFunc("0 35 9 * * 2", updatePathfinderRoles, client); // every Tuesday at 9:35AM

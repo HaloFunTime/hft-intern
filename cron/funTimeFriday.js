@@ -1,3 +1,4 @@
+const axios = require("axios");
 const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
@@ -149,9 +150,140 @@ const unfocusFunTimeFridayEvent = async (client) => {
   }
 };
 
+const publishFunTimeFridayReport = async (client) => {
+  const now = dayjs();
+  const thisFriday = now.day(5);
+  const eventStart = dayjs.tz(
+    `${thisFriday.format("YYYY-MM-DD")} 17:00:00`,
+    "America/Denver"
+  );
+  const ftfNumber =
+    eventStart.diff(dayjs.tz("2022-11-11 17:00:00", "America/Denver"), "week") +
+    1;
+  const quips = [
+    "has come to a close",
+    "is over... finally",
+    "is in the rearview mirror",
+    "just finished, and boy am I tired",
+    "is OVER",
+    "brought the smoke",
+    "was a success, with minimal casualties",
+    "knocked many socks off",
+    "blew us all away",
+    "was one for the books",
+    "was one to remember",
+    "was quite a party",
+  ];
+  const quip = quips[(quips.length * Math.random()) | 0];
+  function buildPartyTimePing(partyTimer) {
+    const hours = Math.floor(partyTimer.seconds / 3600);
+    const minutes = Math.floor((partyTimer.seconds - hours * 3600) / 60);
+    const seconds = partyTimer.seconds - hours * 3600 - minutes * 60;
+    const timeStrings = [];
+    if (hours > 0) {
+      timeStrings.push(`${hours}h`);
+    }
+    if (minutes > 0) {
+      timeStrings.push(`${minutes}m`);
+    }
+    timeStrings.push(`${seconds}s`);
+    return `<@${partyTimer.discordId}> (${timeStrings.join(" ")} in VC)`;
+  }
+  try {
+    const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+    const reportPayload = await axios
+      .get(
+        `${HALOFUNTIME_API_URL}/fun-time-friday/report?fridayDate=${thisFriday.format(
+          "YYYY-MM-DD"
+        )}`,
+        {
+          headers: {
+            Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+          },
+        }
+      )
+      .then((response) => response.data)
+      .catch(async (error) => {
+        // Return the error payload directly if present
+        if (error.response.data) {
+          return error.response.data;
+        }
+        console.error(error);
+      });
+    // Return without trying to post the report if error data is present
+    if ("error" in reportPayload) return;
+    // Opener
+    const openerText = `Fun Time Friday #${ftfNumber} ${quip}.`;
+    // Stats
+    const statsText =
+      `**${reportPayload.totalPlayers} unique player${
+        reportPayload.totalPlayers == 1 ? "" : "s"
+      }** joined us to have a fun time, ` +
+      `and they collectively spent **${reportPayload.totalHours} hour${
+        reportPayload.totalHours == 1 ? "" : "s"
+      }** in voice chat ` +
+      `across **${reportPayload.totalChannels} unique voice channel${
+        reportPayload.totalChannels == 1 ? "" : "s"
+      }**.`;
+    // Party Animals
+    let partyAnimalNumber = 1;
+    const partyAnimalLines = [];
+    for (const partyAnimal of reportPayload.partyAnimals) {
+      let emoji = "🎉";
+      if (partyAnimalNumber === 1) {
+        emoji = "🥇";
+      } else if (partyAnimalNumber === 2) {
+        emoji = "🥈";
+      } else if (partyAnimalNumber === 3) {
+        emoji = "🥉";
+      }
+      partyAnimalLines.push(`- ${emoji}: ${buildPartyTimePing(partyAnimal)}`);
+      partyAnimalNumber++;
+    }
+    let partyAnimalsText =
+      "No one partied hard enough this week to be considered a __**Party Animal**__.";
+    if (partyAnimalLines.length > 0) {
+      partyAnimalsText = `This week's __**Party Animals**__ partied harder than anyone else:\n${partyAnimalLines.join(
+        "\n"
+      )}`;
+    }
+    // Party Poopers
+    const partyPooperLines = [];
+    for (const partyPooper of reportPayload.partyPoopers) {
+      partyPooperLines.push(`- 💩: ${buildPartyTimePing(partyPooper)}`);
+    }
+    let partyPoopersText =
+      "No one partied poorly enough this week to be considered a __**Party Pooper**__.";
+    if (partyPooperLines.length > 0) {
+      partyPoopersText = `This week's __**Party Poopers**__ didn't party as hard as they could've:\n${partyPooperLines.join(
+        "\n"
+      )}`;
+    }
+    // Closer
+    let closerText = "I guess I'm caring for an empty installation.";
+    if (partyAnimalLines.length > 0 || partyPooperLines.length > 0) {
+      closerText =
+        "Party on, __**Party Animals**__! And to our __**Party Poopers**__... how about sticking around longer next week?";
+    }
+    // Send message and publish it
+    const channel = client.channels.cache.get(
+      HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS
+    );
+    const message = await channel.send(
+      `${openerText}\n\n${statsText}\n\n${partyAnimalsText}\n\n${partyPoopersText}\n\n${closerText}`
+    );
+    if (message) {
+      await message.crosspost();
+    }
+  } catch (e) {
+    console.error(e);
+  }
+};
+
 module.exports = {
   conditionalWednesdayPost: conditionalWednesdayPost,
   createFunTimeFridayEvent: createFunTimeFridayEvent,
   focusFunTimeFridayEvent: focusFunTimeFridayEvent,
   unfocusFunTimeFridayEvent: unfocusFunTimeFridayEvent,
+  publishFunTimeFridayReport: publishFunTimeFridayReport,
 };
