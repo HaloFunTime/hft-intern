@@ -13,11 +13,17 @@ const {
   HALOFUNTIME_ID_ROLE_TRAILBLAZER,
   HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_S3,
   HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_S4,
+  HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_S5,
   HALOFUNTIME_ID_ROLE_TRAILBLAZER_SHERPA,
   HALOFUNTIME_ID,
 } = require("../constants.js");
 const scheduledEvents = require("../utils/scheduledEvents");
-const { getCurrentSeason, SEASON_03, SEASON_04 } = require("../utils/seasons");
+const {
+  getCurrentSeason,
+  SEASON_03,
+  SEASON_04,
+  SEASON_05,
+} = require("../utils/seasons");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -30,6 +36,10 @@ const ROLE_ID_BY_NAME_AND_SEASON = {
   [SEASON_04]: {
     sherpa: HALOFUNTIME_ID_ROLE_TRAILBLAZER_SHERPA,
     scout: HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_S4,
+  },
+  [SEASON_05]: {
+    sherpa: HALOFUNTIME_ID_ROLE_TRAILBLAZER_SHERPA,
+    scout: HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_S5,
   },
 };
 

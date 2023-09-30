@@ -10,11 +10,17 @@ const {
   HALOFUNTIME_ID_ROLE_PATHFINDER,
   HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_S3,
   HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_S4,
+  HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_S5,
   HALOFUNTIME_ID_ROLE_PATHFINDER_ILLUMINATED,
   HALOFUNTIME_ID,
 } = require("../constants.js");
 const scheduledEvents = require("../utils/scheduledEvents");
-const { getCurrentSeason, SEASON_03, SEASON_04 } = require("../utils/seasons");
+const {
+  getCurrentSeason,
+  SEASON_03,
+  SEASON_04,
+  SEASON_05,
+} = require("../utils/seasons");
 const { getDateTimeForPathfinderEventStart } = require("../utils/pathfinders");
 
 dayjs.extend(utc);
@@ -28,6 +34,10 @@ const ROLE_ID_BY_NAME_AND_SEASON = {
   [SEASON_04]: {
     illuminated: HALOFUNTIME_ID_ROLE_PATHFINDER_ILLUMINATED,
     dynamo: HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_S4,
+  },
+  [SEASON_05]: {
+    illuminated: HALOFUNTIME_ID_ROLE_PATHFINDER_ILLUMINATED,
+    dynamo: HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_S5,
   },
 };
 
