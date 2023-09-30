@@ -5,7 +5,12 @@ const {
   HALOFUNTIME_ID_CHANNEL_VOD_REVIEW,
   HALOFUNTIME_ID_CHANNEL_CLUBS,
 } = require("../constants.js");
-const { getCurrentSeason, SEASON_03, SEASON_04 } = require("../utils/seasons");
+const {
+  getCurrentSeason,
+  SEASON_03,
+  SEASON_04,
+  SEASON_05,
+} = require("../utils/seasons");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -173,6 +178,46 @@ module.exports = {
                 response.pointsThemTharHills
               }/100 points** ${
                 response.pointsThemTharHills === 100 ? "✅" : ""
+              }`,
+            });
+        }
+      } else if (currentSeason === SEASON_05) {
+        progressEmbed.setDescription("**Season 5**").addFields({
+          name: "🦀 Church of the Crab",
+          value: `> *Attend Trailblazer Tuesday! 50 points per session attended.*\n> **${
+            response.pointsChurchOfTheCrab
+          }/250 points** ${response.pointsChurchOfTheCrab === 250 ? "✅" : ""}`,
+        });
+        if (response.linkedGamertag) {
+          progressEmbed
+            .addFields({
+              name: "🎮 Online Warrior",
+              value: `> *Beat your Ranked Arena placement CSR by 200 or more. Earnable once.*\n> **${
+                response.pointsOnlineWarrior
+              }/200 points** ${
+                response.pointsOnlineWarrior === 200 ? "✅" : ""
+              }`,
+            })
+            .addFields({
+              name: "🪙 Heads or Tails",
+              value: `> *Get headshot kills in Ranked Arena. 1 point for every 5 headshot kills.*\n> **${
+                response.pointsHeadsOrTails
+              }/150 points** ${
+                response.pointsHeadsOrTails === 150 ? "✅" : ""
+              }`,
+            })
+            .addFields({
+              name: "🔌 High Voltage",
+              value: `> *Win games on the map Recharge in Ranked Arena. 5 points per win.*\n> **${
+                response.pointsHighVoltage
+              }/100 points** ${response.pointsHighVoltage === 100 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "💀 Exterminator",
+              value: `> *Achieve an Extermination in Ranked Arena. Earnable once.*\n> **${
+                response.pointsExterminator
+              }/100 points** ${
+                response.pointsExterminator === 100 ? "✅" : ""
               }`,
             });
         }
