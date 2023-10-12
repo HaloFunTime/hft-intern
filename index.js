@@ -113,10 +113,10 @@ client.on("ready", () => {
   scheduleFunc("0 5 * * * *", updateFirst100Roles, client); // every hour on the fifth minute
   scheduleFunc("0 */5 * * * *", updateNewHereRoles, client); // every five minutes
   scheduleFunc("0 */15 * * * *", updateRankedRoles, client); // every fifteen minutes
-  scheduleFunc("0 0 11 * * 2", updatePartyTimerRoles, client); // every Tuesday at 11AM
+  scheduleFunc("0 0 11 * * 1", updatePartyTimerRoles, client); // every Monday at 11AM
 
   // Fun Time Friday
-  scheduleFunc("0 0 10 * * 2", createFunTimeFridayEvent, client); // every Tuesday at 10AM
+  scheduleFunc("0 0 11 * * 0", createFunTimeFridayEvent, client); // every Sunday at 11AM
   scheduleFunc("0 0 6 * * 3", conditionalWednesdayPost, client); // every Wednesday at 6AM
   scheduleFunc("0 0 12 * * 5", focusFunTimeFridayEvent, client); // every Friday at noon
   scheduleFunc("0 0 5 * * 6", unfocusFunTimeFridayEvent, client); // every Saturday at 5AM
