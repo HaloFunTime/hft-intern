@@ -21,7 +21,7 @@ module.exports = {
       "America/Denver"
     );
     const domainChallengeEnd = dayjs.tz(
-      "2024-02-13 09:00:00",
+      "2024-01-30 11:00:00",
       "America/Denver"
     );
     if (now < domainChallengeStart) {
@@ -75,7 +75,7 @@ module.exports = {
     if ("error" in response) {
       await interaction.editReply({
         content:
-          "You couldn't join the Domain Challeng at this time. Sucks for you.",
+          "You couldn't join the Domain Challenge at this time. Sucks for you.",
         ephemeral: true,
       });
       return;

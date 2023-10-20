@@ -194,7 +194,7 @@ const updateNewHereRoles = async (client) => {
     welcomeDM += `Welcome to HaloFunTime, <@${member.user.id}>! I'm the Intern, HaloFunTime's favorite bot.\n\n`;
     welcomeDM +=
       "HaloFunTime is a party-up server designed to help you find people to play Halo with. ";
-    welcomeDM += `Use forum posts & role pings in the <#${HALOFUNTIME_ID_CHANNEL_LFG}> channel to find people and party up! `;
+    welcomeDM += `Post in threads in the <#${HALOFUNTIME_ID_CHANNEL_LFG}> channel to find people and party up! `;
     welcomeDM +=
       "You can add or remove roles in the 'Channels & Roles' section at any time to start (or stop) receiving LFG pings. ";
     welcomeDM +=
