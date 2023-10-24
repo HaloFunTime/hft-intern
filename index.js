@@ -23,6 +23,11 @@ const {
   createPathfinderHikesEvent,
 } = require("./cron/pathfinders");
 const {
+  announceNewDomain,
+  processReassignments,
+  weeklyTeamRecap,
+} = require("./cron/season05");
+const {
   createTrailblazerTuesdayEvent,
   trailblazerDailyPassionReport,
   updateTrailblazerRoles,
@@ -130,4 +135,9 @@ client.on("ready", () => {
   scheduleFunc("0 5 9 * * 2", updateTrailblazerRoles, client); // every Tuesday at 9:05AM
   scheduleFunc("0 0 10 * * 3", createTrailblazerTuesdayEvent, client); // every Wednesday at 10AM
   scheduleFunc("0 0 9 * * *", trailblazerDailyPassionReport, client); // every day at 9AM
+
+  // Season 5
+  scheduleFunc("0 0 10 * * *", processReassignments, client); // every day at 10AM
+  scheduleFunc("0 30 9 * * 2", weeklyTeamRecap, client); // every Tuesday at 9:30AM
+  scheduleFunc("0 0 11 * * 3", announceNewDomain, client); // every Wednesday at 11AM
 });
