@@ -66,6 +66,13 @@ module.exports = {
       });
       return;
     }
+    // TEMPORARILY DISABLING THIS COMMAND; REMOVE FOLLOWING BLOCK ONCE BEANS ARE IMPLEMENTED
+    await interaction.reply({
+      content:
+        "This command is temporarily disabled. It will return soon alongside a revamped Hike system!",
+      ephemeral: true,
+    });
+    return;
     const players = interaction.options.getString("players");
     const map = interaction.options.getString("map");
     const mode1 = interaction.options.getString("mode1");
