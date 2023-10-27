@@ -420,7 +420,7 @@ const updateRankedRoles = async (client) => {
         `your gamertag with the \`/link-gamertag\` command. If you remove the* <@&${HALOFUNTIME_ID_ROLE_RANKED}> ` +
         "*role or change your linked gamertag, you will lose your rank-specific role.*";
       const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_LFG);
-      const thread = channel.threads.fetch(
+      const thread = await channel.threads.fetch(
         HALOFUNTIME_ID_CHANNEL_LFG_THREAD_RANKED_ARENA_GRIND
       );
       await thread.send({
