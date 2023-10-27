@@ -300,24 +300,21 @@ const trailblazerDailyPassionReport = async (client) => {
         text: `"${passionReportQuip}"`,
         iconURL: "https://api.halofuntime.com/static/TrailblazerLogo.png",
       });
-    await trailblazersChannel.send({
-      allowedMentions: { parse: [] },
-      embeds: [passionReportEmbed],
-    });
-    for (const embed of passionEmbeds) {
-      await trailblazersChannel.send({
-        allowedMentions: { parse: [] },
-        embeds: [embed],
-      });
-    }
     const thread = await trailblazersChannel.threads.create({
       name: now.format("MMMM D, YYYY"),
       autoArchiveDuration: 60,
       reason: "Passion.",
     });
     await thread.send({
-      content: "Discuss today's passion levels in this thread.",
+      allowedMentions: { parse: [] },
+      embeds: [passionReportEmbed],
     });
+    for (const embed of passionEmbeds) {
+      await thread.send({
+        allowedMentions: { parse: [] },
+        embeds: [embed],
+      });
+    }
   }
   console.log("Finished daily passion report.");
 };
