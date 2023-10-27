@@ -28,6 +28,7 @@ const {
   PARTYTIMER_CAP,
   PARTYTIMER_TOTAL_REP_MINIMUM,
   PARTYTIMER_UNIQUE_REP_MINIMUM,
+  HALOFUNTIME_ID_CHANNEL_LFG_THREAD_RANKED_ARENA_GRIND,
 } = require("../constants.js");
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -419,10 +420,13 @@ const updateRankedRoles = async (client) => {
         `\n\n> *To be eligible for a rank-specific role, get the* <@&${HALOFUNTIME_ID_ROLE_RANKED}> *role and link ` +
         `your gamertag with the \`/link-gamertag\` command. If you remove the* <@&${HALOFUNTIME_ID_ROLE_RANKED}> ` +
         "*role or change your linked gamertag, you will lose your rank-specific role.*";
-      const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_BANTER);
-      await channel.send({
+      const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_LFG);
+      const thread = channel.threads.fetch(
+        HALOFUNTIME_ID_CHANNEL_LFG_THREAD_RANKED_ARENA_GRIND
+      );
+      await thread.send({
         content: congratsMessage,
-        allowedMentions: { parse: [] },
+        allowedMentions: { parse: ["users"] },
       });
     }
     console.log("Finished checking Ranked roles.");
