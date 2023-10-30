@@ -2,7 +2,6 @@ const { SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
 const {
   HALOFUNTIME_ID_ROLE_PATHFINDER,
-  HALOFUNTIME_ID_CHANNEL_CLUBS,
   HALOFUNTIME_ID_CHANNEL_WAYWO,
 } = require("../constants.js");
 const { MAX_PLAYER_COUNT_CHOICES } = require("../utils/pathfinders.js");
@@ -30,15 +29,8 @@ module.exports = {
     )
     .addStringOption((option) =>
       option
-        .setName("mode1")
-        .setDescription("The name of the first mode to test")
-        .setMaxLength(32)
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName("mode2")
-        .setDescription("The name of the second mode to test")
+        .setName("mode")
+        .setDescription("The name of the mode to test")
         .setMaxLength(32)
         .setRequired(true)
     ),
@@ -46,7 +38,7 @@ module.exports = {
     // Command may only be executed by someone with the Pathfinder role
     if (!interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_PATHFINDER)) {
       await interaction.reply({
-        content: `You must have the <@&${HALOFUNTIME_ID_ROLE_PATHFINDER}> role to use this command. You can get it in the <#${HALOFUNTIME_ID_CHANNEL_CLUBS}> channel.`,
+        content: `You must have the <@&${HALOFUNTIME_ID_ROLE_PATHFINDER}> role to use this command. You can get it in <id:customize>.`,
         ephemeral: true,
       });
       return;
@@ -66,17 +58,9 @@ module.exports = {
       });
       return;
     }
-    // TEMPORARILY DISABLING THIS COMMAND; REMOVE FOLLOWING BLOCK ONCE BEANS ARE IMPLEMENTED
-    await interaction.reply({
-      content:
-        "This command is temporarily disabled. It will return soon alongside a revamped Hike system!",
-      ephemeral: true,
-    });
-    return;
     const players = interaction.options.getString("players");
     const map = interaction.options.getString("map");
-    const mode1 = interaction.options.getString("mode1");
-    const mode2 = interaction.options.getString("mode2");
+    const mode = interaction.options.getString("mode");
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
     const response = await axios
       .post(
@@ -88,8 +72,7 @@ module.exports = {
           mapSubmitterDiscordUsername: interaction.user.username,
           maxPlayerCount: players,
           map: map,
-          mode1: mode1,
-          mode2: mode2,
+          mode: mode,
         },
         {
           headers: {
@@ -107,7 +90,7 @@ module.exports = {
       });
     if (response.success) {
       await interaction.reply({
-        content: `<@${interaction.user.id}> successfully submitted **${map}** for **Pathfinder Hikes** playtesting! Use the \`/pathfinder-hikes-queue\` command to view the queue of maps submitted for playtesting.`,
+        content: `<@${interaction.user.id}> spent 50 🫘 **Pathfinder Beans** to submit **${map}** for **Pathfinder Hikes** playtesting!\n\nUse the \`/pathfinder-hikes-queue\` command to view the queue of maps submitted for playtesting.`,
       });
     } else if ("error" in response) {
       // Try to figure out a "friendly" rejection message
@@ -122,10 +105,10 @@ module.exports = {
         }
         if (
           response?.error?.details?.detail ===
-          "A Pathfinder Hike submission has already been created by this Discord user."
+          "This Discord user does not have enough Pathfinder Beans for a Hike submission."
         ) {
           friendlyMessage =
-            "\n\nYou have already submitted another map for playtesting. Until that map is playtested, you cannot submit more playtest requests.";
+            "\n\nYou must have at least 50 🫘 **Pathfinder Beans** to submit a playtest request. Check your current total with the `/check-beans` command.";
         }
       }
       await interaction.reply({

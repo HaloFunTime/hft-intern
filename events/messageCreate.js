@@ -1,4 +1,6 @@
 const axios = require("axios");
+const { ChannelType } = require("discord.js");
+const { HALOFUNTIME_ID_CHANNEL_WAYWO } = require("../constants.js");
 const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
 
 async function chatter(message) {
@@ -144,6 +146,49 @@ async function attemptChatter(message) {
   await chatter(message);
 }
 
+async function recordWaywoComment(message) {
+  // Do not record a WAYWO comment if the message was authored by this bot
+  if (message.author.id === message.client.user.id) return;
+  // Do not record a WAYWO comment if the message was sent by another application
+  if (message.applicationId) return;
+  // Do not record a WAYWO comment if the message was not sent in a thread
+  if (message.channel.type !== ChannelType.PublicThread) return;
+  // Do not record a WAYWO comment if the message was not sent in a thread belonging to the WAYWO forum channel
+  if (message.channel.parentId !== HALOFUNTIME_ID_CHANNEL_WAYWO) return;
+  // Record data in the backend
+  const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+  const response = await axios
+    .post(
+      `${HALOFUNTIME_API_URL}/pathfinder/waywo-comment`,
+      {
+        commenterDiscordId: message.author.id,
+        commenterDiscordUsername: message.author.username,
+        commentId: message.id,
+        commentLength: message.content.length,
+        postId: message.channelId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+        },
+      }
+    )
+    .then((response) => response.data)
+    .catch(async (error) => {
+      console.error(error);
+      // Return the error payload directly if present
+      if (error.response.data) {
+        return error.response.data;
+      }
+    });
+  // Log if an error happens
+  if (response.success === false || "error" in response) {
+    console.log(response.error);
+  } else if (response.awardedBean) {
+    await message.react("🫘");
+  }
+}
+
 module.exports = {
   name: "messageCreate",
   async execute(message) {
@@ -153,6 +198,7 @@ module.exports = {
       );
       await attemptChatterPause(message);
       await attemptChatter(message);
+      await recordWaywoComment(message);
     }
   },
 };

@@ -6,7 +6,7 @@ const timezone = require("dayjs/plugin/timezone");
 const customParseFormat = require("dayjs/plugin/customParseFormat");
 const {
   HALOFUNTIME_ID_ROLE_PATHFINDER,
-  HALOFUNTIME_ID_CHANNEL_CLUBS,
+  HALOFUNTIME_ID_CHANNEL_WAYWO,
 } = require("../constants.js");
 const { getDateTimeForPathfinderEventStart } = require("../utils/pathfinders");
 
@@ -19,17 +19,24 @@ module.exports = {
     .setName("pathfinder-hikes-queue")
     .setDescription(
       "Fetch the current queue of maps submitted to Pathfinder Hikes playtesting"
+    )
+    .addBooleanOption((option) =>
+      option
+        .setName("quiet")
+        .setDescription("Should I post the result quietly?")
+        .setRequired(false)
     ),
   async execute(interaction) {
     // Command may only be executed by someone with the Pathfinder role
     if (!interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_PATHFINDER)) {
       await interaction.reply({
-        content: `You must have the <@&${HALOFUNTIME_ID_ROLE_PATHFINDER}> role to use this command. You can get it in the <#${HALOFUNTIME_ID_CHANNEL_CLUBS}> channel.`,
+        content: `You must have the <@&${HALOFUNTIME_ID_ROLE_PATHFINDER}> role to use this command. You can get it in <id:customize>.`,
         ephemeral: true,
       });
       return;
     }
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+    const quiet = interaction.options.getBoolean("quiet") ?? true;
     const response = await axios
       .get(`${HALOFUNTIME_API_URL}/pathfinder/hike-queue`, {
         headers: {
@@ -50,10 +57,42 @@ module.exports = {
         ephemeral: true,
       });
     } else {
+      const quipPayload = await axios
+        .get(`${HALOFUNTIME_API_URL}/intern/random-hike-queue-quip`, {
+          headers: {
+            Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+          },
+        })
+        .then((response) => response.data)
+        .catch(async (error) => {
+          // Return the error payload directly if present
+          if (error.response.data) {
+            return error.response.data;
+          }
+          console.error(error);
+        });
+      // Return a default quip if an error is present
+      let hikeQueueQuip = "";
+      if ("error" in quipPayload) {
+        hikeQueueQuip = "Hiking. It's better than biking.";
+      } else {
+        hikeQueueQuip = quipPayload.quip;
+      }
+      const now = dayjs();
+      const hikeQueueEmbed = new EmbedBuilder()
+        .setColor(0xa4cadb)
+        .setTitle(`__Pathfinder Hikes Queue as of <t:${now.unix()}:R>__`)
+        .setDescription(
+          `Submit a map for playtesting by using \`/pathfinder-hikes-submit\` on your map's <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> post.`
+        )
+        .setFooter({
+          text: `"${hikeQueueQuip}"`,
+          iconURL: "https://api.halofuntime.com/static/PathfinderLogo.png",
+        });
       function buildField(submission) {
         return {
-          name: `__${submission.map}__ (${submission.maxPlayerCount})`,
-          value: `> **Modes:** ${submission.mode1} & ${submission.mode2}\n> **WAYWO:** <#${submission.waywoPostId}>\n> **Submitter:** <@${submission.mapSubmitterDiscordId}>`,
+          name: `<#${submission.waywoPostId}> (${submission.maxPlayerCount})`,
+          value: `> <@${submission.mapSubmitterDiscordId}> wants to test **${submission.mode}**`,
         };
       }
       const scheduledEmbeds = [];
@@ -85,13 +124,18 @@ module.exports = {
       for (const submission of response.unscheduled) {
         fields.push(buildField(submission));
       }
-      const unscheduledEmbed = new EmbedBuilder()
-        .setColor(0x9b59b6)
-        .setTitle("Unscheduled")
-        .addFields(fields);
+      const embeds = [hikeQueueEmbed, ...scheduledEmbeds];
+      if (fields.length > 0) {
+        const unscheduledEmbed = new EmbedBuilder()
+          .setColor(0x9b59b6)
+          .setTitle("Unscheduled")
+          .addFields(fields);
+        embeds.push(unscheduledEmbed);
+      }
       await interaction.reply({
-        embeds: [...scheduledEmbeds, unscheduledEmbed],
-        allowedMentions: { parse: [] },
+        allowedMentions: { parse: ["users"] },
+        embeds: embeds,
+        ephemeral: quiet,
       });
     }
   },

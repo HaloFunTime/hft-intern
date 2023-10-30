@@ -1,7 +1,6 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
 const {
-  HALOFUNTIME_ID_CHANNEL_CLUBS,
   HALOFUNTIME_ID_CHANNEL_LFG,
   HALOFUNTIME_ID_CHANNEL_WAYWO,
   HALOFUNTIME_ID_ROLE_PATHFINDER,
@@ -16,7 +15,7 @@ module.exports = {
     // Command may only be executed by someone with the Pathfinder role
     if (!interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_PATHFINDER)) {
       await interaction.reply({
-        content: `You must have the <@&${HALOFUNTIME_ID_ROLE_PATHFINDER}> role to use this command. You can get it in the <#${HALOFUNTIME_ID_CHANNEL_CLUBS}> channel.`,
+        content: `You must have the <@&${HALOFUNTIME_ID_ROLE_PATHFINDER}> role to use this command. You can get it in <id:customize>.`,
         ephemeral: true,
       });
       return;
