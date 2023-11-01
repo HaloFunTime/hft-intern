@@ -5,13 +5,14 @@ const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
 const {
-  HALOFUNTIME_ID_CHANNEL_SPOTLIGHT,
   HALOFUNTIME_ID_CHANNEL_PATHFINDERS_VC_1,
-  HALOFUNTIME_ID_ROLE_PATHFINDER,
+  HALOFUNTIME_ID_CHANNEL_SPOTLIGHT,
+  HALOFUNTIME_ID_CHANNEL_WAYWO,
   HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_S3,
   HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_S4,
   HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_S5,
   HALOFUNTIME_ID_ROLE_PATHFINDER_ILLUMINATED,
+  HALOFUNTIME_ID_ROLE_PATHFINDER,
   HALOFUNTIME_ID,
 } = require("../constants.js");
 const scheduledEvents = require("../utils/scheduledEvents");
@@ -42,30 +43,110 @@ const ROLE_ID_BY_NAME_AND_SEASON = {
 };
 
 const createPathfinderHikesEvent = async (client) => {
+  const guild = client.guilds.cache.get(HALOFUNTIME_ID);
+  const allMembersMap = await guild.members.fetch({
+    cache: true,
+    withUserCount: true,
+  });
+  const allMembersWithPathfinderRole = Array.from(
+    allMembersMap.values()
+  ).filter(
+    (m) => !m.user.bot && m.roles.cache.has(HALOFUNTIME_ID_ROLE_PATHFINDER)
+  );
+  // Determine Pathfinder Bean awards
+  const discordUsersAwardedBeans = [];
+  for (const m of allMembersWithPathfinderRole) {
+    const funTimerRoles = (m.roles?.cache || []).filter((role) =>
+      /FunTimer/.test(role.name)
+    );
+    let funTimerRank = 0;
+    funTimerRoles.forEach((role) => {
+      funTimerRank = parseInt(role.name.split(" ")[1]);
+    });
+    const season = getCurrentSeason();
+    const seasonTitles = ROLE_ID_BY_NAME_AND_SEASON[season];
+    const pathfinderRoleId = seasonTitles["dynamo"];
+    const isDynamo = m.roles.cache.has(pathfinderRoleId);
+    const beanAward = funTimerRank + (isDynamo ? 10 : 0);
+    if (beanAward > 0) {
+      discordUsersAwardedBeans.push({
+        discordId: m.user.id,
+        discordUsername: m.user.username,
+        awardedBeans: beanAward,
+      });
+    }
+  }
+  const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+  let skipRecap = false;
+  const response = await axios
+    .post(
+      `${HALOFUNTIME_API_URL}/pathfinder/weekly-recap`,
+      {
+        discordUsersAwardedBeans: discordUsersAwardedBeans,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+        },
+      }
+    )
+    .then((response) => response.data)
+    .catch(async (error) => {
+      console.error(error);
+      // Return the error payload directly if present
+      if (error.response?.data) {
+        return error.response?.data;
+      }
+    });
+  if (!response || (response && "error" in response)) {
+    console.error("Ran into an error retrieving the Pathfinder Weekly Recap.");
+    skipRecap = true;
+  }
   const now = dayjs();
   const nextWednesday = now.day(3).add(1, "week");
   const eventStart = getDateTimeForPathfinderEventStart(nextWednesday);
+  let messageContent;
+  const hikesBlurb =
+    "Click the 'Interested' bell on the event below to be notified when it starts. Attending Pathfinder Hikes will earn you 🫘 **Pathfinder Beans** and points toward this season's **Pathfinder Dynamo** role.";
+  if (skipRecap) {
+    messageContent = `Pathfinder Hikes - our weekly Forge map testing session - has been scheduled for next week.\n\n${hikesBlurb}`;
+  } else {
+    const playersS = response.hikerCount !== 1;
+    const postsS = response.waywoPostCount !== 1;
+    const commentsS = response.waywoCommentCount !== 1;
+    const submissionsS = response.hikeSubmissionCount !== 1;
+    const overviewBlurb =
+      "Weekly 🫘 **Pathfinder Bean** bonuses have been awarded and Pathfinder Hikes - our weekly Forge map testing session - has been scheduled for next week.";
+    const recapBlurb = `This week, we had **${response.hikerCount} player${
+      playersS && "s"
+    }** participate in Pathfinder Hike games. Activity in the <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> channel this week included **${
+      response.waywoPostCount
+    } new post${postsS && "s"}** and **${
+      response.waywoCommentCount
+    } total comment${commentsS && "s"}**, as well as **${
+      response.hikeSubmissionCount
+    } new submission${submissionsS && "s"}** to Pathfinder Hikes.`;
+    messageContent = `${overviewBlurb}\n\n${recapBlurb}\n\n${hikesBlurb}`;
+  }
   try {
     const message = await scheduledEvents.createVoiceEvent(
       client,
       HALOFUNTIME_ID,
       HALOFUNTIME_ID_CHANNEL_SPOTLIGHT,
-      `<@&${HALOFUNTIME_ID_ROLE_PATHFINDER}>\n\n` +
-        "Pathfinder Hikes - our weekly Forge map testing session - has been scheduled for next week.\n\n" +
-        "Click the 'Interested' bell below to get notified when it starts. " +
-        "Attending this event will earn you points toward the **Pathfinder Dynamo** role. " +
-        "We'll do our best to play as many maps as we can, but maps whose owners are present for the playtest will have priority!",
+      `<@&${HALOFUNTIME_ID_ROLE_PATHFINDER}>\n\n${messageContent}`,
       "Pathfinder Hikes",
       HALOFUNTIME_ID_CHANNEL_PATHFINDERS_VC_1,
       eventStart.toISOString(),
       null,
-      "Playtest Forge maps with the Pathfinders club! Submit a map using the `/pathfinder-hikes-submit` command in your map's <#1039171549682470982> post.",
+      `Playtest Forge maps with the Pathfinders club! Submit a map using the \`/pathfinder-hikes-submit\` command in your map's <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> post.`,
       "https://i.imgur.com/qItmOhr.jpg"
     );
     if (message) {
       await message.react("🏞");
       await message.react("🥾");
       await message.react("🏕");
+      await message.react("🫘");
+      await message.react("🔥");
     }
   } catch (e) {
     console.error(e);
