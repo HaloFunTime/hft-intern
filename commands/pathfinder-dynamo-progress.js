@@ -4,8 +4,14 @@ const {
   HALOFUNTIME_ID_CHANNEL_LFG,
   HALOFUNTIME_ID_CHANNEL_WAYWO,
   HALOFUNTIME_ID_ROLE_PATHFINDER,
+  HALOFUNTIME_ID_THREAD_PATHFINDER_BOT_COMMANDS,
 } = require("../constants.js");
-const { getCurrentSeason, SEASON_03, SEASON_04 } = require("../utils/seasons");
+const {
+  getCurrentSeason,
+  SEASON_03,
+  SEASON_04,
+  SEASON_05,
+} = require("../utils/seasons");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -16,6 +22,16 @@ module.exports = {
     if (!interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_PATHFINDER)) {
       await interaction.reply({
         content: `You must have the <@&${HALOFUNTIME_ID_ROLE_PATHFINDER}> role to use this command. You can get it in <id:customize>.`,
+        ephemeral: true,
+      });
+      return;
+    }
+    // Command may only be executed in the Pathfinder Bot Commands thread
+    if (
+      interaction.channelId !== HALOFUNTIME_ID_THREAD_PATHFINDER_BOT_COMMANDS
+    ) {
+      await interaction.reply({
+        content: `You may only use this command in the <#${HALOFUNTIME_ID_THREAD_PATHFINDER_BOT_COMMANDS}> thread.`,
         ephemeral: true,
       });
       return;
@@ -163,6 +179,46 @@ module.exports = {
                 response.pointsForgedInFire
               }/200 points** ${
                 response.pointsForgedInFire === 200 ? "✅" : ""
+              }`,
+            });
+        }
+      } else if (currentSeason === SEASON_05) {
+        progressEmbed
+          .setDescription("**Season 5**")
+          .addFields({
+            name: "🫘 Bean Spender",
+            value: `> *Spend 50 🫘 **Pathfinder Beans** to submit a map to Pathfinder Hikes playtesting. Earnable once.*\n> **${
+              response.pointsBeanSpender
+            }/200 points** ${response.pointsBeanSpender === 200 ? "✅" : ""}`,
+          })
+          .addFields({
+            name: "🧱 What Are You Working On?",
+            value: `> *Create a* <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> *post for a project you're working on. 50 points per post.*\n> **${
+              response.pointsWhatAreYouWorkingOn
+            }/150 points** ${
+              response.pointsWhatAreYouWorkingOn === 150 ? "✅" : ""
+            }`,
+          })
+          .addFields({
+            name: "💬 Feedback Fiend",
+            value: `> *Comment on* <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> *posts. 1 point per comment.*\n> **${
+              response.pointsFeedbackFiend
+            }/100 points** ${response.pointsFeedbackFiend === 100 ? "✅" : ""}`,
+          });
+        if (response.linkedGamertag) {
+          progressEmbed
+            .addFields({
+              name: "🥾 Gone Hiking",
+              value: `> *Attend Pathfinder Hikes playtesting in-game! 10 points per map hiked.*\n> **${
+                response.pointsGoneHiking
+              }/250 points** ${response.pointsGoneHiking === 250 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "🔥 Forged in Fire",
+              value: `> *Spend time playing Custom Games on Forge maps. 1 point per full hour played.*\n> **${
+                response.pointsForgedInFire
+              }/100 points** ${
+                response.pointsForgedInFire === 100 ? "✅" : ""
               }`,
             });
         }

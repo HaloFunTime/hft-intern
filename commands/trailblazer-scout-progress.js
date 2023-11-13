@@ -3,7 +3,7 @@ const axios = require("axios");
 const {
   HALOFUNTIME_ID_ROLE_TRAILBLAZER,
   HALOFUNTIME_ID_CHANNEL_VOD_REVIEW,
-  HALOFUNTIME_ID_CHANNEL_CLUBS,
+  HALOFUNTIME_ID_THREAD_TRAILBLAZER_BOT_COMMANDS,
 } = require("../constants.js");
 const {
   getCurrentSeason,
@@ -21,6 +21,16 @@ module.exports = {
     if (!interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_TRAILBLAZER)) {
       await interaction.reply({
         content: `You must have the <@&${HALOFUNTIME_ID_ROLE_TRAILBLAZER}> role to use this command. You can get it in <id:customize>.`,
+        ephemeral: true,
+      });
+      return;
+    }
+    // Command may only be executed in the Trailblazer Bot Commands thread
+    if (
+      interaction.channelId !== HALOFUNTIME_ID_THREAD_TRAILBLAZER_BOT_COMMANDS
+    ) {
+      await interaction.reply({
+        content: `You may only use this command in the <#${HALOFUNTIME_ID_THREAD_TRAILBLAZER_BOT_COMMANDS}> thread.`,
         ephemeral: true,
       });
       return;
