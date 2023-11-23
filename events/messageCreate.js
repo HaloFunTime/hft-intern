@@ -146,6 +146,41 @@ async function attemptChatter(message) {
   await chatter(message);
 }
 
+async function attemptRandomBeanReward(message) {
+  // Do not award a Pathfinder Bean if the random roll fails
+  if (Math.random() > 0.01) return;
+  // Bean time!
+  const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+  const response = await axios
+    .post(
+      `${HALOFUNTIME_API_URL}/pathfinder/change-beans`,
+      {
+        discordId: message.author.id,
+        discordUsername: message.author.username,
+        beanDelta: 1,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+        },
+      }
+    )
+    .then((response) => response.data)
+    .catch(async (error) => {
+      console.error(error);
+      // Return the error payload directly if present
+      if (error.response.data) {
+        return error.response.data;
+      }
+    });
+  // Log if an error happens
+  if (response.success === false || "error" in response) {
+    console.log(response.error);
+  } else if (response.success) {
+    await message.react("🫘");
+  }
+}
+
 async function recordWaywoComment(message) {
   // Do not record a WAYWO comment if the message was authored by this bot
   if (message.author.id === message.client.user.id) return;
@@ -186,6 +221,9 @@ async function recordWaywoComment(message) {
     console.log(response.error);
   } else if (response.awardedBean) {
     await message.react("🫘");
+  } else if (!response.awardedBean) {
+    // Reward a Pathfinder Bean anyway 1% of the time to drive everyone crazy trying to figure out how to trigger it
+    await attemptRandomBeanReward(message);
   }
 }
 

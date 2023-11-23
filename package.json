@@ -20,9 +20,9 @@
   },
   "homepage": "https://github.com/HaloFunTime/hft-intern#readme",
   "dependencies": {
-    "axios": "^1.1.2",
+    "axios": "^1.6.2",
     "dayjs": "^1.11.7",
-    "discord.js": "14.13.0",
+    "discord.js": "14.14.1",
     "dotenv": "^16.0.3",
     "node-cron": "3.0.0"
   },
