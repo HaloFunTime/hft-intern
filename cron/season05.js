@@ -69,17 +69,14 @@ const processReassignments = async (client) => {
   for (const pr of response.processedReassignments) {
     const member = await guild.members.fetch(pr.discordUserId);
     const { roleId, emojiId, emojiString } =
-      await members.updateDomainChallengeTeamRole(
-        member,
-        response.assignedTeam
-      );
+      await members.updateDomainChallengeTeamRole(member, pr.team);
     let messageText = `<@${pr.discordUserId}> `;
     if (roleId) {
-      messageText += `has been reassigned to ${emojiString} ${roleId}.`;
+      messageText += `has been reassigned to ${emojiString} <@&${roleId}>.`;
     } else {
       messageText += "is no longer assigned to a team.";
     }
-    messageText += ` *${pr.reason}*`;
+    messageText += `\n> *${pr.reason}*`;
     const message = await channel.send({
       allowedMentions: { users: [pr.discordUserId] },
       content: messageText,

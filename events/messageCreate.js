@@ -1,6 +1,9 @@
 const axios = require("axios");
 const { ChannelType } = require("discord.js");
-const { HALOFUNTIME_ID_CHANNEL_WAYWO } = require("../constants.js");
+const {
+  HALOFUNTIME_ID_CHANNEL_PASSION_PATROL,
+  HALOFUNTIME_ID_CHANNEL_WAYWO,
+} = require("../constants.js");
 const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
 
 async function chatter(message) {
@@ -146,6 +149,60 @@ async function attemptChatter(message) {
   await chatter(message);
 }
 
+async function attemptPassionPatrolAction(message) {
+  // Do not attempt a Passion Patrol action if the message was authored by this bot
+  if (message.author.id === message.client.user.id) return;
+  // Do not attempt a Passion Patrol action if the message was sent by another application
+  if (message.applicationId) return;
+  // Do not attempt a Passion Patrol action if the message mentions no one
+  if (message.mentions.users.size === 0) return;
+  // Do not attempt a Passion Patrol action if the message does not mention the bot specifically
+  const messageMentionedBot = message.mentions.users.reduce((acc, user) => {
+    if (acc) return true;
+    return user.id === message.client.user.id;
+  }, false);
+  if (!messageMentionedBot) return;
+  // Do not attempt a Passion Patrol action if the message content does not match a lenient "passion patrol" regular expression
+  const passionPatrol = /(passion){1}.+(patrol){1}/i;
+  if (!passionPatrol.test(message.content)) return;
+  // Retrieve the current chief of the Passion Patrol
+  const passionPatrolChannel = message.client.channels.cache.get(
+    HALOFUNTIME_ID_CHANNEL_PASSION_PATROL
+  );
+  const matches = passionPatrolChannel.topic.match(/(\d+)/);
+  if (!matches) return;
+  // Do not attempt a Passion Patrol action if the message was not sent by the Chief of the Passion Patrol
+  const passionPatrolChiefId = matches[0];
+  if (message.author.id !== passionPatrolChiefId) return;
+  // Attempt actions on mentioned users based on whether "add" or "remove" was said
+  let actionTaken = false;
+  await message.mentions.users.forEach(async (user) => {
+    if (user.id === message.client.user.id) return;
+    const add = /(add){1}/i;
+    const remove = /(remove){1}/i;
+    if (add.test(message.content)) {
+      await passionPatrolChannel.permissionOverwrites.create(user.id, {
+        ReadMessageHistory: true,
+        SendMessages: true,
+        ViewChannel: true,
+      });
+      await passionPatrolChannel.send(
+        `<@${user.id}> has been added to the Passion Patrol by <@${passionPatrolChiefId}>.`
+      );
+      actionTaken = true;
+    } else if (remove.test(message.content)) {
+      await passionPatrolChannel.permissionOverwrites.delete(
+        user.id,
+        "Chief's orders."
+      );
+      await passionPatrolChannel.send(
+        `<@${user.id}> has been removed from the Passion Patrol by <@${passionPatrolChiefId}>.`
+      );
+      actionTaken = true;
+    }
+  });
+}
+
 async function attemptRandomBeanReward(message) {
   // Do not award a Pathfinder Bean if the random roll fails
   if (Math.random() > 0.01) return;
@@ -236,6 +293,7 @@ module.exports = {
       );
       await attemptChatterPause(message);
       await attemptChatter(message);
+      await attemptPassionPatrolAction(message);
       await recordWaywoComment(message);
     }
   },
