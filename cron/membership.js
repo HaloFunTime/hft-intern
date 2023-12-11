@@ -85,6 +85,12 @@ const kickLurkers = async (client) => {
   }
 };
 
+const runLfgHealthReport = async (client) => {
+  const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_LOGS);
+  const healthString = await members.lfgThreadHealthReport(client);
+  channel.send("# LFG Thread Health Report:\n" + healthString);
+};
+
 const postHelpfulHintToNewHereChannel = async (client) => {
   const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
   const hintPayload = await axios
@@ -434,6 +440,7 @@ const updateRankedRoles = async (client) => {
 
 module.exports = {
   kickLurkers: kickLurkers,
+  runLfgHealthReport: runLfgHealthReport,
   postHelpfulHintToNewHereChannel: postHelpfulHintToNewHereChannel,
   updateFirst100Roles: updateFirst100Roles,
   updateNewHereRoles: updateNewHereRoles,

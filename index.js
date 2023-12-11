@@ -5,6 +5,7 @@ const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const dotenv = require("dotenv");
 const {
   kickLurkers,
+  runLfgHealthReport,
   postHelpfulHintToNewHereChannel,
   updateFirst100Roles,
   updateNewHereRoles,
@@ -110,6 +111,7 @@ const scheduleFunc = (cronExpression, func, ...args) => {
 client.on("ready", () => {
   // Membership
   scheduleFunc("0 0 8 * * 1", kickLurkers, client); // every Monday at 8AM
+  scheduleFunc("0 0 9 * * 1", runLfgHealthReport, client); // every Monday at 9AM
   scheduleFunc(
     "0 30 9,10,11,12,13,14,15,16,17,18 * * *",
     postHelpfulHintToNewHereChannel,
