@@ -12,7 +12,6 @@ const {
   HALOFUNTIME_ID_CHANNEL_LFG_TAG_SOCIAL,
   HALOFUNTIME_ID_CHANNEL_LFG_TAG_TESTING,
   HALOFUNTIME_ID_CHANNEL_LFG,
-  HALOFUNTIME_ID_CHANNEL_NEW_HALO_VC,
   HALOFUNTIME_ID_CHANNEL_WAYWO,
   HALOFUNTIME_ID_ROLE_8S,
   HALOFUNTIME_ID_ROLE_BTB,
@@ -45,104 +44,6 @@ LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_SOCIAL] =
   HALOFUNTIME_ID_ROLE_SOCIAL;
 LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_TESTING] =
   HALOFUNTIME_ID_ROLE_TESTING;
-
-async function attemptLfgHelp(thread) {
-  // Do not send an LFG Help message if the thread is not in the LFG forum channel
-  if (thread.parentId !== HALOFUNTIME_ID_CHANNEL_LFG) return;
-  if (thread.sendable) {
-    let messageContent = `Thanks for making an LFG post! You can make a new VC for your group at any time by joining the <#${HALOFUNTIME_ID_CHANNEL_NEW_HALO_VC}> channel.`;
-    const threadOwner = await thread.fetchOwner();
-    await thread.fetchStarterMessage(); // Kludge to ensure starter message has been posted before attempting the help response
-    // Get gamertag info
-    const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
-    const linkResponse = await axios
-      .get(
-        `${HALOFUNTIME_API_URL}/link/discord-to-xbox-live?discordId=${
-          threadOwner.user.id
-        }&discordUsername=${encodeURIComponent(threadOwner.user.username)}`,
-        {
-          headers: {
-            Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
-          },
-        }
-      )
-      .then((response) => response.data)
-      .catch(async (error) => {
-        // Return the error payload directly if present
-        if (error.response.data) {
-          return error.response.data;
-        }
-        console.error(error);
-      });
-    let gamertag = null;
-    let gamertagVerified = false;
-    if ("xboxLiveGamertag" in linkResponse) {
-      gamertag = linkResponse.xboxLiveGamertag;
-      gamertagVerified = linkResponse.verified;
-    }
-    // Get game stats
-    let matchmadeGamesPlayed = null;
-    let customGamesPlayed = null;
-    if (gamertag && gamertagVerified) {
-      const statsResponse = await axios
-        .get(
-          `${HALOFUNTIME_API_URL}/halo-infinite/summary-stats?gamertag=${gamertag}`,
-          {
-            headers: {
-              Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
-            },
-          }
-        )
-        .then((response) => response.data)
-        .catch(async (error) => {
-          // Return the error payload directly if present
-          if (error.response.data) {
-            return error.response.data;
-          }
-          console.error(error);
-        });
-      if ("matchmaking" in statsResponse) {
-        matchmadeGamesPlayed = statsResponse.matchmaking?.gamesPlayed;
-      }
-      if ("custom" in statsResponse) {
-        customGamesPlayed = statsResponse.custom?.gamesPlayed;
-      }
-    }
-    // Add gamertag blurb
-    if (
-      gamertag &&
-      matchmadeGamesPlayed !== null &&
-      customGamesPlayed !== null
-    ) {
-      messageContent += `\n\n<@${thread.ownerId}>'s linked gamertag is \`${gamertag}\`, which has played **${matchmadeGamesPlayed}** matchmade games and **${customGamesPlayed}** custom games in Halo Infinite.`;
-    } else if (gamertag) {
-      messageContent += `\n\n<@${thread.ownerId}>'s linked gamertag is \`${gamertag}\`.`;
-    } else {
-      messageContent += `\n\n<@${thread.ownerId}>, you have not linked your gamertag on HaloFunTime. Please do so with \`/link-gamertag\` so others can use \`/gamertag\` to check your gamertag!`;
-    }
-    // Add tag blurb
-    const pingRecommendations = [];
-    for (const tag of thread.appliedTags) {
-      pingRecommendations.push(`<@&${LFG_TAG_IDS_TO_ROLE_IDS[tag]}>`);
-    }
-    if (pingRecommendations.length > 0) {
-      const roleText =
-        pingRecommendations.length === 1
-          ? "this LFG role"
-          : "any of these LFG roles";
-      messageContent +=
-        "\n\n> **NOTE:** To get more eyes on your LFG post, try mentioning ";
-      messageContent += `${roleText}: ${pingRecommendations.join(" ")}`;
-      messageContent +=
-        "\n> __***Each LFG role mention will ping hundreds of users, so please use this power responsibly!***__";
-    }
-    // Send the LFG Help message
-    await thread.send({
-      content: messageContent,
-      allowedMentions: { users: [thread.ownerId] },
-    });
-  }
-}
 
 async function attemptFileShareEnforcement(thread) {
   // Do not enforce post restrictions if the thread is not in the File Share channel
@@ -297,7 +198,6 @@ async function recordWaywoPost(thread) {
 module.exports = {
   name: "threadCreate",
   async execute(thread) {
-    await attemptLfgHelp(thread);
     await attemptFileShareEnforcement(thread);
     await recordTestingLFGPost(thread);
     await recordWaywoPost(thread);
