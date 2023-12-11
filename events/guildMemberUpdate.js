@@ -63,7 +63,9 @@ async function updateLfgThreadMembership(oldMember, newMember) {
       );
       reason = "Added Testing Role";
     }
-    await thread.members.add(newMember.id, reason);
+    if (thread) {
+      await thread.members.add(newMember.id, reason);
+    }
   });
 }
 
