@@ -85,9 +85,6 @@ const trailblazerDailyPassionReport = async (client) => {
     cache: true,
     withUserCount: true,
   });
-  const allMembers = Array.from(allMembersMap.values()).filter(
-    (m) => !m.user.bot
-  );
   const allMembersWithTrailblazerRole = Array.from(
     allMembersMap.values()
   ).filter(
@@ -141,7 +138,6 @@ const trailblazerDailyPassionReport = async (client) => {
     }
     const players = [...response.players];
     players.sort((a, b) => (a.currentCSR < b.currentCSR ? 1 : -1));
-    const passionFields = [];
     const tiersList = [
       "Onyx",
       "Diamond",
@@ -182,15 +178,9 @@ const trailblazerDailyPassionReport = async (client) => {
         // Skip unranked players
         continue;
       }
-      let playerSubTier;
-      if (playerTier !== "Onyx") {
-        const tierMin = tiers[playerTier][1];
-        playerSubTier = Math.floor((player.currentCSR - tierMin) / 50) + 1;
-      }
-      let playerFullTier = playerTier;
-      if (playerSubTier) {
-        playerFullTier += ` ${playerSubTier}`;
-      }
+      const tierMin = tiers[playerTier][1];
+      const playerSubTier = Math.floor((player.currentCSR - tierMin) / 50) + 1;
+      const playerFullTier = `${playerTier} ${playerSubTier}`;
       if (playerFullTier in representedCSRsByTier) {
         representedCSRsByTier[playerFullTier].add(player.currentCSR);
       } else {
@@ -202,90 +192,60 @@ const trailblazerDailyPassionReport = async (client) => {
         playersByCSR[player.currentCSR] = [player];
       }
     }
+    function getColorForTier(tier) {
+      if (tier === "Onyx") {
+        return 0x4f356b;
+      } else if (tier === "Diamond") {
+        return 0x81bbd5;
+      } else if (tier === "Platinum") {
+        return 0x8283c4;
+      } else if (tier === "Gold") {
+        return 0xe5d16f;
+      } else if (tier === "Silver") {
+        return 0xcccccc;
+      } else if (tier === "Bronze") {
+        return 0x825538;
+      }
+    }
     let [
-      onyxFields,
-      diamondFields,
-      platinumFields,
-      goldFields,
-      silverFields,
-      bronzeFields,
+      onyxEmbeds,
+      diamondEmbeds,
+      platinumEmbeds,
+      goldEmbeds,
+      silverEmbeds,
+      bronzeEmbeds,
     ] = Array.from({ length: 6 }, () => []);
     for (const [fullTier, csrSet] of Object.entries(representedCSRsByTier)) {
       const tier = fullTier.split(" ")[0];
-      let fields;
+      let embeds;
       if (tier === "Onyx") {
-        fields = onyxFields;
+        embeds = onyxEmbeds;
       } else if (tier === "Diamond") {
-        fields = diamondFields;
+        embeds = diamondEmbeds;
       } else if (tier === "Platinum") {
-        fields = platinumFields;
+        embeds = platinumEmbeds;
       } else if (tier === "Gold") {
-        fields = goldFields;
+        embeds = goldEmbeds;
       } else if (tier === "Silver") {
-        fields = silverFields;
+        embeds = silverEmbeds;
       } else if (tier === "Bronze") {
-        fields = bronzeFields;
+        embeds = bronzeEmbeds;
       }
       const csrStrings = [];
       for (const csr of csrSet) {
         const csrPlayerIdStrings = playersByCSR[csr].map(
           (csrPlayer) => `<@${csrPlayer.discordUserId}>`
         );
-        csrStrings.push(`> \`${csr}\` ${csrPlayerIdStrings.join(" ")}`);
+        csrStrings.push(`\`${csr}\` ${csrPlayerIdStrings.join(" ")}`);
       }
-      fields.push({
-        name: `${emojiStrings[tier]} ${fullTier}`,
-        value: csrStrings.join("\n"),
-      });
-    }
-    const passionEmbeds = [];
-    if (onyxFields.length > 0) {
-      passionEmbeds.push(
-        new EmbedBuilder()
-          .setColor(0x4f356b)
-          .setTitle("__Onyx Passion__")
-          .addFields(onyxFields)
-      );
-    }
-    if (diamondFields.length > 0) {
-      passionEmbeds.push(
-        new EmbedBuilder()
-          .setColor(0x81bbd5)
-          .setTitle("__Diamond Passion__")
-          .addFields(diamondFields)
-      );
-    }
-    if (platinumFields.length > 0) {
-      passionEmbeds.push(
-        new EmbedBuilder()
-          .setColor(0x8283c4)
-          .setTitle("__Platinum Passion__")
-          .addFields(platinumFields)
-      );
-    }
-    if (goldFields.length > 0) {
-      passionEmbeds.push(
-        new EmbedBuilder()
-          .setColor(0xe5d16f)
-          .setTitle("__Gold Passion__")
-          .addFields(goldFields)
-      );
-    }
-    if (silverFields.length > 0) {
-      passionEmbeds.push(
-        new EmbedBuilder()
-          .setColor(0xcccccc)
-          .setTitle("__Silver Passion__")
-          .addFields(silverFields)
-      );
-    }
-    if (bronzeFields.length > 0) {
-      passionEmbeds.push(
-        new EmbedBuilder()
-          .setColor(0x825538)
-          .setTitle("__Bronze Passion__")
-          .addFields(bronzeFields)
-      );
+      if (csrStrings.length > 0) {
+        embeds.push(
+          new EmbedBuilder().setColor(getColorForTier(tier)).addFields({
+            name: `${emojiStrings[tier]} ${fullTier}`,
+            value: csrStrings.join("\n"),
+          })
+        );
+      }
     }
     const trailblazersChannel = client.channels.cache.get(
       HALOFUNTIME_ID_CHANNEL_TRAILBLAZERS
@@ -309,11 +269,20 @@ const trailblazerDailyPassionReport = async (client) => {
       allowedMentions: { parse: [] },
       embeds: [passionReportEmbed],
     });
-    for (const embed of passionEmbeds) {
-      await thread.send({
-        allowedMentions: { parse: [] },
-        embeds: [embed],
-      });
+    for (const embeds of [
+      onyxEmbeds,
+      diamondEmbeds,
+      platinumEmbeds,
+      goldEmbeds,
+      silverEmbeds,
+      bronzeEmbeds,
+    ]) {
+      if (embeds.length > 0) {
+        await thread.send({
+          allowedMentions: { parse: [] },
+          embeds: embeds,
+        });
+      }
     }
   }
   console.log("Finished daily passion report.");
