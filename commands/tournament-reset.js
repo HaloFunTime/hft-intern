@@ -40,7 +40,9 @@ module.exports = {
           HALOFUNTIME_ID_ROLE_TOURNAMENT_COMPETITOR
         );
         for (const member of competitorRole.members) {
-          await member.roles.remove(HALOFUNTIME_ID_ROLE_TOURNAMENT_COMPETITOR);
+          await member.roles.cache.remove(
+            HALOFUNTIME_ID_ROLE_TOURNAMENT_COMPETITOR
+          );
         }
         await interaction.reply({
           content: "Successfully reset the tournament.",

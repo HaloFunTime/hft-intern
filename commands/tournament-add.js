@@ -22,7 +22,6 @@ module.exports = {
         .setRequired(true)
     ),
   async execute(interaction) {
-    console.log(interaction);
     if (interaction.guildId !== HALOFUNTIME_ID) {
       interaction.reply({
         content: "This command may only be run in the HaloFunTime server.",
