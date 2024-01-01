@@ -118,14 +118,14 @@ const createPathfinderHikesEvent = async (client) => {
     const overviewBlurb =
       "Weekly 🫘 **Pathfinder Bean** bonuses have been awarded and Pathfinder Hikes - our weekly Forge map testing session - has been scheduled for next week.";
     const recapBlurb = `This week, we had **${response.hikerCount} player${
-      playersS && "s"
+      playersS ? "s" : ""
     }** participate in Pathfinder Hike games. Activity in the <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> channel this week included **${
       response.waywoPostCount
-    } new post${postsS && "s"}** and **${
+    } new post${postsS ? "s" : ""}** and **${
       response.waywoCommentCount
-    } total comment${commentsS && "s"}**, as well as **${
+    } total comment${commentsS ? "s" : ""}**, as well as **${
       response.hikeSubmissionCount
-    } new submission${submissionsS && "s"}** to Pathfinder Hikes.`;
+    } new submission${submissionsS ? "s" : ""}** to Pathfinder Hikes.`;
     messageContent = `${overviewBlurb}\n\n${recapBlurb}\n\n${hikesBlurb}`;
   }
   try {
