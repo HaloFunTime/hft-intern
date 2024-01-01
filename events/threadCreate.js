@@ -2,48 +2,8 @@ const { EmbedBuilder } = require("discord.js");
 const axios = require("axios");
 const {
   HALOFUNTIME_ID_CHANNEL_FILE_SHARE,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_8S,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_BTB,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_CUSTOMS,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_CO_OP,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_CUSTOMS,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_MATCHMAKING,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_RANKED,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_SOCIAL,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_TESTING,
-  HALOFUNTIME_ID_CHANNEL_LFG,
   HALOFUNTIME_ID_CHANNEL_WAYWO,
-  HALOFUNTIME_ID_ROLE_8S,
-  HALOFUNTIME_ID_ROLE_BTB,
-  HALOFUNTIME_ID_ROLE_CUSTOMS,
-  HALOFUNTIME_ID_ROLE_MCC_CO_OP,
-  HALOFUNTIME_ID_ROLE_MCC_CUSTOMS,
-  HALOFUNTIME_ID_ROLE_MCC_MATCHMAKING,
-  HALOFUNTIME_ID_ROLE_PATHFINDER,
-  HALOFUNTIME_ID_ROLE_RANKED,
-  HALOFUNTIME_ID_ROLE_SOCIAL,
-  HALOFUNTIME_ID_ROLE_TESTING,
 } = require("../constants.js");
-
-const LFG_TAG_IDS_TO_ROLE_IDS = {};
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_8S] =
-  HALOFUNTIME_ID_ROLE_8S;
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_BTB] =
-  HALOFUNTIME_ID_ROLE_BTB;
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_CUSTOMS] =
-  HALOFUNTIME_ID_ROLE_CUSTOMS;
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_CO_OP] =
-  HALOFUNTIME_ID_ROLE_MCC_CO_OP;
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_CUSTOMS] =
-  HALOFUNTIME_ID_ROLE_MCC_CUSTOMS;
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_MATCHMAKING] =
-  HALOFUNTIME_ID_ROLE_MCC_MATCHMAKING;
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_RANKED] =
-  HALOFUNTIME_ID_ROLE_RANKED;
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_SOCIAL] =
-  HALOFUNTIME_ID_ROLE_SOCIAL;
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_TESTING] =
-  HALOFUNTIME_ID_ROLE_TESTING;
 
 async function attemptFileShareEnforcement(thread) {
   // Do not enforce post restrictions if the thread is not in the File Share channel
@@ -114,52 +74,6 @@ async function attemptFileShareEnforcement(thread) {
   }
 }
 
-async function recordTestingLFGPost(thread) {
-  // Do not record a Testing LFG post if the thread is not in the LFG forum channel
-  if (thread.parentId !== HALOFUNTIME_ID_CHANNEL_LFG) return;
-  // Do not record a Testing LFG post if the thread does not have the Testing tag
-  let hasTestingTag = false;
-  for (const tag of thread.appliedTags) {
-    if (tag === HALOFUNTIME_ID_CHANNEL_LFG_TAG_TESTING) {
-      hasTestingTag = true;
-    }
-  }
-  if (!hasTestingTag) return;
-  // Do not record a Testing LFG post if the thread owner does not have the Pathfinder role
-  const threadOwner = await thread.fetchOwner();
-  if (!threadOwner.guildMember.roles.cache.has(HALOFUNTIME_ID_ROLE_PATHFINDER))
-    return;
-  // Record data in the backend
-  const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
-  const response = await axios
-    .post(
-      `${HALOFUNTIME_API_URL}/pathfinder/testing-lfg-post`,
-      {
-        posterDiscordId: threadOwner.user.id,
-        posterDiscordUsername: threadOwner.user.username,
-        postId: thread.id,
-        postTitle: thread.name,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
-        },
-      }
-    )
-    .then((response) => response.data)
-    .catch(async (error) => {
-      console.error(error);
-      // Return the error payload directly if present
-      if (error.response.data) {
-        return error.response.data;
-      }
-    });
-  // Log if an error happens
-  if (response.success === false || "error" in response) {
-    console.log(response.error);
-  }
-}
-
 async function recordWaywoPost(thread) {
   // Do not record a WAYWO post if the thread is not in the WAYWO forum channel
   if (thread.parentId !== HALOFUNTIME_ID_CHANNEL_WAYWO) return;
@@ -199,7 +113,6 @@ module.exports = {
   name: "threadCreate",
   async execute(thread) {
     await attemptFileShareEnforcement(thread);
-    await recordTestingLFGPost(thread);
     await recordWaywoPost(thread);
   },
 };

@@ -1,10 +1,73 @@
 const axios = require("axios");
-const { ChannelType } = require("discord.js");
+const { ChannelType, MessageType } = require("discord.js");
 const {
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_8S,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_BTB,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_CUSTOMS,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_CO_OP,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_CUSTOMS,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_MATCHMAKING,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_PVE,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_RANKED,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_SOCIAL,
+  HALOFUNTIME_ID_CHANNEL_LFG_TAG_TESTING,
+  HALOFUNTIME_ID_CHANNEL_LFG,
   HALOFUNTIME_ID_CHANNEL_PASSION_PATROL,
   HALOFUNTIME_ID_CHANNEL_WAYWO,
+  HALOFUNTIME_ID_ROLE_8S,
+  HALOFUNTIME_ID_ROLE_BTB,
+  HALOFUNTIME_ID_ROLE_CUSTOMS,
+  HALOFUNTIME_ID_ROLE_MCC_CO_OP,
+  HALOFUNTIME_ID_ROLE_MCC_CUSTOMS,
+  HALOFUNTIME_ID_ROLE_MCC_MATCHMAKING,
+  HALOFUNTIME_ID_ROLE_PVE,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_BRONZE,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_DIAMOND,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_GOLD,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_ONYX,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_PLATINUM,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_SILVER,
+  HALOFUNTIME_ID_ROLE_SOCIAL,
+  HALOFUNTIME_ID_ROLE_TESTING,
 } = require("../constants.js");
 const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+
+const LFG_TAG_IDS_TO_ROLE_IDS = {};
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_8S] = [
+  HALOFUNTIME_ID_ROLE_8S,
+];
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_BTB] = [
+  HALOFUNTIME_ID_ROLE_BTB,
+];
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_CUSTOMS] = [
+  HALOFUNTIME_ID_ROLE_CUSTOMS,
+];
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_CO_OP] = [
+  HALOFUNTIME_ID_ROLE_MCC_CO_OP,
+];
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_CUSTOMS] = [
+  HALOFUNTIME_ID_ROLE_MCC_CUSTOMS,
+];
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_MATCHMAKING] = [
+  HALOFUNTIME_ID_ROLE_MCC_MATCHMAKING,
+];
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_PVE] = [
+  HALOFUNTIME_ID_ROLE_PVE,
+];
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_RANKED] = [
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_ONYX,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_DIAMOND,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_PLATINUM,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_GOLD,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_SILVER,
+  HALOFUNTIME_ID_ROLE_RANKED_ARENA_BRONZE,
+];
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_SOCIAL] = [
+  HALOFUNTIME_ID_ROLE_SOCIAL,
+];
+LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_TESTING] = [
+  HALOFUNTIME_ID_ROLE_TESTING,
+];
 
 async function chatter(message) {
   const chatterPayload = await axios
@@ -147,6 +210,77 @@ async function attemptChatter(message) {
   if (Math.random() > 0.001) return;
   // Chatter away!
   await chatter(message);
+}
+
+async function attemptLfgHelp(message) {
+  // Do not attempt LFG help if the message was authored by this bot
+  if (message.author.id === message.client.user.id) return;
+  // Do not attempt LFG help if the message was sent by another application
+  if (message.applicationId) return;
+  // Do not attempt LFG help if the message was not sent in a thread in the LFG forum channel
+  if (message.channel.parentId !== HALOFUNTIME_ID_CHANNEL_LFG) return;
+  // Do not attempt LFG help if the message contains role or member mentions, or is a direct reply
+  if (
+    message.mentions.roles.size > 0 ||
+    message.mentions.users.size > 0 ||
+    message.type === MessageType.Reply
+  )
+    return;
+  // Do not attempt LFG help if the sender has already been offered help in the past
+  const response = await axios
+    .post(
+      `${HALOFUNTIME_API_URL}/discord/lfg-thread-help-prompt`,
+      {
+        discordUserId: message.author.id,
+        discordUsername: message.author.username,
+        lfgThreadId: message.channelId,
+        lfgThreadName: message.channel.name,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+        },
+      }
+    )
+    .then((response) => response.data)
+    .catch(async (error) => {
+      // Return the error payload directly if present
+      if (error.response.data) {
+        return error.response.data;
+      }
+      console.error(error);
+    });
+  // Log if an error happens
+  if (response.success === false || "error" in response) {
+    console.log(response.error);
+    return;
+  } else if (response.success && response.new) {
+    // Deduce appropriate LFG roles from the thread's tags
+    const pingRecommendations = [];
+    for (const tag of message.channel.appliedTags) {
+      const roleIds = LFG_TAG_IDS_TO_ROLE_IDS[tag] || [];
+      for (const roleId of roleIds) {
+        pingRecommendations.push(`<@&${roleId}>`);
+      }
+    }
+    if (pingRecommendations.length > 0) {
+      const roleText =
+        pingRecommendations.length === 1
+          ? "this LFG role"
+          : "one or more of these LFG roles";
+      const messageContent = `<@${
+        message.author.id
+      }>, I noticed that your message didn't mention anyone. Try directly replying to someone or mentioning ${roleText}: ${pingRecommendations.join(
+        " "
+      )}.`;
+      // Send the LFG Help message
+      await message.channel.send({
+        content: messageContent,
+        allowedMentions: { users: [message.author.id] },
+        ephemeral: true,
+      });
+    }
+  }
 }
 
 async function attemptPassionPatrolAction(message) {
@@ -293,6 +427,7 @@ module.exports = {
       );
       await attemptChatterPause(message);
       await attemptChatter(message);
+      await attemptLfgHelp(message);
       await attemptPassionPatrolAction(message);
       await recordWaywoComment(message);
     }
