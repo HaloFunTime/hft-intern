@@ -39,7 +39,8 @@ module.exports = {
         const competitorRole = guild.roles.cache.get(
           HALOFUNTIME_ID_ROLE_TOURNAMENT_COMPETITOR
         );
-        for (const member of competitorRole.members) {
+        const competitors = Array.from(competitorRole.members.values());
+        for (const member of competitors) {
           await member.roles.cache.remove(
             HALOFUNTIME_ID_ROLE_TOURNAMENT_COMPETITOR
           );
