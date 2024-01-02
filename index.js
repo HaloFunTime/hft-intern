@@ -5,8 +5,8 @@ const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const dotenv = require("dotenv");
 const {
   kickLurkers,
-  runLfgHealthReport,
   postHelpfulHintToNewHereChannel,
+  runLfgHealthReport,
   updateFirst100Roles,
   updateNewHereRoles,
   updatePartyTimerRoles,
@@ -16,12 +16,13 @@ const {
   conditionalWednesdayPost,
   createFunTimeFridayEvent,
   focusFunTimeFridayEvent,
-  unfocusFunTimeFridayEvent,
   publishFunTimeFridayReport,
+  unfocusFunTimeFridayEvent,
 } = require("./cron/funTimeFriday");
 const {
-  updatePathfinderRoles,
   createPathfinderHikesEvent,
+  updatePathfinderRoles,
+  weeklyPopularFilesReport,
 } = require("./cron/pathfinders");
 const {
   announceNewDomain,
@@ -132,6 +133,7 @@ client.on("ready", () => {
   // Pathfinders
   scheduleFunc("0 35 9 * * 2", updatePathfinderRoles, client); // every Tuesday at 9:35AM
   scheduleFunc("0 0 10 * * 4", createPathfinderHikesEvent, client); // every Thursday at 10AM
+  scheduleFunc("0 0 10 * * 5", weeklyPopularFilesReport, client); // every Friday at 10AM
 
   // Trailblazers
   scheduleFunc("0 5 9 * * 2", updateTrailblazerRoles, client); // every Tuesday at 9:05AM

@@ -4,10 +4,12 @@ const https = require("node:https");
 const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
+const { EmbedBuilder } = require("discord.js");
 const {
   HALOFUNTIME_ID_CHANNEL_PATHFINDERS_VC_1,
   HALOFUNTIME_ID_CHANNEL_SPOTLIGHT,
   HALOFUNTIME_ID_CHANNEL_WAYWO,
+  HALOFUNTIME_ID_EMOJI_HALOFUNTIME_DOT_COM,
   HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_S3,
   HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_S4,
   HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_S5,
@@ -289,7 +291,86 @@ const updatePathfinderRoles = async (client) => {
   console.log("Finished checking Pathfinder roles.");
 };
 
+const weeklyPopularFilesReport = async (client) => {
+  console.log("Running weekly popular files report...");
+  const now = dayjs();
+  const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+  const response = await axios
+    .get(`${HALOFUNTIME_API_URL}/pathfinder/popular-files`, {
+      headers: {
+        Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+      },
+    })
+    .then((response) => response.data)
+    .catch(async (error) => {
+      console.error(error);
+      // Return the error payload directly if present
+      if (error.response?.data) {
+        return error.response?.data;
+      }
+    });
+  if ("error" in response) {
+    return;
+  } else {
+    const embeds = [];
+    let i = 0;
+    for (const file of response.files) {
+      i++;
+      const contributorStrings = [];
+      for (const contributorDiscordId of file.contributorDiscordIds) {
+        contributorStrings.push(`<@${contributorDiscordId}>`);
+      }
+      const footerString = `Tags: ${file.tags.join(", ")}`;
+      embeds.push(
+        new EmbedBuilder()
+          .setTitle(`#${i} - ${file.name}`)
+          .setURL(file.waypointUrl)
+          .setDescription(file.description)
+          .setImage(file.thumbnailUrl)
+          .setColor(0xbc8fce)
+          .addFields(
+            {
+              name: "__File Stats__",
+              value: `- ${file.playsRecent} recent play${
+                file.playsRecent !== 1 ? "s" : ""
+              }\n- ${file.playsAllTime} total play${
+                file.playsAllTime !== 1 ? "s" : ""
+              }\n- ${file.bookmarks} bookmarks\n`,
+              inline: true,
+            },
+            {
+              name: "__HaloFunTime Contributors__",
+              value: contributorStrings.join(" ") ?? "N/A",
+              inline: true,
+            }
+          )
+          .setFooter({ text: footerString })
+      );
+    }
+    const spotlightChannel = client.channels.cache.get(
+      HALOFUNTIME_ID_CHANNEL_SPOTLIGHT
+    );
+    const message = await spotlightChannel.send({
+      content:
+        `# __Popular HaloFunTime Files: <t:${now.unix()}:D>__\n\n` +
+        "Every week we spotlight the top 10 most popular HaloFunTime files, sorted by recent play count.\n\n" +
+        "**Tag your published files in-game with 'halofuntime' to be included!**\n\n" +
+        "Link your gamertag with `/link-gamertag` to show up as a tagged contributor.",
+      embeds: embeds,
+    });
+    await message.react(HALOFUNTIME_ID_EMOJI_HALOFUNTIME_DOT_COM);
+    const thread = await message.startThread({
+      name: `Spotlight: ${now.format("MMMM D, YYYY")}`,
+      autoArchiveDuration: 60,
+      reason: "Spotlight.",
+    });
+    await thread.send("Discuss this week's popular files here.");
+  }
+  console.log("Finished weekly popular files report.");
+};
+
 module.exports = {
   createPathfinderHikesEvent: createPathfinderHikesEvent,
   updatePathfinderRoles: updatePathfinderRoles,
+  weeklyPopularFilesReport: weeklyPopularFilesReport,
 };

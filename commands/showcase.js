@@ -88,7 +88,6 @@ module.exports = {
       function modeEmbed(modeFile, slot) {
         return new EmbedBuilder()
           .setTitle(`#${slot}: ` + modeFile.name + " (Mode)")
-          .setTitle("Mode: " + modeFile.name)
           .setURL(modeFile.waypointURL)
           .setDescription(`*${modeFile.description}*`)
           .setThumbnail(modeFile.thumbnailURL)
