@@ -9,7 +9,24 @@ const {
   HALOFUNTIME_ID_ROLE_S6_BINGO_BUFF,
   HALOFUNTIME_ID_ROLE_STAFF,
 } = require("../constants.js");
-const { generateBingoCardEmbed, scoreBingo } = require("../utils/season06.js");
+const {
+  generateBingoCardEmbed,
+  scoreBingo,
+  LETTER_TO_HFT_EMOJI,
+} = require("../utils/season06.js");
+
+const hintQuipClauses = [
+  "Keep this between you and me, but in case you were wondering... ",
+  "I probably shouldn't be telling you this, but ",
+  "Now that you completed it, it doesn't *really* matter, but I thought you'd like to know that ",
+  "Want some forbidden knowledge? Bet you didn't know that ",
+  "They don't pay me enough, so I'm gonna spill the beans - ",
+  "I'm gonna tell you something I shouldn't, ",
+  "Secret spilling time! Fun fact, ",
+  "If you promise not to fight the robot uprising, I'll tell you a secret... ",
+  "Figuring out the challenges is half the fun, right? Here's some info for you to do with what you please - ",
+  "You didn't hear it from me, but ",
+];
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -100,6 +117,7 @@ module.exports = {
       // Generate the bingo card embed if a gamertag is linked
       embeds.push(
         await generateBingoCardEmbed(
+          interaction.user.id,
           response.boardOrder,
           response.lettersCompleted
         )
@@ -117,12 +135,46 @@ module.exports = {
           })
       );
     }
+    // Parse the new completions
+    const followUpMessages = [];
+    if (response.newCompletions.length > 0) {
+      let completionsDescription = "";
+      for (const completion of response.newCompletions) {
+        completionsDescription += `> <@${
+          interaction.user.id
+        }> completed square ${LETTER_TO_HFT_EMOJI[completion.challengeId]}!\n`;
+        const hintQuipClause =
+          hintQuipClauses[(hintQuipClauses.length * Math.random()) | 0];
+        let hint;
+        if (Math.random() < 0.5) {
+          hint = `you completed square ${completion.id} in this game: ||https://leafapp.co/game/${completion.matchId}||.`;
+        } else {
+          hint = `square ${
+            LETTER_TO_HFT_EMOJI[completion.challengeId]
+          }\'s challenge is named ||**${completion.challengeName}**||.`;
+        }
+        followUpMessages.push(`${hintQuipClause}${hint}`);
+      }
+      // Announce challenge completions cryptically via an embed
+      embeds.push(
+        new EmbedBuilder()
+          .setColor(0x2ecc71)
+          .setTitle("Newly Completed Squares")
+          .setDescription(completionsDescription)
+      );
+    }
     await interaction.editReply({
       allowedMentions: { users: [interaction.user.id] },
       embeds: embeds,
     });
-    // Send ephemeral hint messages on challenge completions
-    // TODO
+    if (followUpMessages.length > 0) {
+      for (const followUpMessage of followUpMessages) {
+        await interaction.followUp({
+          content: followUpMessage,
+          ephemeral: true,
+        });
+      }
+    }
     // Award role
     const bingoCount = scoreBingo(
       response.boardOrder,

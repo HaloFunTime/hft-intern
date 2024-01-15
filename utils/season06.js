@@ -183,8 +183,8 @@ const scoreBingo = (boardOrder, lettersCompleted) => {
   return bingoCount;
 };
 
-const generateBingoCardEmbed = async (boardOrder, lettersCompleted) => {
-  let description = "";
+const generateBingoCardEmbed = async (userId, boardOrder, lettersCompleted) => {
+  let description = `*<@${userId}>'s Progress*`;
   for (let i = 0; i < boardOrder.length; i++) {
     if (i % 5 === 0) {
       description += "> ";
@@ -221,4 +221,6 @@ const generateBingoCardEmbed = async (boardOrder, lettersCompleted) => {
 module.exports = {
   generateBingoCardEmbed: generateBingoCardEmbed,
   scoreBingo: scoreBingo,
+  LETTER_TO_EMOJI: LETTER_TO_EMOJI,
+  LETTER_TO_HFT_EMOJI: LETTER_TO_HFT_EMOJI,
 };

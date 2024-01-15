@@ -95,7 +95,13 @@ module.exports = {
       responseContent +=
         "Use the `/check-bingo-card` command to check your Bingo Card.\n\n";
       responseContent += `Complete bingo __**three ways**__ to earn the <@&${HALOFUNTIME_ID_ROLE_S6_BINGO_BUFF}> role!`;
-      embeds.push(await generateBingoCardEmbed(response.boardOrder, []));
+      embeds.push(
+        await generateBingoCardEmbed(
+          interaction.user.id,
+          response.boardOrder,
+          []
+        )
+      );
     } else {
       responseContent = `<@${interaction.user.id}> you have already joined the Bingo Challenge. Use the \`/check-bingo-card\` command to check your Bingo Card.`;
     }
