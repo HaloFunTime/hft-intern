@@ -150,7 +150,9 @@ module.exports = {
           hintQuipClauses[(hintQuipClauses.length * Math.random()) | 0];
         let hint;
         if (Math.random() < 0.5) {
-          hint = `you completed square ${completion.id} in this game: ||https://leafapp.co/game/${completion.matchId}||.`;
+          hint = `you completed square ${
+            LETTER_TO_HFT_EMOJI[completion.challengeId]
+          } in this game: ||https://leafapp.co/game/${completion.matchId}||.`;
         } else {
           hint = `square ${
             LETTER_TO_HFT_EMOJI[completion.challengeId]

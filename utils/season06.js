@@ -184,7 +184,7 @@ const scoreBingo = (boardOrder, lettersCompleted) => {
 };
 
 const generateBingoCardEmbed = async (userId, boardOrder, lettersCompleted) => {
-  let description = `*<@${userId}>'s Progress*`;
+  let description = `*<@${userId}>'s Progress*\n`;
   for (let i = 0; i < boardOrder.length; i++) {
     if (i % 5 === 0) {
       description += "> ";
