@@ -143,9 +143,9 @@ module.exports = {
     if (response.newCompletions.length > 0) {
       let completionsDescription = "";
       for (const completion of response.newCompletions) {
-        completionsDescription += `> <@${
-          interaction.user.id
-        }> completed square ${LETTER_TO_HFT_EMOJI[completion.challengeId]}!\n`;
+        completionsDescription += `- Square ${
+          LETTER_TO_HFT_EMOJI[completion.challengeId]
+        } was just completed!\n`;
         const hintQuipClause =
           hintQuipClauses[(hintQuipClauses.length * Math.random()) | 0];
         let hint;
@@ -164,7 +164,7 @@ module.exports = {
       embeds.push(
         new EmbedBuilder()
           .setColor(0x2ecc71)
-          .setTitle("Newly Completed Squares")
+          .setTitle("Newly Completed Squares!")
           .setDescription(completionsDescription)
       );
     }
@@ -174,11 +174,12 @@ module.exports = {
     });
     if (followUpMessages.length > 0) {
       for (const followUpMessage of followUpMessages) {
-        console.log(followUpMessage);
-        // await interaction.followUp({
-        //   content: followUpMessage,
-        //   ephemeral: true,
-        // });
+        try {
+          await interaction.member.send(followUpMessage);
+        } catch (error) {
+          console.error(error);
+          console.log("Failed to DM hint to Bingo Challenge participant.");
+        }
       }
     }
     // Award role

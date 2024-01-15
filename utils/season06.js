@@ -184,7 +184,7 @@ const scoreBingo = (boardOrder, lettersCompleted) => {
 };
 
 const generateBingoCardEmbed = async (userId, boardOrder, lettersCompleted) => {
-  let description = `*<@${userId}>'s Progress*\n`;
+  let description = `*<@${userId}>'s Progress*\n\n`;
   for (let i = 0; i < boardOrder.length; i++) {
     if (i % 5 === 0) {
       description += "> ";
@@ -203,7 +203,7 @@ const generateBingoCardEmbed = async (userId, boardOrder, lettersCompleted) => {
     .setTitle("Season 6 Bingo Card")
     .setDescription(description)
     .addFields({
-      name: "Bingo Progress",
+      name: "Challenge Scores",
       value:
         `> **${bingoCount}/3 bingos** ${bingoCount >= 3 ? "✅" : ""}\n` +
         `> **${lettersCompleted.length}/25 squares** ${
