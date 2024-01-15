@@ -96,7 +96,8 @@ module.exports = {
           return error.response.data;
         }
       });
-    if ("error" in response) {
+    // Handle response errors
+    if (!response || "error" in response) {
       await interaction.editReply({
         content:
           "I couldn't check your Bingo Card. Give me a couple minutes and try again after that.",
@@ -104,6 +105,7 @@ module.exports = {
       });
       return;
     }
+    // Handle response indicating user isn't part of challenge yet
     if (!response.joinedChallenge) {
       await interaction.editReply({
         content:
@@ -112,6 +114,7 @@ module.exports = {
       });
       return;
     }
+    // Create the response
     const embeds = [];
     if (response.linkedGamertag) {
       // Generate the bingo card embed if a gamertag is linked
@@ -169,10 +172,11 @@ module.exports = {
     });
     if (followUpMessages.length > 0) {
       for (const followUpMessage of followUpMessages) {
-        await interaction.followUp({
-          content: followUpMessage,
-          ephemeral: true,
-        });
+        console.log(followUpMessage);
+        // await interaction.followUp({
+        //   content: followUpMessage,
+        //   ephemeral: true,
+        // });
       }
     }
     // Award role

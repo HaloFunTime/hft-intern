@@ -79,7 +79,7 @@ module.exports = {
           return error.response.data;
         }
       });
-    if ("error" in response) {
+    if (!response || "error" in response) {
       await interaction.editReply({
         content:
           "You couldn't join the Bingo Challenge at this time. Try again in a couple minutes.",
