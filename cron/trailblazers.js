@@ -71,6 +71,7 @@ const createTrailblazerTuesdayEvent = async (client) => {
       await message.react("🌠");
       await message.react("📚");
       await message.react("🎥");
+      await message.crosspost();
     }
   } catch (e) {
     console.error(e);

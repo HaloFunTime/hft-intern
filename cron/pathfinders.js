@@ -149,6 +149,7 @@ const createPathfinderHikesEvent = async (client) => {
       await message.react("🏕");
       await message.react("🫘");
       await message.react("🔥");
+      await message.crosspost();
     }
   } catch (e) {
     console.error(e);
@@ -365,6 +366,7 @@ const weeklyPopularFilesReport = async (client) => {
       reason: "Spotlight.",
     });
     await thread.send("Discuss this week's popular files here.");
+    await message.crosspost();
   }
   console.log("Finished weekly popular files report.");
 };
