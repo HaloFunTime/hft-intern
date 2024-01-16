@@ -1,4 +1,4 @@
-const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandBuilder, Embed } = require("discord.js");
 const axios = require("axios");
 const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
@@ -148,17 +148,25 @@ module.exports = {
         } was just completed!\n`;
         const hintQuipClause =
           hintQuipClauses[(hintQuipClauses.length * Math.random()) | 0];
-        let hint;
+        let title, hint, link;
         if (Math.random() < 0.5) {
+          title = "Bingo Challenge Hint: Game Link";
           hint = `you completed square ${
             LETTER_TO_HFT_EMOJI[completion.challengeId]
-          } in this game: ||https://leafapp.co/game/${completion.matchId}||.`;
+          } in the game this hint message links to.`;
+          link = `https://leafapp.co/game/${completion.matchId}`;
         } else {
+          title = "Bingo Challenge Hint: Challenge Name";
           hint = `square ${
             LETTER_TO_HFT_EMOJI[completion.challengeId]
           }\'s challenge is named ||**${completion.challengeName}**||.`;
+          link = null;
         }
-        followUpMessages.push(`${hintQuipClause}${hint}`);
+        followUpMessages.push({
+          title: title,
+          content: `${hintQuipClause}${hint}`,
+          link: link,
+        });
       }
       // Announce challenge completions cryptically via an embed
       embeds.push(
@@ -175,7 +183,14 @@ module.exports = {
     if (followUpMessages.length > 0) {
       for (const followUpMessage of followUpMessages) {
         try {
-          await interaction.member.send(followUpMessage);
+          const embed = new EmbedBuilder()
+            .setColor(0xffd700)
+            .setTitle(followUpMessage.title)
+            .setDescription(followUpMessage.content);
+          if (followUpMessage.link) {
+            embed.setURL(followUpMessage.link);
+          }
+          await interaction.member.send({ embeds: [embed] });
         } catch (error) {
           console.error(error);
           console.log("Failed to DM hint to Bingo Challenge participant.");

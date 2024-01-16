@@ -46,8 +46,11 @@ const checkParticipantGames = async (client) => {
   const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_LOGS);
   if (response.newGameCount > 0) {
     const message = await channel.send({
-      content: `Fetched ${response.newGameCount} new games (${response.totalGameCount} total).`,
+      content: `Fetched ${response.newGameCount} new game${
+        response.newGameCount === 1 ? "" : "s"
+      } (${response.totalGameCount} total).`,
     });
+    await message.react("🆕");
   }
 };
 
