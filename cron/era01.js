@@ -7,9 +7,10 @@ const {
 const { getCurrentEra, ERA_01 } = require("../utils/eras");
 
 const checkParticipantGames = async (client) => {
-  if (getCurrentEra() !== ERA_01) {
-    return;
-  }
+  // if (getCurrentEra() !== ERA_01) {
+  //   return;
+  // }
+  // TODO: Uncomment above
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
   const members = await guild.members.fetch();
   const membersArray = Array.from(members.values()).filter(
