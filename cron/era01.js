@@ -4,11 +4,10 @@ const {
   HALOFUNTIME_ID_ROLE_MEMBER,
   HALOFUNTIME_ID,
 } = require("../constants");
-const { getCurrentSeason, SEASON_05, SEASON_06 } = require("../utils/seasons");
+const { getCurrentEra, ERA_01 } = require("../utils/eras");
 
 const checkParticipantGames = async (client) => {
-  if (getCurrentSeason() !== SEASON_05) {
-    // TODO: Update this to S6
+  if (getCurrentEra() !== ERA_01) {
     return;
   }
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
@@ -20,7 +19,7 @@ const checkParticipantGames = async (client) => {
   const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
   const response = await axios
     .post(
-      `${HALOFUNTIME_API_URL}/season-06/check-participant-games`,
+      `${HALOFUNTIME_API_URL}/era-01/check-participant-games`,
       {
         discordUserIds: discordUserIds,
       },

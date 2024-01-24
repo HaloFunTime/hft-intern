@@ -6,14 +6,15 @@ const timezone = require("dayjs/plugin/timezone");
 const {
   HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS,
   HALOFUNTIME_ID_CHANNEL_BINGO_CHALLENGE,
-  HALOFUNTIME_ID_ROLE_S6_BINGO_BUFF,
+  HALOFUNTIME_ID_ROLE_E1_BINGO_BUFF,
   HALOFUNTIME_ID_ROLE_STAFF,
 } = require("../constants.js");
+const { ERA_DATA } = require("../utils/eras.js");
 const {
   generateBingoCardEmbed,
   scoreBingo,
   LETTER_TO_HFT_EMOJI,
-} = require("../utils/season06.js");
+} = require("../utils/era01.js");
 
 const hintQuipClauses = [
   "Keep this between you and me, but in case you were wondering... ",
@@ -35,18 +36,15 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("check-bingo-card")
     .setDescription(
-      "Check your personal progress toward the Season 6 Bingo Challenge."
+      "Check your personal progress toward the Era 1 Bingo Challenge."
     ),
   async execute(interaction) {
     // Pre- and post-challenge handling
     if (!interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_STAFF)) {
       // TODO: Remove Staff gate
       const now = dayjs();
-      const cardCheckingStart = dayjs.tz(
-        "2024-01-30 14:00:00",
-        "America/Denver"
-      );
-      const cardCheckingEnd = dayjs.tz("2024-04-30 11:00:00", "America/Denver"); // TODO: Update to last day of S6
+      const cardCheckingStart = ERA_DATA["era01"].startTime.add(4, "hour");
+      const cardCheckingEnd = ERA_DATA["era01"].endTime;
       if (now < cardCheckingStart) {
         await interaction.reply({
           content: `You can't check your Bingo Card until <t:${cardCheckingStart.unix()}:f>.`,
@@ -77,7 +75,7 @@ module.exports = {
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
     const response = await axios
       .post(
-        `${HALOFUNTIME_API_URL}/season-06/check-bingo-card`,
+        `${HALOFUNTIME_API_URL}/era-01/check-bingo-card`,
         {
           discordUserId: interaction.user.id,
           discordUsername: interaction.user.username,
@@ -205,7 +203,7 @@ module.exports = {
     if (bingoCount >= 3) {
       const challengeCompleteResponse = await axios
         .post(
-          `${HALOFUNTIME_API_URL}/season-06/save-buff`,
+          `${HALOFUNTIME_API_URL}/era-01/save-buff`,
           {
             discordUserId: response.discordUserId,
             discordUsername: interaction.user.username,
@@ -231,12 +229,12 @@ module.exports = {
         return;
       }
       if (challengeCompleteResponse.newBuff === true) {
-        await interaction.member.roles.add(HALOFUNTIME_ID_ROLE_S6_BINGO_BUFF);
+        await interaction.member.roles.add(HALOFUNTIME_ID_ROLE_E1_BINGO_BUFF);
         const channel = interaction.client.channels.cache.get(
           HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS
         );
         await channel.send(
-          `Congratulations to <@${challengeCompleteResponse.discordUserId}> for completing the <#${HALOFUNTIME_ID_CHANNEL_BINGO_CHALLENGE}> and earning the <@&${HALOFUNTIME_ID_ROLE_S6_BINGO_BUFF}> role!`
+          `Congratulations to <@${challengeCompleteResponse.discordUserId}> for completing the <#${HALOFUNTIME_ID_CHANNEL_BINGO_CHALLENGE}> and earning the <@&${HALOFUNTIME_ID_ROLE_E1_BINGO_BUFF}> role!`
         );
       }
     }

@@ -200,7 +200,7 @@ const generateBingoCardEmbed = async (userId, boardOrder, lettersCompleted) => {
   const bingoCount = scoreBingo(boardOrder, lettersCompleted);
   const boardEmbed = new EmbedBuilder()
     .setColor(0xffd700)
-    .setTitle("Season 6 Bingo Card")
+    .setTitle("Era 1 Bingo Card")
     .setDescription(description)
     .addFields({
       name: "Challenge Scores",

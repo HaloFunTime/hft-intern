@@ -5,10 +5,11 @@ const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
 const {
   HALOFUNTIME_ID_CHANNEL_BINGO_CHALLENGE,
-  HALOFUNTIME_ID_ROLE_S6_BINGO_BUFF,
+  HALOFUNTIME_ID_ROLE_E1_BINGO_BUFF,
   HALOFUNTIME_ID_ROLE_STAFF,
 } = require("../constants.js");
-const { generateBingoCardEmbed } = require("../utils/season06.js");
+const { ERA_DATA } = require("../utils/eras.js");
+const { generateBingoCardEmbed } = require("../utils/era01.js");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -16,20 +17,14 @@ dayjs.extend(timezone);
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("join-bingo-challenge")
-    .setDescription("Join the Season 6 Bingo Challenge. B-I-N-G-O."),
+    .setDescription("Join the Era 1 Bingo Challenge. B-I-N-G-O."),
   async execute(interaction) {
     // Pre- and post-challenge handling
     if (!interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_STAFF)) {
       // TODO: Remove Staff gate
       const now = dayjs();
-      const joinChallengeStart = dayjs.tz(
-        "2024-01-30 11:00:00",
-        "America/Denver"
-      );
-      const joinChallengeEnd = dayjs.tz(
-        "2024-04-30 11:00:00",
-        "America/Denver"
-      ); // TODO: Update to last day of S6
+      const joinChallengeStart = ERA_DATA["era01"].startTime;
+      const joinChallengeEnd = ERA_DATA["era01"].endTime;
       if (now < joinChallengeStart) {
         await interaction.reply({
           content: "You can't join the **Bingo Challenge** yet.",
@@ -60,7 +55,7 @@ module.exports = {
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
     const response = await axios
       .post(
-        `${HALOFUNTIME_API_URL}/season-06/join-challenge`,
+        `${HALOFUNTIME_API_URL}/era-01/join-challenge`,
         {
           discordUserId: interaction.user.id,
           discordUsername: interaction.user.username,
@@ -94,7 +89,7 @@ module.exports = {
       responseContent = `<@${interaction.user.id}> has just joined the Bingo Challenge!\n\n`;
       responseContent +=
         "Use the `/check-bingo-card` command to check your Bingo Card.\n\n";
-      responseContent += `Complete bingo __**three ways**__ to earn the <@&${HALOFUNTIME_ID_ROLE_S6_BINGO_BUFF}> role!`;
+      responseContent += `Complete bingo __**three ways**__ to earn the <@&${HALOFUNTIME_ID_ROLE_E1_BINGO_BUFF}> role!`;
       embeds.push(
         await generateBingoCardEmbed(
           interaction.user.id,
