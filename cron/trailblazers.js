@@ -293,6 +293,10 @@ const updateTrailblazerRoles = async (client) => {
   console.log("Checking Trailblazer roles...");
   // Validate that there are roles to assign for the current Season
   const season = getCurrentSeason();
+  if (!season) {
+    console.log("Early exiting - not currently in a Season.");
+    return;
+  }
   const seasonTitles = ROLE_ID_BY_NAME_AND_SEASON[season];
   if (!seasonTitles) {
     console.log(`Early exiting - no Trailblazer entry for ${season}.`);
