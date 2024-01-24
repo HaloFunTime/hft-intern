@@ -2,7 +2,9 @@ const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
 const {
   HALOFUNTIME_ID_CHANNEL_LFG,
+  HALOFUNTIME_ID_CHANNEL_SPOTLIGHT,
   HALOFUNTIME_ID_CHANNEL_WAYWO,
+  HALOFUNTIME_ID_EMOJI_HEART_PATHFINDERS,
   HALOFUNTIME_ID_ROLE_PATHFINDER,
   HALOFUNTIME_ID_THREAD_PATHFINDER_BOT_COMMANDS,
 } = require("../constants.js");
@@ -12,6 +14,7 @@ const {
   SEASON_04,
   SEASON_05,
 } = require("../utils/seasons");
+const { getCurrentEra, ERA_DATA } = require("../utils/eras");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -67,19 +70,21 @@ module.exports = {
       });
     } else {
       const currentSeason = getCurrentSeason();
-      if (!currentSeason) {
+      const currentEra = getCurrentEra();
+      if (!currentSeason && !currentEra) {
         await interaction.editReply({
           content:
-            "Could not check your progress toward the Trailblazer Scout role at this time.",
+            "Could not check your progress toward the Pathfinder Dynamo role at this time.",
           ephemeral: true,
         });
       }
+      let earnedPromotion = false;
       // Create the base progress embed
       const progressEmbed = new EmbedBuilder()
         .setColor(0x9b59b6)
         .setTitle("Pathfinder Dynamo Progress")
         .setThumbnail("https://api.halofuntime.com/static/PathfinderLogo.png");
-      // Add the appropriate description and fields for the current season
+      // Add the appropriate description and fields for the current season or era
       if (currentSeason === SEASON_03) {
         progressEmbed
           .setDescription("**Season 3**")
@@ -222,6 +227,46 @@ module.exports = {
               }`,
             });
         }
+      } else if (currentEra === "era01") {
+        progressEmbed
+          .setDescription("**Era 1**")
+          .addFields({
+            name: "🫘 Bean Spender",
+            value: `> *Spend 50 🫘 **Pathfinder Beans** to submit a map to Pathfinder Hikes playtesting. Earnable once.*\n> **${
+              response.pointsBeanSpender
+            }/200 points** ${response.pointsBeanSpender === 200 ? "✅" : ""}`,
+          })
+          .addFields({
+            name: "🧱 What Are You Working On?",
+            value: `> *Create a* <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> *post for a project you're working on. 50 points per post.*\n> **${
+              response.pointsWhatAreYouWorkingOn
+            }/150 points** ${
+              response.pointsWhatAreYouWorkingOn === 150 ? "✅" : ""
+            }`,
+          })
+          .addFields({
+            name: "💬 Feedback Fiend",
+            value: `> *Comment on* <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> *posts. 1 point per comment.*\n> **${
+              response.pointsFeedbackFiend
+            }/100 points** ${response.pointsFeedbackFiend === 100 ? "✅" : ""}`,
+          });
+        if (response.linkedGamertag) {
+          progressEmbed
+            .addFields({
+              name: "🥾 Gone Hiking",
+              value: `> *Attend Pathfinder Hikes playtesting in-game! 10 points per map hiked.*\n> **${
+                response.pointsGoneHiking
+              }/250 points** ${response.pointsGoneHiking === 250 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "🔥 Forged in Fire",
+              value: `> *Spend time playing Custom Games on maps made on Forge canvases. 1 point per full hour played.*\n> **${
+                response.pointsForgedInFire
+              }/100 points** ${
+                response.pointsForgedInFire === 100 ? "✅" : ""
+              }`,
+            });
+        }
       }
       // Add the gamertag link prompt field if needed
       if (!response.linkedGamertag) {
@@ -237,7 +282,7 @@ module.exports = {
           name: "Your Total Pathfinder Dynamo Points",
           value: `> **${response.totalPoints}/500 points** ${
             response.totalPoints >= 500 ? "✅" : ""
-          }\n> *Remember: promotions run every Tuesday morning!*\n`,
+          }\n`,
         })
         .setFooter({
           text: "Pathfinder Dynamo Progress",
@@ -246,6 +291,28 @@ module.exports = {
       await interaction.editReply({
         embeds: [progressEmbed],
       });
+      // Check for a promotion
+      if (currentEra !== null && response.totalPoints >= 500) {
+        earnedPromotion = true;
+      }
+      if (earnedPromotion) {
+        const promotionRoleId = ERA_DATA[currentEra].dynamoRole;
+        // Only promote if the user does not already have the role
+        if (!interaction.member.roles.cache.has(promotionRoleId)) {
+          await interaction.member.roles.add(promotionRoleId);
+          const channel = interaction.client.channels.cache.get(
+            HALOFUNTIME_ID_CHANNEL_SPOTLIGHT
+          );
+          const pathfinderPromotionMessage = await channel.send(
+            `<@${interaction.user.id}> checked their challenge progress in <#${HALOFUNTIME_ID_THREAD_PATHFINDER_BOT_COMMANDS}> and just earned the <@&${promotionRoleId}> role!`
+          );
+          await pathfinderPromotionMessage.react("🎉");
+          await pathfinderPromotionMessage.react(
+            HALOFUNTIME_ID_EMOJI_HEART_PATHFINDERS
+          );
+          await pathfinderPromotionMessage.react("🫘");
+        }
+      }
     }
   },
 };

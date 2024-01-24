@@ -1,8 +1,11 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
 const {
-  HALOFUNTIME_ID_ROLE_TRAILBLAZER,
+  HALOFUNTIME_ID_CHANNEL_TRAILBLAZER_ANNOUNCEMENTS,
   HALOFUNTIME_ID_CHANNEL_VOD_REVIEW,
+  HALOFUNTIME_ID_EMOJI_HEART_TRAILBLAZERS,
+  HALOFUNTIME_ID_EMOJI_PASSION,
+  HALOFUNTIME_ID_ROLE_TRAILBLAZER,
   HALOFUNTIME_ID_THREAD_TRAILBLAZER_BOT_COMMANDS,
 } = require("../constants.js");
 const {
@@ -11,6 +14,7 @@ const {
   SEASON_04,
   SEASON_05,
 } = require("../utils/seasons");
+const { getCurrentEra, ERA_DATA } = require("../utils/eras");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -66,19 +70,21 @@ module.exports = {
       });
     } else {
       const currentSeason = getCurrentSeason();
-      if (!currentSeason) {
+      const currentEra = getCurrentEra();
+      if (!currentSeason && !currentEra) {
         await interaction.editReply({
           content:
             "Could not check your progress toward the Trailblazer Scout role at this time.",
           ephemeral: true,
         });
       }
+      let earnedPromotion = false;
       // Create the base progress embed
       const progressEmbed = new EmbedBuilder()
         .setColor(0x3498db)
         .setTitle("Trailblazer Scout Progress")
         .setThumbnail("https://api.halofuntime.com/static/TrailblazerLogo.png");
-      // Add the appropriate description and fields for the current season
+      // Add the appropriate description and fields for the current season or era
       if (currentSeason === SEASON_03) {
         progressEmbed
           .setDescription("**Season 3**")
@@ -231,6 +237,40 @@ module.exports = {
               }`,
             });
         }
+      } else if (currentEra === "era01") {
+        progressEmbed.setDescription("**Era 1**").addFields({
+          name: "🦀 Church of the Crab",
+          value: `> *Attend Trailblazer Tuesday! 50 points per session attended.*\n> **${
+            response.pointsChurchOfTheCrab
+          }/250 points** ${response.pointsChurchOfTheCrab === 250 ? "✅" : ""}`,
+        });
+        if (response.linkedGamertag) {
+          progressEmbed
+            .addFields({
+              name: "📈 CSR Go Up",
+              value: `> *Win games in Ranked Arena. 1 point per win.*\n> **${
+                response.pointsCSRGoUp
+              }/200 points** ${response.pointsCSRGoUp === 200 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "💀 Play To Slay",
+              value: `> *Win Slayer games in Ranked Arena. 5 points per win.*\n> **${
+                response.pointsPlayToSlay
+              }/100 points** ${response.pointsPlayToSlay === 100 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "🏙️ Mean Streets",
+              value: `> *Win games on the map Streets in Ranked Arena. 5 points per win.*\n> **${
+                response.pointsMeanStreets
+              }/100 points** ${response.pointsMeanStreets === 100 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "🔥 Hot Streak",
+              value: `> *Win 3 consecutive Ranked Arena games and finish on top of the scoreboard each time. Earnable once.*\n> **${
+                response.pointsHotStreak
+              }/100 points** ${response.pointsHotStreak === 100 ? "✅" : ""}`,
+            });
+        }
       }
       // Add the gamertag link prompt field if needed
       if (!response.linkedGamertag) {
@@ -246,7 +286,7 @@ module.exports = {
           name: "Your Total Trailblazer Scout Points",
           value: `> **${response.totalPoints}/500 points** ${
             response.totalPoints >= 500 ? "✅" : ""
-          }\n> *Remember: promotions run every Tuesday morning!*\n`,
+          }\n`,
         })
         .setFooter({
           text: "Trailblazer Scout Progress",
@@ -255,6 +295,28 @@ module.exports = {
       await interaction.editReply({
         embeds: [progressEmbed],
       });
+      // Check for a promotion
+      if (currentEra !== null && response.totalPoints >= 500) {
+        earnedPromotion = true;
+      }
+      if (earnedPromotion) {
+        const promotionRoleId = ERA_DATA[currentEra].scoutRole;
+        // Only promote if the user does not already have the role
+        if (!interaction.member.roles.cache.has(promotionRoleId)) {
+          await interaction.member.roles.add(promotionRoleId);
+          const channel = interaction.client.channels.cache.get(
+            HALOFUNTIME_ID_CHANNEL_TRAILBLAZER_ANNOUNCEMENTS
+          );
+          const trailblazerPromotionMessage = await channel.send(
+            `<@${interaction.user.id}> checked their challenge progress in <#${HALOFUNTIME_ID_THREAD_TRAILBLAZER_BOT_COMMANDS}> and just earned the <@&${promotionRoleId}> role!`
+          );
+          await trailblazerPromotionMessage.react("🎉");
+          await trailblazerPromotionMessage.react(
+            HALOFUNTIME_ID_EMOJI_HEART_TRAILBLAZERS
+          );
+          await trailblazerPromotionMessage.react(HALOFUNTIME_ID_EMOJI_PASSION);
+        }
+      }
     }
   },
 };

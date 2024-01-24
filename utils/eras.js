@@ -2,6 +2,10 @@ const dayjs = require("dayjs");
 const isBetween = require("dayjs/plugin/isBetween");
 const timezone = require("dayjs/plugin/timezone");
 const utc = require("dayjs/plugin/utc");
+const {
+  HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_E1,
+  HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_E1,
+} = require("../constants");
 
 dayjs.extend(isBetween);
 dayjs.extend(timezone);
@@ -14,6 +18,8 @@ const ERA_DATA = {
   [ERA_01]: {
     startTime: ERA_01_START_TIME,
     endTime: ERA_01_END_TIME,
+    scoutRole: HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_E1,
+    dynamoRole: HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_E1,
   },
 };
 
