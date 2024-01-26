@@ -20,11 +20,13 @@ const {
   unfocusFunTimeFridayEvent,
 } = require("./cron/funTimeFriday");
 const {
+  checkProdigyRoles,
   createPathfinderHikesEvent,
   updatePathfinderRoles,
   weeklyPopularFilesReport,
 } = require("./cron/pathfinders");
 const {
+  checkTitanRoles,
   createTrailblazerTuesdayEvent,
   trailblazerDailyPassionReport,
   updateTrailblazerRoles,
@@ -131,11 +133,13 @@ client.on("ready", () => {
   scheduleFunc("0 0 12 * * 6", publishFunTimeFridayReport, client); // every Saturday at noon
 
   // Pathfinders
+  scheduleFunc("0 0 * * * *", checkProdigyRoles, client); // every hour at the top of the hour
   scheduleFunc("0 35 9 * * 2", updatePathfinderRoles, client); // every Tuesday at 9:35AM
   scheduleFunc("0 0 10 * * 4", createPathfinderHikesEvent, client); // every Thursday at 10AM
   scheduleFunc("0 0 10 * * 5", weeklyPopularFilesReport, client); // every Friday at 10AM
 
   // Trailblazers
+  scheduleFunc("0 0 * * * *", checkTitanRoles, client); // every hour at the top of the hour
   scheduleFunc("0 5 9 * * 2", updateTrailblazerRoles, client); // every Tuesday at 9:05AM
   scheduleFunc("0 0 10 * * 3", createTrailblazerTuesdayEvent, client); // every Wednesday at 10AM
   scheduleFunc("0 0 9 * * *", trailblazerDailyPassionReport, client); // every day at 9AM

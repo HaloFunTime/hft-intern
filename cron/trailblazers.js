@@ -10,11 +10,14 @@ const {
   HALOFUNTIME_ID_CHANNEL_TRAILBLAZER_ANNOUNCEMENTS,
   HALOFUNTIME_ID_CHANNEL_TRAILBLAZERS_VC_1,
   HALOFUNTIME_ID_CHANNEL_TRAILBLAZERS,
+  HALOFUNTIME_ID_EMOJI_HEART_TRAILBLAZERS,
+  HALOFUNTIME_ID_EMOJI_PASSION,
   HALOFUNTIME_ID_ROLE_TRAILBLAZER,
   HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_S3,
   HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_S4,
   HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_S5,
   HALOFUNTIME_ID_ROLE_TRAILBLAZER_SHERPA,
+  HALOFUNTIME_ID_ROLE_TRAILBLAZER_TITAN,
   HALOFUNTIME_ID,
 } = require("../constants.js");
 const scheduledEvents = require("../utils/scheduledEvents");
@@ -24,6 +27,7 @@ const {
   SEASON_04,
   SEASON_05,
 } = require("../utils/seasons");
+const { ERA_DATA } = require("../utils/eras");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -41,6 +45,157 @@ const ROLE_ID_BY_NAME_AND_SEASON = {
     sherpa: HALOFUNTIME_ID_ROLE_TRAILBLAZER_SHERPA,
     scout: HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_S5,
   },
+};
+
+const checkTitanRoles = async (client) => {
+  console.log("Checking Trailblazer Titan role eligibility...");
+  const now = dayjs();
+  if (now < ERA_DATA["era01"].startTime.add(6, "hour")) {
+    console.log("Early exiting - Eras have not yet begun.");
+    return;
+  }
+  try {
+    const guild = client.guilds.cache.get(HALOFUNTIME_ID);
+    const allMembersMap = await guild.members.fetch({
+      cache: true,
+      withUserCount: true,
+    });
+    const allMembersWithTrailblazerRole = Array.from(
+      allMembersMap.values()
+    ).filter(
+      (m) => !m.user.bot && m.roles.cache.has(HALOFUNTIME_ID_ROLE_TRAILBLAZER)
+    );
+    const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+    const response = await axios
+      .post(
+        `${HALOFUNTIME_API_URL}/trailblazer/titan-check`,
+        {
+          discordUserIds: allMembersWithTrailblazerRole.map((m) => m.user.id),
+          playlistId: HALO_INFINITE_RANKED_ARENA_PLAYLIST_ID,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+          },
+        }
+      )
+      .then((response) => response.data)
+      .catch(async (error) => {
+        console.error(error);
+        // Return the error payload directly if present
+        if (error?.response?.data) {
+          return error.response.data;
+        }
+      });
+    if (!response || "error" in response) {
+      console.error(
+        "Ran into an error checking Trailblazer Titan role eligibility."
+      );
+    }
+    // Get member objects for everyone who earned Titan
+    const allMembers = Array.from(allMembersMap.values()).filter(
+      (m) => !m.user.bot
+    );
+    const memberIdsEarnedTitan = response.yes.map((o) => o.discordUserId);
+    const membersToRemoveTitan = allMembers.filter(
+      (m) =>
+        m.roles.cache.has(HALOFUNTIME_ID_ROLE_TRAILBLAZER_TITAN) &&
+        !memberIdsEarnedTitan.includes(m.user.id)
+    );
+    const membersToAddTitan = allMembers.filter(
+      (m) =>
+        m.roles.cache.has(HALOFUNTIME_ID_ROLE_TRAILBLAZER) &&
+        !m.roles.cache.has(HALOFUNTIME_ID_ROLE_TRAILBLAZER_TITAN) &&
+        memberIdsEarnedTitan.includes(m.user.id)
+    );
+    // Assemble the promotion and demotion messages
+    const promotionData = [];
+    for (const m of membersToAddTitan) {
+      const quipPayload = await axios
+        .get(
+          `${HALOFUNTIME_API_URL}/intern/random-trailblazer-titan-promotion-quip`,
+          {
+            headers: {
+              Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+            },
+          }
+        )
+        .then((response) => response.data)
+        .catch(async (error) => {
+          console.error(error);
+          // Return the error payload directly if present
+          if (error?.response?.data) {
+            return error.response.data;
+          }
+        });
+      // Return a default quip if an error is present
+      let quip = "";
+      if (!quipPayload || "error" in quipPayload) {
+        quip = "Well earned.";
+      } else {
+        quip = quipPayload.quip;
+      }
+      promotionData.push({
+        message: `${m.user.id} has earned the <@&${HALOFUNTIME_ID_ROLE_TRAILBLAZER_TITAN}> role! ${quip}`,
+        member: m,
+      });
+    }
+    const demotionData = [];
+    for (const m of membersToRemoveTitan) {
+      const quipPayload = await axios
+        .get(
+          `${HALOFUNTIME_API_URL}/intern/random-trailblazer-titan-demotion-quip`,
+          {
+            headers: {
+              Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+            },
+          }
+        )
+        .then((response) => response.data)
+        .catch(async (error) => {
+          console.error(error);
+          // Return the error payload directly if present
+          if (error?.response?.data) {
+            return error.response.data;
+          }
+        });
+      // Return a default quip if an error is present
+      let quip = "";
+      if (!quipPayload || "error" in quipPayload) {
+        quip = "See you later?";
+      } else {
+        quip = quipPayload.quip;
+      }
+      demotionData.push({
+        message: `${m.user.id} has lost the <@&${HALOFUNTIME_ID_ROLE_TRAILBLAZER_TITAN}> role. ${quip}`,
+        member: m,
+      });
+    }
+    // Apply the promotions/demotions and announce them
+    const channel = client.channels.cache.get(
+      HALOFUNTIME_ID_CHANNEL_TRAILBLAZER_ANNOUNCEMENTS
+    );
+    for (const promotion of promotionData) {
+      await promotion.member.roles.add(HALOFUNTIME_ID_ROLE_TRAILBLAZER_TITAN);
+      const message = await channel.send({
+        content: promotion.message,
+        allowedMentions: { users: [promotion.member.user.id] },
+      });
+      await message.react("🎉");
+      await message.react(HALOFUNTIME_ID_EMOJI_HEART_TRAILBLAZERS);
+      await message.react(HALOFUNTIME_ID_EMOJI_PASSION);
+    }
+    for (const demotion of demotionData) {
+      await demotion.member.roles.remove(HALOFUNTIME_ID_ROLE_TRAILBLAZER_TITAN);
+      await channel.send({
+        content: demotion.message,
+        allowedMentions: { users: [demotion.member.user.id] },
+      });
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  console.log("Finished checking Trailblazer Titan role eligibility.");
 };
 
 const createTrailblazerTuesdayEvent = async (client) => {
@@ -430,6 +585,7 @@ const updateTrailblazerRoles = async (client) => {
 };
 
 module.exports = {
+  checkTitanRoles: checkTitanRoles,
   createTrailblazerTuesdayEvent: createTrailblazerTuesdayEvent,
   trailblazerDailyPassionReport: trailblazerDailyPassionReport,
   updateTrailblazerRoles: updateTrailblazerRoles,

@@ -10,10 +10,12 @@ const {
   HALOFUNTIME_ID_CHANNEL_SPOTLIGHT,
   HALOFUNTIME_ID_CHANNEL_WAYWO,
   HALOFUNTIME_ID_EMOJI_HALOFUNTIME_DOT_COM,
+  HALOFUNTIME_ID_EMOJI_HEART_PATHFINDERS,
   HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_S3,
   HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_S4,
   HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_S5,
   HALOFUNTIME_ID_ROLE_PATHFINDER_ILLUMINATED,
+  HALOFUNTIME_ID_ROLE_PATHFINDER_PRODIGY,
   HALOFUNTIME_ID_ROLE_PATHFINDER,
   HALOFUNTIME_ID,
 } = require("../constants.js");
@@ -24,6 +26,7 @@ const {
   SEASON_04,
   SEASON_05,
 } = require("../utils/seasons");
+const { ERA_DATA } = require("../utils/eras");
 const { getDateTimeForPathfinderEventStart } = require("../utils/pathfinders");
 
 dayjs.extend(utc);
@@ -42,6 +45,156 @@ const ROLE_ID_BY_NAME_AND_SEASON = {
     illuminated: HALOFUNTIME_ID_ROLE_PATHFINDER_ILLUMINATED,
     dynamo: HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_S5,
   },
+};
+
+const checkProdigyRoles = async (client) => {
+  console.log("Checking Pathfinder Prodigy role eligibility...");
+  const now = dayjs();
+  if (now < ERA_DATA["era01"].startTime.add(6, "hour")) {
+    console.log("Early exiting - Eras have not yet begun.");
+    return;
+  }
+  try {
+    const guild = client.guilds.cache.get(HALOFUNTIME_ID);
+    const allMembersMap = await guild.members.fetch({
+      cache: true,
+      withUserCount: true,
+    });
+    const allMembersWithPathfinderRole = Array.from(
+      allMembersMap.values()
+    ).filter(
+      (m) => !m.user.bot && m.roles.cache.has(HALOFUNTIME_ID_ROLE_PATHFINDER)
+    );
+    const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+    const response = await axios
+      .post(
+        `${HALOFUNTIME_API_URL}/pathfinder/prodigy-check`,
+        {
+          discordUserIds: allMembersWithPathfinderRole.map((m) => m.user.id),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+          },
+        }
+      )
+      .then((response) => response.data)
+      .catch(async (error) => {
+        console.error(error);
+        // Return the error payload directly if present
+        if (error?.response?.data) {
+          return error.response.data;
+        }
+      });
+    if (!response || "error" in response) {
+      console.error(
+        "Ran into an error checking Pathfinder Prodigy role eligibility."
+      );
+    }
+    // Get member objects for everyone who earned Prodigy
+    const allMembers = Array.from(allMembersMap.values()).filter(
+      (m) => !m.user.bot
+    );
+    const memberIdsEarnedProdigy = response.yes.map((o) => o.discordUserId);
+    const membersToRemoveProdigy = allMembers.filter(
+      (m) =>
+        m.roles.cache.has(HALOFUNTIME_ID_ROLE_PATHFINDER_PRODIGY) &&
+        !memberIdsEarnedProdigy.includes(m.user.id)
+    );
+    const membersToAddProdigy = allMembers.filter(
+      (m) =>
+        m.roles.cache.has(HALOFUNTIME_ID_ROLE_PATHFINDER) &&
+        !m.roles.cache.has(HALOFUNTIME_ID_ROLE_PATHFINDER_PRODIGY) &&
+        memberIdsEarnedProdigy.includes(m.user.id)
+    );
+    // Assemble the promotion and demotion messages
+    const promotionData = [];
+    for (const m of membersToAddProdigy) {
+      const quipPayload = await axios
+        .get(
+          `${HALOFUNTIME_API_URL}/intern/random-pathfinder-prodigy-promotion-quip`,
+          {
+            headers: {
+              Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+            },
+          }
+        )
+        .then((response) => response.data)
+        .catch(async (error) => {
+          console.error(error);
+          // Return the error payload directly if present
+          if (error?.response?.data) {
+            return error.response.data;
+          }
+        });
+      // Return a default quip if an error is present
+      let quip = "";
+      if (!quipPayload || "error" in quipPayload) {
+        quip = "Well earned.";
+      } else {
+        quip = quipPayload.quip;
+      }
+      promotionData.push({
+        message: `${m.user.id} has earned the <@&${HALOFUNTIME_ID_ROLE_PATHFINDER_PRODIGY}> role! ${quip}`,
+        member: m,
+      });
+    }
+    const demotionData = [];
+    for (const m of membersToRemoveProdigy) {
+      const quipPayload = await axios
+        .get(
+          `${HALOFUNTIME_API_URL}/intern/random-pathfinder-prodigy-demotion-quip`,
+          {
+            headers: {
+              Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+            },
+          }
+        )
+        .then((response) => response.data)
+        .catch(async (error) => {
+          console.error(error);
+          // Return the error payload directly if present
+          if (error?.response?.data) {
+            return error.response.data;
+          }
+        });
+      // Return a default quip if an error is present
+      let quip = "";
+      if (!quipPayload || "error" in quipPayload) {
+        quip = "See you later?";
+      } else {
+        quip = quipPayload.quip;
+      }
+      demotionData.push({
+        message: `${m.user.id} has lost the <@&${HALOFUNTIME_ID_ROLE_PATHFINDER_PRODIGY}> role. ${quip}`,
+        member: m,
+      });
+    }
+    // Apply the promotions/demotions and announce them
+    const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_SPOTLIGHT);
+    for (const promotion of promotionData) {
+      await promotion.member.roles.add(HALOFUNTIME_ID_ROLE_PATHFINDER_PRODIGY);
+      const message = await channel.send({
+        content: promotion.message,
+        allowedMentions: { users: [promotion.member.user.id] },
+      });
+      await message.react("🎉");
+      await message.react(HALOFUNTIME_ID_EMOJI_HEART_PATHFINDERS);
+      await message.react("🫘");
+    }
+    for (const demotion of demotionData) {
+      await demotion.member.roles.remove(
+        HALOFUNTIME_ID_ROLE_PATHFINDER_PRODIGY
+      );
+      await channel.send({
+        content: demotion.message,
+        allowedMentions: { users: [demotion.member.user.id] },
+      });
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  console.log("Finished checking Pathfinder Prodigy role eligibility.");
 };
 
 const createPathfinderHikesEvent = async (client) => {
@@ -376,6 +529,7 @@ const weeklyPopularFilesReport = async (client) => {
 };
 
 module.exports = {
+  checkProdigyRoles: checkProdigyRoles,
   createPathfinderHikesEvent: createPathfinderHikesEvent,
   updatePathfinderRoles: updatePathfinderRoles,
   weeklyPopularFilesReport: weeklyPopularFilesReport,
