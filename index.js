@@ -34,7 +34,6 @@ const {
   processReassignments,
   weeklyTeamRecap,
 } = require("./cron/season05");
-const { checkParticipantGames } = require("./cron/era01");
 
 dotenv.config();
 
@@ -145,7 +144,4 @@ client.on("ready", () => {
   scheduleFunc("0 0 10 * * *", processReassignments, client); // every day at 10AM
   scheduleFunc("0 30 9 * * 2", weeklyTeamRecap, client); // every Tuesday at 9:30AM
   scheduleFunc("0 0 11 * * 3", announceNewDomain, client); // every Wednesday at 11AM
-
-  // Era 1
-  scheduleFunc("0 */5 * * * *", checkParticipantGames, client); // every five minutes
 });

@@ -71,8 +71,39 @@ module.exports = {
     await interaction.deferReply({
       allowedMentions: { users: [interaction.user.id] },
     });
-    // Hit the HFT API with a progress check request
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+    // Hit the HFT API with a game check request
+    const gameResponse = await axios
+      .post(
+        `${HALOFUNTIME_API_URL}/era-01/check-participant-games`,
+        {
+          discordUserIds: [interaction.user.id],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+          },
+        }
+      )
+      .then((response) => response.data)
+      .catch(async (error) => {
+        console.error(error);
+        // Return the error payload directly if present
+        if (error?.response?.data) {
+          return error.response.data;
+        }
+      });
+    if (!gameResponse || "error" in gameResponse) {
+      console.log(gameResponse);
+      console.error("Ran into an error checking participant games.");
+      await interaction.editReply({
+        content:
+          "I couldn't check your Bingo Card. Give me a couple minutes and try again after that.",
+        ephemeral: true,
+      });
+      return;
+    }
+    // Hit the HFT API with a progress check request
     const response = await axios
       .post(
         `${HALOFUNTIME_API_URL}/era-01/check-bingo-card`,

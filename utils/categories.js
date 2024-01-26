@@ -51,7 +51,7 @@ const lowerAndCloseForRole = async (
       },
     ],
   });
-  await ftfCategory.setPosition(10);
+  await ftfCategory.setPosition(11);
 };
 
 module.exports = {
