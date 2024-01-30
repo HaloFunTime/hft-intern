@@ -3,6 +3,7 @@ const {
   HALOFUNTIME_ID_CHANNEL_LFG_THREAD_BTB_AND_CHILL,
   HALOFUNTIME_ID_CHANNEL_LFG_THREAD_CASUAL_4V4_HALO,
   HALOFUNTIME_ID_CHANNEL_LFG_THREAD_CRAZY_CUSTOM_GAMES,
+  HALOFUNTIME_ID_CHANNEL_LFG_THREAD_FFA_VIBE_LORDS,
   HALOFUNTIME_ID_CHANNEL_LFG_THREAD_FIREFIGHT_FUN,
   HALOFUNTIME_ID_CHANNEL_LFG_THREAD_FORGE_MAP_TESTS,
   HALOFUNTIME_ID_CHANNEL_LFG_THREAD_RANKED_ARENA_GRIND,
@@ -10,6 +11,7 @@ const {
   HALOFUNTIME_ID_ROLE_8S,
   HALOFUNTIME_ID_ROLE_BTB,
   HALOFUNTIME_ID_ROLE_CUSTOMS,
+  HALOFUNTIME_ID_ROLE_FFA,
   HALOFUNTIME_ID_ROLE_PVE,
   HALOFUNTIME_ID_ROLE_RANKED,
   HALOFUNTIME_ID_ROLE_SOCIAL,
@@ -42,6 +44,11 @@ async function updateLfgThreadMembership(oldMember, newMember) {
         (t) => t.id === HALOFUNTIME_ID_CHANNEL_LFG_THREAD_CRAZY_CUSTOM_GAMES
       );
       reason = "Removed Customs Role";
+    } else if (role.id === HALOFUNTIME_ID_ROLE_FFA) {
+      thread = lfgChannel.threads.cache.find(
+        (t) => t.id === HALOFUNTIME_ID_CHANNEL_LFG_THREAD_FFA_VIBE_LORDS
+      );
+      reason = "Removed FFA Role";
     } else if (role.id === HALOFUNTIME_ID_ROLE_PVE) {
       thread = lfgChannel.threads.cache.find(
         (t) => t.id === HALOFUNTIME_ID_CHANNEL_LFG_THREAD_FIREFIGHT_FUN
@@ -93,6 +100,11 @@ async function updateLfgThreadMembership(oldMember, newMember) {
         (t) => t.id === HALOFUNTIME_ID_CHANNEL_LFG_THREAD_CRAZY_CUSTOM_GAMES
       );
       reason = "Added Customs Role";
+    } else if (role.id === HALOFUNTIME_ID_ROLE_FFA) {
+      thread = lfgChannel.threads.cache.find(
+        (t) => t.id === HALOFUNTIME_ID_CHANNEL_LFG_THREAD_FFA_VIBE_LORDS
+      );
+      reason = "Added FFA Role";
     } else if (role.id === HALOFUNTIME_ID_ROLE_PVE) {
       thread = lfgChannel.threads.cache.find(
         (t) => t.id === HALOFUNTIME_ID_CHANNEL_LFG_THREAD_FIREFIGHT_FUN

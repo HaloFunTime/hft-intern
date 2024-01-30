@@ -40,25 +40,22 @@ module.exports = {
     ),
   async execute(interaction) {
     // Pre- and post-challenge handling
-    if (!interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_STAFF)) {
-      // TODO: Remove Staff gate
-      const now = dayjs();
-      const cardCheckingStart = ERA_DATA["era01"].startTime.add(4, "hour");
-      const cardCheckingEnd = ERA_DATA["era01"].endTime;
-      if (now < cardCheckingStart) {
-        await interaction.reply({
-          content: `You can't check your Bingo Card until <t:${cardCheckingStart.unix()}:f>.`,
-          ephemeral: true,
-        });
-        return;
-      } else if (now > cardCheckingEnd) {
-        await interaction.reply({
-          content:
-            "The **Bingo Challenge** is over. You'll have to find another retirement home.",
-          ephemeral: true,
-        });
-        return;
-      }
+    const now = dayjs();
+    const cardCheckingStart = ERA_DATA["era01"].startTime.add(4, "hour");
+    const cardCheckingEnd = ERA_DATA["era01"].endTime;
+    if (now < cardCheckingStart) {
+      await interaction.reply({
+        content: `You can't check your Bingo Card until <t:${cardCheckingStart.unix()}:f>.`,
+        ephemeral: true,
+      });
+      return;
+    } else if (now > cardCheckingEnd) {
+      await interaction.reply({
+        content:
+          "The **Bingo Challenge** is over. You'll have to find another retirement home.",
+        ephemeral: true,
+      });
+      return;
     }
     // Command may only be executed in the Bingo Challenge channel
     if (interaction.channelId !== HALOFUNTIME_ID_CHANNEL_BINGO_CHALLENGE) {

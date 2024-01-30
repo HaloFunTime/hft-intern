@@ -10,6 +10,7 @@ const {
   HALOFUNTIME_ID_EMOJI_FUNTIMEBOT,
   HALOFUNTIME_ID_EMOJI_HFT_INTERN,
   HALOFUNTIME_ID,
+  HALOFUNTIME_ID_CHANNEL_THE_DOMAIN,
 } = require("../constants");
 const members = require("../utils/members");
 const { getCurrentSeason, SEASON_05 } = require("../utils/seasons");
@@ -141,15 +142,15 @@ const weeklyTeamRecap = async (client) => {
   }
   let resultLine;
   if (domainsFunTimeBot > domainsHFTIntern) {
-    resultLine = `__<@&${HALOFUNTIME_ID_ROLE_TEAM_FUNTIMEBOT}> is beating <@&${HALOFUNTIME_ID_ROLE_TEAM_HFT_INTERN}> by **${domainString(
+    resultLine = `__<@&${HALOFUNTIME_ID_ROLE_TEAM_FUNTIMEBOT}> has beaten <@&${HALOFUNTIME_ID_ROLE_TEAM_HFT_INTERN}> by **${domainString(
       domainsFunTimeBot - domainsHFTIntern
-    )}!**__`;
+    )}!**__\nThe victors may now access <#${HALOFUNTIME_ID_CHANNEL_THE_DOMAIN}>. The losers may only watch...`;
   } else if (domainsHFTIntern > domainsFunTimeBot) {
-    resultLine = `__<@&${HALOFUNTIME_ID_ROLE_TEAM_HFT_INTERN}> is beating <@&${HALOFUNTIME_ID_ROLE_TEAM_FUNTIMEBOT}> by **${domainString(
+    resultLine = `__<@&${HALOFUNTIME_ID_ROLE_TEAM_HFT_INTERN}> has beaten <@&${HALOFUNTIME_ID_ROLE_TEAM_FUNTIMEBOT}> by **${domainString(
       domainsHFTIntern - domainsFunTimeBot
-    )}!**__`;
+    )}!**__\nThe victors may now access <#${HALOFUNTIME_ID_CHANNEL_THE_DOMAIN}>. The losers may only watch...`;
   } else {
-    resultLine = `__**<@&${HALOFUNTIME_ID_ROLE_TEAM_FUNTIMEBOT}> and <@&${HALOFUNTIME_ID_ROLE_TEAM_HFT_INTERN}> are tied!**__`;
+    resultLine = `__**<@&${HALOFUNTIME_ID_ROLE_TEAM_FUNTIMEBOT}> and <@&${HALOFUNTIME_ID_ROLE_TEAM_HFT_INTERN}> are tied!**__\nNow <#${HALOFUNTIME_ID_CHANNEL_THE_DOMAIN}> will be open to all.`;
   }
 
   const channel = client.channels.cache.get(
