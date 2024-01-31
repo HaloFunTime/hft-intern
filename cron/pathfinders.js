@@ -135,7 +135,7 @@ const checkProdigyRoles = async (client) => {
         quip = quipPayload.quip;
       }
       promotionData.push({
-        message: `${m.user.id} has earned the <@&${HALOFUNTIME_ID_ROLE_PATHFINDER_PRODIGY}> role! ${quip}`,
+        message: `<@${m.user.id}> has earned the <@&${HALOFUNTIME_ID_ROLE_PATHFINDER_PRODIGY}> role! ${quip}`,
         member: m,
       });
     }
@@ -166,7 +166,7 @@ const checkProdigyRoles = async (client) => {
         quip = quipPayload.quip;
       }
       demotionData.push({
-        message: `${m.user.id} has lost the <@&${HALOFUNTIME_ID_ROLE_PATHFINDER_PRODIGY}> role. ${quip}`,
+        message: `<@${m.user.id}> has lost the <@&${HALOFUNTIME_ID_ROLE_PATHFINDER_PRODIGY}> role. ${quip}`,
         member: m,
       });
     }

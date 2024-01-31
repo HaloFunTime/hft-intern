@@ -136,7 +136,7 @@ const checkTitanRoles = async (client) => {
         quip = quipPayload.quip;
       }
       promotionData.push({
-        message: `${m.user.id} has earned the <@&${HALOFUNTIME_ID_ROLE_TRAILBLAZER_TITAN}> role! ${quip}`,
+        message: `<@${m.user.id}> has earned the <@&${HALOFUNTIME_ID_ROLE_TRAILBLAZER_TITAN}> role! ${quip}`,
         member: m,
       });
     }
@@ -167,7 +167,7 @@ const checkTitanRoles = async (client) => {
         quip = quipPayload.quip;
       }
       demotionData.push({
-        message: `${m.user.id} has lost the <@&${HALOFUNTIME_ID_ROLE_TRAILBLAZER_TITAN}> role. ${quip}`,
+        message: `<@${m.user.id}> has lost the <@&${HALOFUNTIME_ID_ROLE_TRAILBLAZER_TITAN}> role. ${quip}`,
         member: m,
       });
     }
