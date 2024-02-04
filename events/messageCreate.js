@@ -1,18 +1,17 @@
 const axios = require("axios");
 const { ChannelType, MessageType } = require("discord.js");
 const {
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_8S,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_BTB,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_CUSTOMS,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_FFA,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_CO_OP,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_CUSTOMS,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_MATCHMAKING,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_PVE,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_RANKED,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_SOCIAL,
-  HALOFUNTIME_ID_CHANNEL_LFG_TAG_TESTING,
-  HALOFUNTIME_ID_CHANNEL_LFG,
+  HALOFUNTIME_ID_CHANNEL_LFG_8S,
+  HALOFUNTIME_ID_CHANNEL_LFG_BTB,
+  HALOFUNTIME_ID_CHANNEL_LFG_CUSTOMS,
+  HALOFUNTIME_ID_CHANNEL_LFG_FFA,
+  HALOFUNTIME_ID_CHANNEL_LFG_MCC_CO_OP,
+  HALOFUNTIME_ID_CHANNEL_LFG_MCC_CUSTOMS,
+  HALOFUNTIME_ID_CHANNEL_LFG_MCC_MATCHMAKING,
+  HALOFUNTIME_ID_CHANNEL_LFG_PVE,
+  HALOFUNTIME_ID_CHANNEL_LFG_RANKED,
+  HALOFUNTIME_ID_CHANNEL_LFG_SOCIAL,
+  HALOFUNTIME_ID_CHANNEL_LFG_TESTING,
   HALOFUNTIME_ID_CHANNEL_PASSION_PATROL,
   HALOFUNTIME_ID_CHANNEL_WAYWO,
   HALOFUNTIME_ID_ROLE_8S,
@@ -34,32 +33,32 @@ const {
 } = require("../constants.js");
 const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
 
-const LFG_TAG_IDS_TO_ROLE_IDS = {};
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_8S] = [
+const LFG_CHANNEL_IDS_TO_ROLE_IDS = {};
+LFG_CHANNEL_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_8S] = [
   HALOFUNTIME_ID_ROLE_8S,
 ];
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_BTB] = [
+LFG_CHANNEL_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_BTB] = [
   HALOFUNTIME_ID_ROLE_BTB,
 ];
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_CUSTOMS] = [
+LFG_CHANNEL_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_CUSTOMS] = [
   HALOFUNTIME_ID_ROLE_CUSTOMS,
 ];
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_FFA] = [
+LFG_CHANNEL_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_FFA] = [
   HALOFUNTIME_ID_ROLE_FFA,
 ];
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_CO_OP] = [
+LFG_CHANNEL_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_MCC_CO_OP] = [
   HALOFUNTIME_ID_ROLE_MCC_CO_OP,
 ];
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_CUSTOMS] = [
+LFG_CHANNEL_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_MCC_CUSTOMS] = [
   HALOFUNTIME_ID_ROLE_MCC_CUSTOMS,
 ];
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_MCC_MATCHMAKING] = [
+LFG_CHANNEL_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_MCC_MATCHMAKING] = [
   HALOFUNTIME_ID_ROLE_MCC_MATCHMAKING,
 ];
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_PVE] = [
+LFG_CHANNEL_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_PVE] = [
   HALOFUNTIME_ID_ROLE_PVE,
 ];
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_RANKED] = [
+LFG_CHANNEL_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_RANKED] = [
   HALOFUNTIME_ID_ROLE_RANKED_ARENA_ONYX,
   HALOFUNTIME_ID_ROLE_RANKED_ARENA_DIAMOND,
   HALOFUNTIME_ID_ROLE_RANKED_ARENA_PLATINUM,
@@ -67,10 +66,10 @@ LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_RANKED] = [
   HALOFUNTIME_ID_ROLE_RANKED_ARENA_SILVER,
   HALOFUNTIME_ID_ROLE_RANKED_ARENA_BRONZE,
 ];
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_SOCIAL] = [
+LFG_CHANNEL_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_SOCIAL] = [
   HALOFUNTIME_ID_ROLE_SOCIAL,
 ];
-LFG_TAG_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TAG_TESTING] = [
+LFG_CHANNEL_IDS_TO_ROLE_IDS[HALOFUNTIME_ID_CHANNEL_LFG_TESTING] = [
   HALOFUNTIME_ID_ROLE_TESTING,
 ];
 
@@ -222,8 +221,8 @@ async function attemptLfgHelp(message) {
   if (message.author.id === message.client.user.id) return;
   // Do not attempt LFG help if the message was sent by another application
   if (message.applicationId) return;
-  // Do not attempt LFG help if the message was not sent in a thread in the LFG forum channel
-  if (message.channel.parentId !== HALOFUNTIME_ID_CHANNEL_LFG) return;
+  // Do not attempt LFG help if the message was not sent in an LFG channel
+  if (!(message.channelId in LFG_CHANNEL_IDS_TO_ROLE_IDS)) return;
   // Do not attempt LFG help if the message contains role or member mentions, or is a direct reply
   if (
     message.mentions.roles.size > 0 ||
@@ -234,12 +233,12 @@ async function attemptLfgHelp(message) {
   // Do not attempt LFG help if the sender has already been offered help in the past
   const response = await axios
     .post(
-      `${HALOFUNTIME_API_URL}/discord/lfg-thread-help-prompt`,
+      `${HALOFUNTIME_API_URL}/discord/lfg-channel-help-prompt`,
       {
         discordUserId: message.author.id,
         discordUsername: message.author.username,
-        lfgThreadId: message.channelId,
-        lfgThreadName: message.channel.name,
+        lfgChannelId: message.channelId,
+        lfgChannelName: message.channel.name,
       },
       {
         headers: {
@@ -260,26 +259,22 @@ async function attemptLfgHelp(message) {
     console.log(response.error);
     return;
   } else if (response.success && response.new) {
-    // Deduce appropriate LFG roles from the thread's tags
+    // Deduce appropriate LFG roles based on the channelId
     const pingRecommendations = [];
-    for (const tag of message.channel.appliedTags) {
-      const roleIds = LFG_TAG_IDS_TO_ROLE_IDS[tag] || [];
-      for (const roleId of roleIds) {
-        pingRecommendations.push(`<@&${roleId}>`);
-      }
+    const roleIds = LFG_CHANNEL_IDS_TO_ROLE_IDS[message.channelId] || [];
+    for (const roleId of roleIds) {
+      pingRecommendations.push(`<@&${roleId}>`);
     }
     if (pingRecommendations.length > 0) {
       const roleText =
         pingRecommendations.length === 1
           ? "this LFG role"
-          : "one or more of these LFG roles";
-      const messageContent = `<@${
-        message.author.id
-      }>, I noticed that your message didn't mention anyone. Try directly replying to someone or mentioning ${roleText}: ${pingRecommendations.join(
+          : "one of these LFG roles";
+      const messageContent = `I noticed that your message didn't mention anyone. Try directly replying to someone or mentioning ${roleText}: ${pingRecommendations.join(
         " "
       )}.`;
       // Send the LFG Help message
-      await message.channel.send({
+      await message.reply({
         content: messageContent,
         allowedMentions: { users: [message.author.id] },
         ephemeral: true,

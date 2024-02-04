@@ -8,8 +8,7 @@ const {
   HALO_INFINITE_RANKED_ARENA_PLAYLIST_ID,
   HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS,
   HALOFUNTIME_ID_CHANNEL_FIRST_100,
-  HALOFUNTIME_ID_CHANNEL_LFG_THREAD_RANKED_ARENA_GRIND,
-  HALOFUNTIME_ID_CHANNEL_LFG,
+  HALOFUNTIME_ID_CHANNEL_LFG_RANKED,
   HALOFUNTIME_ID_CHANNEL_LOGS,
   HALOFUNTIME_ID_CHANNEL_NEW_HERE,
   HALOFUNTIME_ID_EMOJI_GRUNT_BIRTHDAY,
@@ -86,12 +85,6 @@ const kickLurkers = async (client) => {
   } else {
     channel.send("No members to kick for failing to accept the rules.");
   }
-};
-
-const runLfgHealthReport = async (client) => {
-  const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_LOGS);
-  const healthString = await members.lfgThreadHealthReport(client);
-  channel.send("# LFG Thread Health Report:\n" + healthString);
 };
 
 const postHelpfulHintToNewHereChannel = async (client) => {
@@ -203,7 +196,7 @@ const updateNewHereRoles = async (client) => {
     welcomeDM += `Welcome to HaloFunTime, <@${member.user.id}>! I'm the Intern, HaloFunTime's favorite bot.\n\n`;
     welcomeDM +=
       "HaloFunTime is a party-up server designed to help you find people to play Halo with. ";
-    welcomeDM += `Post in threads in the <#${HALOFUNTIME_ID_CHANNEL_LFG}> channel to find people and party up! `;
+    welcomeDM += "Ping LFG roles in LFG channels to find people and party up! ";
     welcomeDM +=
       "You can add or remove roles in the 'Channels & Roles' section at any time to start (or stop) receiving LFG pings. ";
     welcomeDM +=
@@ -437,9 +430,7 @@ const updateRankedRoles = async (client) => {
       for (m of membersToAddRank) {
         const member = await m.roles.add(roleId);
         console.log(
-          `ADDED ${rank.toUpperCase()} role to ${member.user.username}#${
-            member.user.discriminator
-          }`
+          `ADDED ${rank.toUpperCase()} role to ${member.user.username}`
         );
         const congratsMessage = `<@${m.user.id}> has earned the <@&${roleId}> role!`;
         congratulationMessages.push(congratsMessage);
@@ -447,23 +438,21 @@ const updateRankedRoles = async (client) => {
       for (m of membersToRemoveRank) {
         const member = await m.roles.remove(roleId);
         console.log(
-          `REMOVED ${rank.toUpperCase()} role from ${member.user.username}#${
-            member.user.discriminator
-          }`
+          `REMOVED ${rank.toUpperCase()} role from ${member.user.username}`
         );
       }
     }
     if (congratulationMessages.length > 0) {
       const congratsMessage =
         congratulationMessages.join("\n") +
-        `\n\n> *To be eligible for a rank-specific role, get the* <@&${HALOFUNTIME_ID_ROLE_RANKED}> *role and link ` +
-        `your gamertag with the \`/link-gamertag\` command. If you remove the* <@&${HALOFUNTIME_ID_ROLE_RANKED}> ` +
-        "*role or change your linked gamertag, you will lose your rank-specific role.*";
-      const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_LFG);
-      const thread = await channel.threads.fetch(
-        HALOFUNTIME_ID_CHANNEL_LFG_THREAD_RANKED_ARENA_GRIND
+        `\n\n> *To get a rank role, get the* <@&${HALOFUNTIME_ID_ROLE_RANKED}> *role from <id:customize> and link ` +
+        "your gamertag with the `/link-gamertag` command. Rank roles are assigned based on the highest rank you have " +
+        "achieved during the current ranking period, and updated every fifteen minutes. Removing the* " +
+        `<@&${HALOFUNTIME_ID_ROLE_RANKED}> *role or changing your linked gamertag will remove your rank role.`;
+      const channel = client.channels.cache.get(
+        HALOFUNTIME_ID_CHANNEL_LFG_RANKED
       );
-      await thread.send({
+      await channel.send({
         content: congratsMessage,
         allowedMentions: { parse: ["users"] },
       });
@@ -474,7 +463,6 @@ const updateRankedRoles = async (client) => {
 
 module.exports = {
   kickLurkers: kickLurkers,
-  runLfgHealthReport: runLfgHealthReport,
   postHelpfulHintToNewHereChannel: postHelpfulHintToNewHereChannel,
   updateFirst100Roles: updateFirst100Roles,
   updateNewHereRoles: updateNewHereRoles,
