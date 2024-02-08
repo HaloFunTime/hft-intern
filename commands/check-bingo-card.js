@@ -180,7 +180,10 @@ module.exports = {
           hint = `you completed square ${
             LETTER_TO_HFT_EMOJI[completion.challengeId]
           } in the game this hint message links to.`;
-          link = `https://leafapp.co/game/${completion.matchId}`;
+          link =
+            completion.challengeId < "U"
+              ? `https://halotracker.com/halo-infinite/match/${completion.matchId}`
+              : `https://leafapp.co/game/${completion.matchId}`;
         } else {
           title = "Bingo Challenge Hint: Challenge Name";
           hint = `square ${

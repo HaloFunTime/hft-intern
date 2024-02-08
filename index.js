@@ -21,20 +21,13 @@ const {
 const {
   checkProdigyRoles,
   createPathfinderHikesEvent,
-  updatePathfinderRoles,
   weeklyPopularFilesReport,
 } = require("./cron/pathfinders");
 const {
   checkTitanRoles,
   createTrailblazerTuesdayEvent,
   trailblazerDailyPassionReport,
-  updateTrailblazerRoles,
 } = require("./cron/trailblazers");
-const {
-  announceNewDomain,
-  processReassignments,
-  weeklyTeamRecap,
-} = require("./cron/season05");
 
 dotenv.config();
 
@@ -132,18 +125,11 @@ client.on("ready", () => {
 
   // Pathfinders
   scheduleFunc("0 0 * * * *", checkProdigyRoles, client); // every hour at the top of the hour
-  scheduleFunc("0 35 9 * * 2", updatePathfinderRoles, client); // every Tuesday at 9:35AM
   scheduleFunc("0 0 10 * * 4", createPathfinderHikesEvent, client); // every Thursday at 10AM
   scheduleFunc("0 0 10 * * 5", weeklyPopularFilesReport, client); // every Friday at 10AM
 
   // Trailblazers
   scheduleFunc("0 0 * * * *", checkTitanRoles, client); // every hour at the top of the hour
-  scheduleFunc("0 5 9 * * 2", updateTrailblazerRoles, client); // every Tuesday at 9:05AM
   scheduleFunc("0 0 10 * * 3", createTrailblazerTuesdayEvent, client); // every Wednesday at 10AM
   scheduleFunc("0 0 9 * * *", trailblazerDailyPassionReport, client); // every day at 9AM
-
-  // Season 5
-  scheduleFunc("0 0 10 * * *", processReassignments, client); // every day at 10AM
-  scheduleFunc("0 0 9 * * 2", weeklyTeamRecap, client); // every Tuesday at 9AM
-  scheduleFunc("0 0 11 * * 3", announceNewDomain, client); // every Wednesday at 11AM
 });

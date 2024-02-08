@@ -1,6 +1,4 @@
 const axios = require("axios");
-const http = require("node:http");
-const https = require("node:https");
 const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
@@ -13,39 +11,14 @@ const {
   HALOFUNTIME_ID_EMOJI_HEART_TRAILBLAZERS,
   HALOFUNTIME_ID_EMOJI_PASSION,
   HALOFUNTIME_ID_ROLE_TRAILBLAZER,
-  HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_S3,
-  HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_S4,
-  HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_S5,
-  HALOFUNTIME_ID_ROLE_TRAILBLAZER_SHERPA,
   HALOFUNTIME_ID_ROLE_TRAILBLAZER_TITAN,
   HALOFUNTIME_ID,
 } = require("../constants.js");
 const scheduledEvents = require("../utils/scheduledEvents");
-const {
-  getCurrentSeason,
-  SEASON_03,
-  SEASON_04,
-  SEASON_05,
-} = require("../utils/seasons");
 const { ERA_DATA } = require("../utils/eras");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-
-const ROLE_ID_BY_NAME_AND_SEASON = {
-  [SEASON_03]: {
-    sherpa: HALOFUNTIME_ID_ROLE_TRAILBLAZER_SHERPA,
-    scout: HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_S3,
-  },
-  [SEASON_04]: {
-    sherpa: HALOFUNTIME_ID_ROLE_TRAILBLAZER_SHERPA,
-    scout: HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_S4,
-  },
-  [SEASON_05]: {
-    sherpa: HALOFUNTIME_ID_ROLE_TRAILBLAZER_SHERPA,
-    scout: HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_S5,
-  },
-};
 
 const checkTitanRoles = async (client) => {
   console.log("Checking Trailblazer Titan role eligibility...");
@@ -444,149 +417,8 @@ const trailblazerDailyPassionReport = async (client) => {
   console.log("Finished daily passion report.");
 };
 
-const updateTrailblazerRoles = async (client) => {
-  console.log("Checking Trailblazer roles...");
-  // Validate that there are roles to assign for the current Season
-  const season = getCurrentSeason();
-  if (!season) {
-    console.log("Early exiting - not currently in a Season.");
-    return;
-  }
-  const seasonTitles = ROLE_ID_BY_NAME_AND_SEASON[season];
-  if (!seasonTitles) {
-    console.log(`Early exiting - no Trailblazer entry for ${season}.`);
-    return;
-  }
-  const guild = client.guilds.cache.get(HALOFUNTIME_ID);
-  const allMembersMap = await guild.members.fetch({
-    cache: true,
-    withUserCount: true,
-  });
-  const allMembers = Array.from(allMembersMap.values()).filter(
-    (m) => !m.user.bot
-  );
-  const allMembersWithTrailblazerRole = Array.from(
-    allMembersMap.values()
-  ).filter(
-    (m) => !m.user.bot && m.roles.cache.has(HALOFUNTIME_ID_ROLE_TRAILBLAZER)
-  );
-  // Horrible kludge to prevent Axios socket hang up: https://stackoverflow.com/a/43439886
-  delete process.env["http_proxy"];
-  delete process.env["HTTP_PROXY"];
-  delete process.env["https_proxy"];
-  delete process.env["HTTPS_PROXY"];
-  const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
-  const trailblazerRoleEarners = {
-    sherpa: [],
-    scout: [],
-  };
-  for (const m of allMembersWithTrailblazerRole) {
-    const response = await axios
-      .post(
-        `${HALOFUNTIME_API_URL}/trailblazer/seasonal-role-check`,
-        {
-          discordUserId: m.user.id,
-          discordUsername: m.user.username,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
-          },
-          httpAgent: new http.Agent({ keepAlive: true }),
-          httpsAgent: new https.Agent({ keepAlive: true }),
-        }
-      )
-      .then((response) => response.data)
-      .catch(async (error) => {
-        console.error(error);
-        // Return the error payload directly if present
-        if (error.response?.data) {
-          return error.response?.data;
-        }
-      });
-    if (!response || (response && "error" in response)) {
-      console.error("Ran into an error checking Trailblazer seasonal roles.");
-    } else {
-      if (response.sherpa === true) {
-        trailblazerRoleEarners["sherpa"].push(response.discordUserId);
-      }
-      if (response.scout === true) {
-        trailblazerRoleEarners["scout"].push(response.discordUserId);
-      }
-    }
-  }
-  const trailblazerAnnouncementChannel = client.channels.cache.get(
-    HALOFUNTIME_ID_CHANNEL_TRAILBLAZER_ANNOUNCEMENTS
-  );
-  await trailblazerAnnouncementChannel.send(
-    `<@&${HALOFUNTIME_ID_ROLE_TRAILBLAZER}>\n\nIt's promotion time! Let's see if any Trailblazers have earned special recognition this week...`
-  );
-  let promotedTrailblazerCount = 0;
-  for (let title of ["sherpa", "scout"]) {
-    // Validate that a "sherpa" or a "scout" role are defined for this Season
-    const roleId = seasonTitles[title];
-    if (!roleId) {
-      console.log(`Skipping ${title} - no entry defined.`);
-      continue;
-    }
-    // Add and remove the role as needed
-    const trailblazerIdsEarnedRole = trailblazerRoleEarners[title];
-    const trailblazersToRemoveRole = allMembers.filter(
-      (m) =>
-        m.roles.cache.has(roleId) &&
-        !trailblazerIdsEarnedRole.includes(m.user.id)
-    );
-    const trailblazersToAddRole = allMembers.filter(
-      (m) =>
-        m.roles.cache.has(HALOFUNTIME_ID_ROLE_TRAILBLAZER) &&
-        !m.roles.cache.has(roleId) &&
-        trailblazerIdsEarnedRole.includes(m.user.id)
-    );
-    for (let m of trailblazersToAddRole) {
-      const trailblazer = await m.roles.add(roleId);
-      console.log(
-        `Added TRAILBLAZER ${title.toUpperCase()} role to ${
-          trailblazer.user.username
-        }#${trailblazer.user.discriminator}`
-      );
-      const trailblazerPromotionMessage =
-        await trailblazerAnnouncementChannel.send({
-          content: `<@${trailblazer.user.id}> has earned the <@&${roleId}> role!`,
-          allowedMentions: { users: [trailblazer.user.id] },
-        });
-      await trailblazerPromotionMessage.react("🎉");
-    }
-    for (let m of trailblazersToRemoveRole) {
-      const trailblazer = await m.roles.remove(roleId);
-      console.log(
-        `Removed TRAILBLAZER ${rank.toUpperCase()} role from ${
-          trailblazer.user.username
-        }#${trailblazer.user.discriminator}`
-      );
-    }
-    promotedTrailblazerCount += trailblazersToAddRole.length;
-  }
-  const promotionCommandsText =
-    " We'll check again this time next week.\n\n" +
-    "Remember - to be considered for a promotion, you must link your Xbox Live gamertag with the `/link-gamertag` command. " +
-    "Check your progress toward this season's **Trailblazer Scout** role at any time with the `/trailblazer-scout-progress` command.";
-  if (promotedTrailblazerCount) {
-    await trailblazerAnnouncementChannel.send(
-      "That wraps it up for this week's promotions. Congratulations!" +
-        promotionCommandsText
-    );
-  } else {
-    await trailblazerAnnouncementChannel.send(
-      "Looks like no one new earned a promotion this week." +
-        promotionCommandsText
-    );
-  }
-  console.log("Finished checking Trailblazer roles.");
-};
-
 module.exports = {
   checkTitanRoles: checkTitanRoles,
   createTrailblazerTuesdayEvent: createTrailblazerTuesdayEvent,
   trailblazerDailyPassionReport: trailblazerDailyPassionReport,
-  updateTrailblazerRoles: updateTrailblazerRoles,
 };
