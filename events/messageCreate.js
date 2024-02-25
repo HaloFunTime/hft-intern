@@ -13,6 +13,7 @@ const {
   HALOFUNTIME_ID_CHANNEL_LFG_SOCIAL,
   HALOFUNTIME_ID_CHANNEL_LFG_TESTING,
   HALOFUNTIME_ID_CHANNEL_PASSION_PATROL,
+  HALOFUNTIME_ID_CHANNEL_PURPLE_CIRCLE,
   HALOFUNTIME_ID_CHANNEL_WAYWO,
   HALOFUNTIME_ID_ROLE_8S,
   HALOFUNTIME_ID_ROLE_BTB,
@@ -337,6 +338,60 @@ async function attemptPassionPatrolAction(message) {
   });
 }
 
+async function attemptPurpleCircleAction(message) {
+  // Do not attempt a Purple Circle action if the message was authored by this bot
+  if (message.author.id === message.client.user.id) return;
+  // Do not attempt a Purple Circle action if the message was sent by another application
+  if (message.applicationId) return;
+  // Do not attempt a Purple Circle action if the message mentions no one
+  if (message.mentions.users.size === 0) return;
+  // Do not attempt a Purple Circle action if the message does not mention the bot specifically
+  const messageMentionedBot = message.mentions.users.reduce((acc, user) => {
+    if (acc) return true;
+    return user.id === message.client.user.id;
+  }, false);
+  if (!messageMentionedBot) return;
+  // Do not attempt a Purple Circle action if the message content does not match a lenient "purple circle" regular expression
+  const purpleCircle = /(purple){1}.+(circle){1}/i;
+  if (!purpleCircle.test(message.content)) return;
+  // Retrieve the current leader of the Purple Circle
+  const purpleCircleChannel = message.client.channels.cache.get(
+    HALOFUNTIME_ID_CHANNEL_PURPLE_CIRCLE
+  );
+  const matches = purpleCircleChannel.topic.match(/(\d+)/);
+  if (!matches) return;
+  // Do not attempt a Purple Circle action if the message was not sent by the Leader of the Purple Circle
+  const purpleCircleLeaderId = matches[0];
+  if (message.author.id !== purpleCircleLeaderId) return;
+  // Attempt actions on mentioned users based on whether "add" or "remove" was said
+  let actionTaken = false;
+  await message.mentions.users.forEach(async (user) => {
+    if (user.id === message.client.user.id) return;
+    const add = /(add){1}/i;
+    const remove = /(remove){1}/i;
+    if (add.test(message.content)) {
+      await purpleCircleChannel.permissionOverwrites.create(user.id, {
+        ReadMessageHistory: true,
+        SendMessages: true,
+        ViewChannel: true,
+      });
+      await purpleCircleChannel.send(
+        `<@${user.id}> has been added to the Purple Circle by <@${purpleCircleLeaderId}>.`
+      );
+      actionTaken = true;
+    } else if (remove.test(message.content)) {
+      await purpleCircleChannel.permissionOverwrites.delete(
+        user.id,
+        "Leader's orders."
+      );
+      await purpleCircleChannel.send(
+        `<@${user.id}> has been removed from the Purple Circle by <@${purpleCircleLeaderId}>.`
+      );
+      actionTaken = true;
+    }
+  });
+}
+
 async function attemptRandomBeanReward(message) {
   // Do not award a Pathfinder Bean if the random roll fails
   if (Math.random() > 0.01) return;
@@ -429,6 +484,7 @@ module.exports = {
       await attemptChatter(message);
       await attemptLfgHelp(message);
       await attemptPassionPatrolAction(message);
+      await attemptPurpleCircleAction(message);
       await recordWaywoComment(message);
     }
   },
