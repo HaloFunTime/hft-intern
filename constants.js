@@ -112,4 +112,7 @@ module.exports = Object.freeze({
   PARTYTIMER_CAP: 5,
   PARTYTIMER_TOTAL_REP_MINIMUM: 50,
   PARTYTIMER_UNIQUE_REP_MINIMUM: 30,
+  // https://stackoverflow.com/a/73988996/15751555
+  LINK_GAMERTAG_ID: "1212551700301221936",
+  LINK_GAMERTAG_NAME: "link-gamertag",
 });

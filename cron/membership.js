@@ -30,6 +30,8 @@ const {
   PARTYTIMER_CAP,
   PARTYTIMER_TOTAL_REP_MINIMUM,
   PARTYTIMER_UNIQUE_REP_MINIMUM,
+  LINK_GAMERTAG_NAME,
+  LINK_GAMERTAG_ID,
 } = require("../constants.js");
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -204,8 +206,7 @@ const updateNewHereRoles = async (client) => {
     welcomeDM += `I've added you to the <#${HALOFUNTIME_ID_CHANNEL_NEW_HERE}> channel for the next 28 days. `;
     welcomeDM +=
       "It's a great place to meet people, learn about the server, and chat directly with the Staff.\n\n";
-    welcomeDM +=
-      "When you get a chance, please use the `/link-gamertag` command to link your Xbox Live gamertag. ";
+    welcomeDM += `When you get a chance, please use the </${LINK_GAMERTAG_NAME}:${LINK_GAMERTAG_ID}> command to link your Xbox Live gamertag. `;
     welcomeDM +=
       "HaloFunTime uses your linked gamertag to pull data from Halo Infinite, assign special roles, and ";
     welcomeDM += "otherwise make sure everyone has a fun time!";
@@ -446,7 +447,7 @@ const updateRankedRoles = async (client) => {
       const congratsMessage =
         congratulationMessages.join("\n") +
         `\n\n> *To get a rank role, get the* <@&${HALOFUNTIME_ID_ROLE_RANKED}> *role from <id:customize> and link ` +
-        "your gamertag with the `/link-gamertag` command. Rank roles are assigned based on the highest rank you have " +
+        `your gamertag with the </${LINK_GAMERTAG_NAME}:${LINK_GAMERTAG_ID}> command. Rank roles are assigned based on the highest rank you have ` +
         "achieved during the current ranking period, and updated every fifteen minutes. Removing the* " +
         `<@&${HALOFUNTIME_ID_ROLE_RANKED}> *role or changing your linked gamertag will remove your rank role.*`;
       const channel = client.channels.cache.get(

@@ -1,5 +1,6 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
+const { LINK_GAMERTAG_NAME, LINK_GAMERTAG_ID } = require("../constants");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -70,7 +71,7 @@ module.exports = {
         await interaction.reply({
           content:
             `<@${member.id}> hasn't linked a gamertag on HaloFunTime. ` +
-            "They can use `/link-gamertag` at any time to do so.",
+            `They can use </${LINK_GAMERTAG_NAME}:${LINK_GAMERTAG_ID}> at any time to do so.`,
           allowedMentions: { users: [member.id] },
           ephemeral: quiet,
         });

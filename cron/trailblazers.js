@@ -13,6 +13,8 @@ const {
   HALOFUNTIME_ID_ROLE_TRAILBLAZER,
   HALOFUNTIME_ID_ROLE_TRAILBLAZER_TITAN,
   HALOFUNTIME_ID,
+  LINK_GAMERTAG_ID,
+  LINK_GAMERTAG_NAME,
 } = require("../constants.js");
 const scheduledEvents = require("../utils/scheduledEvents");
 const { ERA_DATA } = require("../utils/eras");
@@ -383,7 +385,7 @@ const trailblazerDailyPassionReport = async (client) => {
       .setColor(0xf93a2f)
       .setTitle(`__Daily Passion Report: <t:${now.unix()}:D>__`)
       .setDescription(
-        "Every day we check each Trailblazer's passion in the Ranked Arena playlist. Link your gamertag with `/link-gamertag` to be included."
+        `Every day we check each Trailblazer's passion in the Ranked Arena playlist. Link your gamertag with </${LINK_GAMERTAG_NAME}:${LINK_GAMERTAG_ID}> to be included.`
       )
       .setFooter({
         text: `"${passionReportQuip}"`,
