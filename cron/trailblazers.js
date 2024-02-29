@@ -18,6 +18,7 @@ const {
 } = require("../constants.js");
 const scheduledEvents = require("../utils/scheduledEvents");
 const { ERA_DATA } = require("../utils/eras");
+const { getApplicationCommandMention } = require("../utils/formatting.js");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -381,11 +382,15 @@ const trailblazerDailyPassionReport = async (client) => {
     const trailblazersChannel = client.channels.cache.get(
       HALOFUNTIME_ID_CHANNEL_TRAILBLAZERS
     );
+    const command = await getApplicationCommandMention(
+      LINK_GAMERTAG_NAME,
+      interaction.client
+    );
     const passionReportEmbed = new EmbedBuilder()
       .setColor(0xf93a2f)
       .setTitle(`__Daily Passion Report: <t:${now.unix()}:D>__`)
       .setDescription(
-        `Every day we check each Trailblazer's passion in the Ranked Arena playlist. Link your gamertag with </${LINK_GAMERTAG_NAME}:${LINK_GAMERTAG_ID}> to be included.`
+        `Every day we check each Trailblazer's passion in the Ranked Arena playlist. Link your gamertag with ${command} to be included.`
       )
       .setFooter({
         text: `"${passionReportQuip}"`,

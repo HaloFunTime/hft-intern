@@ -18,6 +18,7 @@ const {
 const scheduledEvents = require("../utils/scheduledEvents");
 const { ERA_DATA, getCurrentEra } = require("../utils/eras");
 const { getDateTimeForPathfinderEventStart } = require("../utils/pathfinders");
+const { getApplicationCommandMention } = require("../utils/formatting.js");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -342,12 +343,16 @@ const weeklyPopularFilesReport = async (client) => {
     const spotlightChannel = client.channels.cache.get(
       HALOFUNTIME_ID_CHANNEL_SPOTLIGHT
     );
+    const command = await getApplicationCommandMention(
+      LINK_GAMERTAG_NAME,
+      interaction.client
+    );
     const message = await spotlightChannel.send({
       content:
         `# __Popular HaloFunTime Files: <t:${now.unix()}:D>__\n\n` +
         "Every week we spotlight the top 10 most popular HaloFunTime files, sorted by recent play count.\n\n" +
         "**Tag your published files in-game with 'halofuntime' to be included!**\n\n" +
-        `Link your gamertag with </${LINK_GAMERTAG_NAME}:${LINK_GAMERTAG_ID}> to show up as a tagged contributor.`,
+        `Link your gamertag with ${command} to show up as a tagged contributor.`,
       embeds: embeds,
     });
     await message.react(HALOFUNTIME_ID_EMOJI_HALOFUNTIME_DOT_COM);

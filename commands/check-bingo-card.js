@@ -17,6 +17,7 @@ const {
   scoreBingo,
   LETTER_TO_HFT_EMOJI,
 } = require("../utils/era01.js");
+const { getApplicationCommandMention } = require("../utils/formatting.js");
 
 const hintQuipClauses = [
   "Keep this between you and me, but in case you were wondering... ",
@@ -154,6 +155,10 @@ module.exports = {
         )
       );
     } else {
+      const command = await getApplicationCommandMention(
+        LINK_GAMERTAG_NAME,
+        interaction.client
+      );
       // Add a gamertag link prompt embed instead if no gamertag is linked
       embeds.push(
         new EmbedBuilder()
@@ -161,7 +166,7 @@ module.exports = {
           .setTitle("No Linked Gamertag Detected")
           .addFields({
             name: "🔗 Link your gamertag!",
-            value: `> Link your Xbox Live Gamertag to HaloFunTime with the </${LINK_GAMERTAG_NAME}:${LINK_GAMERTAG_ID}> command to participate in the Bingo Challenge! Once your gamertag is verified by Staff, the challenge will begin fetching your in-game data.`,
+            value: `> Link your Xbox Live Gamertag to HaloFunTime with the ${command} command to participate in the Bingo Challenge! Once your gamertag is verified by Staff, the challenge will begin fetching your in-game data.`,
           })
       );
     }
