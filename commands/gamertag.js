@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
-const { LINK_GAMERTAG_NAME, LINK_GAMERTAG_ID } = require("../constants");
 const { getApplicationCommandMention } = require("../utils/formatting");
 
 module.exports = {
@@ -37,7 +36,7 @@ module.exports = {
       });
     if ("error" in response) {
       const command = await getApplicationCommandMention(
-        LINK_GAMERTAG_NAME,
+        "link-gamertag",
         interaction.client
       );
       // Send a reply that pings the user if they haven't linked a gamertag
