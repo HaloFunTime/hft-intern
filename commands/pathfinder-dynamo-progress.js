@@ -7,6 +7,8 @@ const {
   HALOFUNTIME_ID_EMOJI_HEART_PATHFINDERS,
   HALOFUNTIME_ID_ROLE_PATHFINDER,
   HALOFUNTIME_ID_THREAD_PATHFINDER_BOT_COMMANDS,
+  LINK_GAMERTAG_NAME,
+  LINK_GAMERTAG_ID,
 } = require("../constants.js");
 const {
   getCurrentSeason,
@@ -15,6 +17,7 @@ const {
   SEASON_05,
 } = require("../utils/seasons");
 const { getCurrentEra, ERA_DATA } = require("../utils/eras");
+const { getApplicationCommandMention } = require("../utils/formatting.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -270,10 +273,14 @@ module.exports = {
       }
       // Add the gamertag link prompt field if needed
       if (!response.linkedGamertag) {
+        const command = await getApplicationCommandMention(
+          LINK_GAMERTAG_NAME,
+          interaction.client
+        );
+
         progressEmbed.addFields({
           name: "🔗 Link your gamertag!",
-          value:
-            "> Link your Xbox Live Gamertag to HaloFunTime with the `/link-gamertag` command to unlock additional challenges tied to your in-game stats! Once your gamertag is verified by Staff, you'll see additional challenges in this section.",
+          value: `> Link your Xbox Live Gamertag to HaloFunTime with the ${command} command to unlock additional challenges tied to your in-game stats! Once your gamertag is verified by Staff, you'll see additional challenges in this section.`,
         });
       }
       // Add the total field, footer, and timestamp

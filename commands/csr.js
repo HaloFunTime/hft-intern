@@ -1,5 +1,7 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
+const { LINK_GAMERTAG_NAME, LINK_GAMERTAG_ID } = require("../constants");
+const { getApplicationCommandMention } = require("../utils/formatting");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -66,11 +68,15 @@ module.exports = {
           console.error(error);
         });
       if ("error" in response) {
+        const command = await getApplicationCommandMention(
+          LINK_GAMERTAG_NAME,
+          interaction.client
+        );
         // Send a reply that potentially pings the member if they haven't linked a gamertag
         await interaction.reply({
           content:
             `<@${member.id}> hasn't linked a gamertag on HaloFunTime. ` +
-            "They can use `/link-gamertag` at any time to do so.",
+            `They can use ${command} at any time to do so.`,
           allowedMentions: { users: [member.id] },
           ephemeral: quiet,
         });

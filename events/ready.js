@@ -1,4 +1,4 @@
-const { ActivityType } = require("discord.js");
+const { ActivityType, Client } = require("discord.js");
 
 module.exports = {
   name: "ready",
@@ -8,5 +8,8 @@ module.exports = {
     client.user.setActivity("instructions", {
       type: ActivityType.Listening,
     });
+
+    // create application command cache
+    client.application.commands.fetch();
   },
 };
