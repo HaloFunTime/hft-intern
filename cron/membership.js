@@ -30,8 +30,6 @@ const {
   PARTYTIMER_CAP,
   PARTYTIMER_TOTAL_REP_MINIMUM,
   PARTYTIMER_UNIQUE_REP_MINIMUM,
-  LINK_GAMERTAG_NAME,
-  LINK_GAMERTAG_ID,
 } = require("../constants.js");
 const { getApplicationCommandMention } = require("../utils/formatting.js");
 dayjs.extend(utc);
@@ -149,9 +147,6 @@ const updateNewHereRoles = async (client) => {
   const now = dayjs();
   const twentyEightDaysAgoUnix = now.subtract(28, "day").valueOf();
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
-  // When developing the bot may not be in the
-  // HFT server so the crashes when it can't fetch the guild
-  if (!guild) return;
   const allMembersMap = await guild.members.fetch({
     cache: true,
     withUserCount: true,
@@ -198,9 +193,9 @@ const updateNewHereRoles = async (client) => {
       `Welcome to the <#${HALOFUNTIME_ID_CHANNEL_NEW_HERE}> channel, <@${member.user.id}>! ${quip}`
     );
     message.react("👋");
-    const linkCommand = await getApplicationCommandMention(
-      LINK_GAMERTAG_NAME,
-      interaction.client
+    const linkGamertagMention = await getApplicationCommandMention(
+      "link-gamertag",
+      client
     );
     let welcomeDM = "";
     welcomeDM += `Welcome to HaloFunTime, <@${member.user.id}>! I'm the Intern, HaloFunTime's favorite bot.\n\n`;
@@ -214,7 +209,7 @@ const updateNewHereRoles = async (client) => {
     welcomeDM += `I've added you to the <#${HALOFUNTIME_ID_CHANNEL_NEW_HERE}> channel for the next 28 days. `;
     welcomeDM +=
       "It's a great place to meet people, learn about the server, and chat directly with the Staff.\n\n";
-    welcomeDM += `When you get a chance, please use the ${linkCommand} command to link your Xbox Live gamertag. `;
+    welcomeDM += `When you get a chance, please use the ${linkGamertagMention} command to link your Xbox Live gamertag. `;
     welcomeDM +=
       "HaloFunTime uses your linked gamertag to pull data from Halo Infinite, assign special roles, and ";
     welcomeDM += "otherwise make sure everyone has a fun time!";
@@ -385,9 +380,6 @@ const updatePartyTimerRoles = async (client) => {
 const updateRankedRoles = async (client) => {
   console.log("Checking Ranked roles...");
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
-  // When developing the bot may not be in the
-  // HFT server so the crashes when it can't fetch the guild
-  if (!guild) return;
   const allMembersMap = await guild.members.fetch({
     cache: true,
     withUserCount: true,
@@ -455,10 +447,14 @@ const updateRankedRoles = async (client) => {
       }
     }
     if (congratulationMessages.length > 0) {
+      const linkGamertagMention = await getApplicationCommandMention(
+        "link-gamertag",
+        client
+      );
       const congratsMessage =
         congratulationMessages.join("\n") +
         `\n\n> *To get a rank role, get the* <@&${HALOFUNTIME_ID_ROLE_RANKED}> *role from <id:customize> and link ` +
-        `your gamertag with the </${LINK_GAMERTAG_NAME}:${LINK_GAMERTAG_ID}> command. Rank roles are assigned based on the highest rank you have ` +
+        `your gamertag with the ${linkGamertagMention} command. Rank roles are assigned based on the highest rank you have ` +
         "achieved during the current ranking period, and updated every fifteen minutes. Removing the* " +
         `<@&${HALOFUNTIME_ID_ROLE_RANKED}> *role or changing your linked gamertag will remove your rank role.*`;
       const channel = client.channels.cache.get(

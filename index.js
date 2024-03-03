@@ -31,7 +31,7 @@ const {
 
 dotenv.config();
 
-const { BOT_TOKEN } = process.env;
+const { BOT_TOKEN, NODE_ENV } = process.env;
 
 const client = new Client({
   intents: [
@@ -86,20 +86,22 @@ for (const file of eventFiles) {
 client.login(BOT_TOKEN);
 
 const scheduleFunc = (cronExpression, func, ...args) => {
-  cron.schedule(
-    cronExpression,
-    () => {
-      try {
-        func(...args);
-      } catch (e) {
-        console.error(e);
+  if (NODE_ENV === "production") {
+    cron.schedule(
+      cronExpression,
+      () => {
+        try {
+          func(...args);
+        } catch (e) {
+          console.error(e);
+        }
+      },
+      {
+        scheduled: true,
+        timezone: "America/Denver",
       }
-    },
-    {
-      scheduled: true,
-      timezone: "America/Denver",
-    }
-  );
+    );
+  }
 };
 
 // Schedule all future cronjobs when the client emits the "ready" event

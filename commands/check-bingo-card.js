@@ -7,9 +7,6 @@ const {
   HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS,
   HALOFUNTIME_ID_CHANNEL_BINGO_CHALLENGE,
   HALOFUNTIME_ID_ROLE_E1_BINGO_BUFF,
-  HALOFUNTIME_ID_ROLE_STAFF,
-  LINK_GAMERTAG_ID,
-  LINK_GAMERTAG_NAME,
 } = require("../constants.js");
 const { ERA_DATA } = require("../utils/eras.js");
 const {
@@ -155,8 +152,8 @@ module.exports = {
         )
       );
     } else {
-      const command = await getApplicationCommandMention(
-        LINK_GAMERTAG_NAME,
+      const linkGamertagMention = await getApplicationCommandMention(
+        "link-gamertag",
         interaction.client
       );
       // Add a gamertag link prompt embed instead if no gamertag is linked
@@ -166,7 +163,7 @@ module.exports = {
           .setTitle("No Linked Gamertag Detected")
           .addFields({
             name: "🔗 Link your gamertag!",
-            value: `> Link your Xbox Live Gamertag to HaloFunTime with the ${command} command to participate in the Bingo Challenge! Once your gamertag is verified by Staff, the challenge will begin fetching your in-game data.`,
+            value: `> Link your Xbox Live Gamertag to HaloFunTime with the ${linkGamertagMention} command to participate in the Bingo Challenge! Once your gamertag is verified by Staff, the challenge will begin fetching your in-game data.`,
           })
       );
     }
