@@ -315,10 +315,14 @@ const updatePartyTimerRoles = async (client) => {
   const channel = client.channels.cache.get(
     HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS
   );
+  const plusRepCommand = await getApplicationCommandMention(
+    "plus-rep",
+    interaction.client
+  );
   const introLine =
     `It's party time! The top ${PARTYTIMER_CAP} FunTimers by rep received (who meet the minimum requirements) earn ` +
     `the <@&${HALOFUNTIME_ID_ROLE_PARTYTIMER}> role, which gives them advanced party hosting powers. ` +
-    "It's important for all FunTimers to use the `/plus-rep` command to reward their favorite party hosts!";
+    `It's important for all FunTimers to use the ${plusRepCommand} command to reward their favorite party hosts!`;
   const promotionsLine =
     partyTimerPromotions.length === 0
       ? `Looks like no one new has earned the <@&${HALOFUNTIME_ID_ROLE_PARTYTIMER}> role this week. We'll check again this time next week.`
@@ -364,7 +368,7 @@ const updatePartyTimerRoles = async (client) => {
     partyTimerEmbeds = [partyTimerEmbed];
   }
   const cooldownLine =
-    "All `/plus-rep` command cooldowns have been reset for the week." +
+    `All ${plusRepCommand} command cooldowns have been reset for the week.` +
     (partyTimerMembers.length > 0
       ? " Hats off to this week's PartyTimers!"
       : " Make sure to give rep so we have some PartyTimers next week!");
