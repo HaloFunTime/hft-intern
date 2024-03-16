@@ -257,6 +257,10 @@ const createPathfinderHikesEvent = async (client) => {
     messageContent = `${overviewBlurb}\n\n${recapBlurb}\n\n${hikesBlurb}`;
   }
   try {
+    const hikesSubmitMention = await getApplicationCommandMention(
+      "pathfinder-hikes-submit",
+      client
+    );
     const message = await scheduledEvents.createVoiceEvent(
       client,
       HALOFUNTIME_ID,
@@ -266,7 +270,7 @@ const createPathfinderHikesEvent = async (client) => {
       HALOFUNTIME_ID_CHANNEL_PATHFINDERS_VC_1,
       eventStart.toISOString(),
       null,
-      `Playtest Forge maps with the Pathfinders club! Submit a map using the \`/pathfinder-hikes-submit\` command in your map's <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> post.`,
+      `Playtest Forge maps with the Pathfinders club! Submit a map using ${hikesSubmitMention} in your map's <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> post.`,
       "https://i.imgur.com/qItmOhr.jpg"
     );
     if (message) {

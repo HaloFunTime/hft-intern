@@ -208,12 +208,17 @@ const updateNewHereRoles = async (client) => {
       "Don't hesitate to create a voice channel or join an existing one - we are a very welcoming community!\n\n";
     welcomeDM += `I've added you to the <#${HALOFUNTIME_ID_CHANNEL_NEW_HERE}> channel for the next 28 days. `;
     welcomeDM +=
-      "It's a great place to meet people, learn about the server, and chat directly with the Staff.\n\n";
-    welcomeDM += `When you get a chance, please use the ${linkGamertagMention} command to link your Xbox Live gamertag. `;
+      "It's a great place to learn about the server and chat directly with the Staff.\n\n";
+    welcomeDM += `When you get a chance, please click ${linkGamertagMention} to link your Xbox Live gamertag. `;
     welcomeDM +=
       "HaloFunTime uses your linked gamertag to pull data from Halo Infinite, assign special roles, and ";
     welcomeDM += "otherwise make sure everyone has a fun time!";
-    await member.send(welcomeDM);
+    try {
+      await member.send(welcomeDM);
+    } catch (e) {
+      console.log("Error sending welcome DM");
+      console.error(e);
+    }
   }
   for (m of membersToRemoveNewHere) {
     const member = await m.roles.remove(HALOFUNTIME_ID_ROLE_NEW_HERE);

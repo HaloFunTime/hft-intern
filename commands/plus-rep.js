@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
+const { getApplicationCommandMention } = require("../utils/formatting.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -81,12 +82,16 @@ module.exports = {
       await interaction.reply(
         `Thanks for giving party hosting rep! ${plusRepSuccessQuip}`
       );
+      const checkRepCommandMention = await getApplicationCommandMention(
+        "check-rep",
+        interaction.client
+      );
       await receiver.send(
         "Someone gave you party hosting rep on __**HaloFunTime**__!" +
           (repMessage !== ""
             ? `\n\nIt came with the following message: \`${repMessage}\`\n\n`
             : " ") +
-          "Check your rep totals at any time with the `/check-rep` command."
+          `Check your rep totals at any time with ${checkRepCommandMention}.`
       );
     } else if ("error" in response) {
       await interaction.reply({

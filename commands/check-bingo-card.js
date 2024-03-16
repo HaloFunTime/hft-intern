@@ -9,12 +9,12 @@ const {
   HALOFUNTIME_ID_ROLE_E1_BINGO_BUFF,
 } = require("../constants.js");
 const { ERA_DATA } = require("../utils/eras.js");
+const { getApplicationCommandMention } = require("../utils/formatting.js");
 const {
   generateBingoCardEmbed,
   scoreBingo,
   LETTER_TO_HFT_EMOJI,
 } = require("../utils/era01.js");
-const { getApplicationCommandMention } = require("../utils/formatting.js");
 
 const hintQuipClauses = [
   "Keep this between you and me, but in case you were wondering... ",
@@ -133,9 +133,12 @@ module.exports = {
     }
     // Handle response indicating user isn't part of challenge yet
     if (!response.joinedChallenge) {
+      const joinBingoChallengeMention = await getApplicationCommandMention(
+        "join-bingo-challenge",
+        interaction.client
+      );
       await interaction.editReply({
-        content:
-          "You can't check your Bingo Card until you've used the `/join-bingo-challenge` command!",
+        content: `Please use ${joinBingoChallengeMention} first - we need to calculate letter positions for your Bingo Card!`,
         ephemeral: true,
       });
       return;

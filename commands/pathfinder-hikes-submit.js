@@ -5,6 +5,7 @@ const {
   HALOFUNTIME_ID_CHANNEL_WAYWO,
 } = require("../constants.js");
 const { MAX_PLAYER_COUNT_CHOICES } = require("../utils/pathfinders.js");
+const { getApplicationCommandMention } = require("../utils/formatting.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -89,8 +90,12 @@ module.exports = {
         }
       });
     if (response.success) {
+      const hikesQueueMention = await getApplicationCommandMention(
+        "pathfinder-hikes-queue",
+        interaction.client
+      );
       await interaction.reply({
-        content: `<@${interaction.user.id}> spent 50 🫘 **Pathfinder Beans** to submit **${map}** for **Pathfinder Hikes** playtesting!\n\nUse the \`/pathfinder-hikes-queue\` command to view the queue of maps submitted for playtesting.`,
+        content: `<@${interaction.user.id}> spent 50 🫘 **Pathfinder Beans** to submit **${map}** for **Pathfinder Hikes** playtesting!\n\nUse ${hikesQueueMention} to view the queue of maps submitted for playtesting.`,
       });
     } else if ("error" in response) {
       // Try to figure out a "friendly" rejection message
@@ -107,8 +112,11 @@ module.exports = {
           response?.error?.details?.detail ===
           "This Discord user does not have enough Pathfinder Beans for a Hike submission."
         ) {
-          friendlyMessage =
-            "\n\nYou must have at least 50 🫘 **Pathfinder Beans** to submit a playtest request. Check your current total with the `/check-beans` command.";
+          const checkBeansMention = await getApplicationCommandMention(
+            "check-beans",
+            interaction.client
+          );
+          friendlyMessage = `\n\nYou must have at least 50 🫘 **Pathfinder Beans** to submit a playtest request. Check your current total with ${checkBeansMention}.`;
         }
       }
       await interaction.reply({

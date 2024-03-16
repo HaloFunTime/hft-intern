@@ -1,5 +1,6 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
+const { getApplicationCommandMention } = require("../utils/formatting");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -136,6 +137,10 @@ module.exports = {
             }
           );
       }
+      const showcaseAddMention = await getApplicationCommandMention(
+        "showcase-add",
+        interaction.client
+      );
       if (response.showcaseFiles.length > 0) {
         // Build embeds
         const allEmbeds = [];
@@ -144,7 +149,7 @@ module.exports = {
             .setTitle(`Halo Infinite Showcase for ${member.username}`)
             .setDescription(
               `See something you like? Let <@${member.id}> know!\n\n` +
-                "Add files to your Showcase with the `/showcase-add` command."
+                `Add files to your Showcase with ${showcaseAddMention}.`
             )
             .setThumbnail("https://api.halofuntime.com/static/HFTLogo.png")
         );
@@ -169,7 +174,7 @@ module.exports = {
       } else {
         await interaction.reply({
           allowedMentions: { users: [member.id] },
-          content: `<@${member.id}> hasn't added any files to their Showcase. They can do so at any time with the \`/showcase-add\` command.`,
+          content: `<@${member.id}> hasn't added any files to their Showcase. They can do so at any time with ${showcaseAddMention}.`,
           ephemeral: quiet,
         });
       }

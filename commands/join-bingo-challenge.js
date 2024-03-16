@@ -10,6 +10,7 @@ const {
 } = require("../constants.js");
 const { ERA_DATA } = require("../utils/eras.js");
 const { generateBingoCardEmbed } = require("../utils/era01.js");
+const { getApplicationCommandMention } = require("../utils/formatting.js");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -82,10 +83,13 @@ module.exports = {
     // Respond
     let responseContent;
     const embeds = [];
+    const checkBingoCardMention = await getApplicationCommandMention(
+      "check-bingo-card",
+      interaction.client
+    );
     if (response.newJoiner) {
       responseContent = `<@${interaction.user.id}> has just joined the Bingo Challenge!\n\n`;
-      responseContent +=
-        "Use the `/check-bingo-card` command to check your Bingo Card.\n\n";
+      responseContent += `Use ${checkBingoCardMention} to check your Bingo Card.\n\n`;
       responseContent += `Complete bingo __**three ways**__ to earn the <@&${HALOFUNTIME_ID_ROLE_E1_BINGO_BUFF}> role!`;
       embeds.push(
         await generateBingoCardEmbed(
@@ -95,7 +99,7 @@ module.exports = {
         )
       );
     } else {
-      responseContent = `<@${interaction.user.id}> you have already joined the Bingo Challenge. Use the \`/check-bingo-card\` command to check your Bingo Card.`;
+      responseContent = `<@${interaction.user.id}> you have already joined the Bingo Challenge. Use ${checkBingoCardMention} to check your Bingo Card.`;
     }
     await interaction.editReply({
       content: responseContent,

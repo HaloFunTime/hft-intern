@@ -9,6 +9,7 @@ const {
   HALOFUNTIME_ID_CHANNEL_WAYWO,
 } = require("../constants.js");
 const { getDateTimeForPathfinderEventStart } = require("../utils/pathfinders");
+const { getApplicationCommandMention } = require("../utils/formatting.js");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -79,11 +80,15 @@ module.exports = {
         hikeQueueQuip = quipPayload.quip;
       }
       const now = dayjs();
+      const hikesSubmitMention = getApplicationCommandMention(
+        "pathfinder-hikes-submit",
+        interaction.client
+      );
       const hikeQueueEmbed = new EmbedBuilder()
         .setColor(0xa4cadb)
         .setTitle(`__Pathfinder Hikes Queue as of <t:${now.unix()}:R>__`)
         .setDescription(
-          `Submit a map for playtesting by using \`/pathfinder-hikes-submit\` on your map's <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> post.`
+          `Submit a map for playtesting by using ${hikesSubmitMention} on your map's <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> post.`
         )
         .setFooter({
           text: `"${hikeQueueQuip}"`,

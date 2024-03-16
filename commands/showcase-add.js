@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
+const { getApplicationCommandMention } = require("../utils/formatting");
 
 const CHOICE_MAP = "map";
 const CHOICE_MODE = "mode";
@@ -65,8 +66,11 @@ module.exports = {
         friendlyErrorMessage =
           "You must have a verified linked gamertag to add files to your Showcase.";
       } else if (responseDetail === "Showcase already has 5 files.") {
-        friendlyErrorMessage =
-          "Your Showcase already has 5 files. Remove a file with `/showcase-remove` if you wish to add this file.";
+        const showcaseRemoveMention = await getApplicationCommandMention(
+          "showcase-remove",
+          interaction.client
+        );
+        friendlyErrorMessage = `Your Showcase already has 5 files. Remove a file with ${showcaseRemoveMention} if you wish to add this file.`;
       } else if (
         responseDetail ===
         `Cannot find a Halo Infinite ${fileType} file with the specified ID.`
