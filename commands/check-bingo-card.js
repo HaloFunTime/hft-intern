@@ -274,6 +274,14 @@ module.exports = {
           `Congratulations to <@${challengeCompleteResponse.discordUserId}> for completing the <#${HALOFUNTIME_ID_CHANNEL_BINGO_CHALLENGE}> and earning the <@&${HALOFUNTIME_ID_ROLE_E1_BINGO_BUFF}> role!`
         );
       }
+      if (challengeCompleteResponse.blackout === true) {
+        const channel = interaction.client.channels.cache.get(
+          HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS
+        );
+        await channel.send(
+          `<@${challengeCompleteResponse.discordUserId}> achieved a <#${HALOFUNTIME_ID_CHANNEL_BINGO_CHALLENGE}> blackout!`
+        );
+      }
     }
   },
 };
