@@ -462,10 +462,10 @@ const updateRankedRoles = async (client) => {
       );
       const congratsMessage =
         congratulationMessages.join("\n") +
-        `\n\n> *To get a rank role, get the* <@&${HALOFUNTIME_ID_ROLE_RANKED}> *role from <id:customize> and link ` +
-        `your gamertag with the ${linkGamertagMention} command. Rank roles are assigned based on the highest rank you have ` +
-        "achieved during the current ranking period, and updated every fifteen minutes. Removing the* " +
-        `<@&${HALOFUNTIME_ID_ROLE_RANKED}> *role or changing your linked gamertag will remove your rank role.*`;
+        `\n\n> ℹ️ *To get a rank role, link your gamertag with the ${linkGamertagMention} command. Rank roles are ` +
+        "updated every 15 minutes based on the highest rank you have achieved during the current ranking period. " +
+        `Removing the* <@&${HALOFUNTIME_ID_ROLE_RANKED}> *role in <id:customize> or changing your linked gamertag ` +
+        "will remove your rank role.*";
       const channel = client.channels.cache.get(
         HALOFUNTIME_ID_CHANNEL_LFG_RANKED
       );
