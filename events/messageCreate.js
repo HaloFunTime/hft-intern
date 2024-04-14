@@ -271,9 +271,11 @@ async function attemptLfgHelp(message) {
         pingRecommendations.length === 1
           ? "this LFG role"
           : "one of these LFG roles";
-      const messageContent = `I noticed that your message didn't mention anyone. Try directly replying to someone or mentioning ${roleText}: ${pingRecommendations.join(
-        " "
-      )}.`;
+      const messageContent =
+        "> ⚠️ *I noticed that your message didn't mention anyone.*\n" +
+        `> *Try directly replying to someone or mentioning ${roleText}:* ${pingRecommendations.join(
+          " "
+        )}.`;
       // Send the LFG Help message
       await message.reply({
         content: messageContent,
