@@ -76,7 +76,7 @@ async function sendLfgChannelWelcomeMessage(oldMember, newMember) {
       partyUpPhrase = "matchmaking in Halo: The Master Chief Collection";
     }
     if (channelId) {
-      const message = `Welcome, <@${newMember.id}>! Ping the ${pingPhrase} in this channel when you're looking to party up for ${partyUpPhrase}. Adjust your LFG roles at any time by visiting <id:customize>.`;
+      const message = `Welcome, <@${newMember.id}>! Ping the ${pingPhrase} in this channel when you're looking to party up for ${partyUpPhrase}. Visit <id:customize> any time to update your LFG roles.`;
       try {
         const channel = newMember.client.channels.cache.get(channelId);
         await channel.send({
