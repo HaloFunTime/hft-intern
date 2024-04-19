@@ -16,6 +16,9 @@ module.exports = {
   async execute(interaction) {
     const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
     const gamertag = interaction.options.getString("gamertag");
+    await interaction.deferReply({
+      allowedMentions: { users: [interaction.user.id] },
+    });
     const response = await axios
       .post(
         `${HALOFUNTIME_API_URL}/link/discord-to-xbox-live`,
@@ -39,14 +42,14 @@ module.exports = {
         console.error(error);
       });
     if ("error" in response) {
-      await interaction.reply({
+      await interaction.editReply({
         content:
           `Your attempt to link <@${interaction.user.id}> to gamertag \`${gamertag}\` on HaloFunTime failed. ` +
           "The gamertag may be invalid or it may already be linked to another Discord account.",
         ephemeral: true,
       });
     } else {
-      await interaction.reply(
+      await interaction.editReply(
         `<@${response.discordUserId}> linked gamertag \`${response.xboxLiveGamertag}\` on HaloFunTime!`
       );
       if (response.verified === false) {
