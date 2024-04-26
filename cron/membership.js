@@ -320,10 +320,7 @@ const updatePartyTimerRoles = async (client) => {
   const channel = client.channels.cache.get(
     HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS
   );
-  const plusRepCommand = await getApplicationCommandMention(
-    "plus-rep",
-    interaction.client
-  );
+  const plusRepCommand = await getApplicationCommandMention("plus-rep", client);
   const introLine =
     `It's party time! The top ${PARTYTIMER_CAP} FunTimers by rep received (who meet the minimum requirements) earn ` +
     `the <@&${HALOFUNTIME_ID_ROLE_PARTYTIMER}> role, which gives them advanced party hosting powers. ` +
@@ -464,7 +461,7 @@ const updateRankedRoles = async (client) => {
         congratulationMessages.join("\n") +
         `\n\n> ℹ️ *To get a rank role, link your gamertag with the* ${linkGamertagMention} *command. Rank roles are ` +
         "updated every 15 minutes based on the highest rank you have achieved during the current ranking period. " +
-        `Removing the* <@&${HALOFUNTIME_ID_ROLE_RANKED}> *role in <id:customize> or changing your linked gamertag ` +
+        `Removing the* <@&${HALOFUNTIME_ID_ROLE_RANKED}> *role in* <id:customize> *or changing your linked gamertag ` +
         "will remove your rank role.*";
       const channel = client.channels.cache.get(
         HALOFUNTIME_ID_CHANNEL_LFG_RANKED
