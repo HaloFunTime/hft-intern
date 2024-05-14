@@ -25,7 +25,6 @@ const {
 } = require("./cron/pathfinders");
 const {
   checkTitanRoles,
-  createTrailblazerTuesdayEvent,
   trailblazerDailyPassionReport,
 } = require("./cron/trailblazers");
 
@@ -36,11 +35,12 @@ const { BOT_TOKEN, NODE_ENV } = process.env;
 const client = new Client({
   intents: [
     GatewayIntentBits.DirectMessages,
-    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMembers, // Privileged intent
     GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildPresences, // Privileged intent
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildVoiceStates,
-    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.MessageContent, // Privileged intent
   ],
 });
 
@@ -132,6 +132,5 @@ client.on("ready", () => {
 
   // Trailblazers
   scheduleFunc("0 0 * * * *", checkTitanRoles, client); // every hour at the top of the hour
-  scheduleFunc("0 0 10 * * 3", createTrailblazerTuesdayEvent, client); // every Wednesday at 10AM
   scheduleFunc("0 0 9 * * *", trailblazerDailyPassionReport, client); // every day at 9AM
 });

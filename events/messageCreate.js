@@ -31,6 +31,8 @@ const {
   HALOFUNTIME_ID_ROLE_RANKED_ARENA_SILVER,
   HALOFUNTIME_ID_ROLE_SOCIAL,
   HALOFUNTIME_ID_ROLE_TESTING,
+  HALOFUNTIME_ID_CHANNEL_NOODLE_TOWN,
+  HALOFUNTIME_ID_ROLE_STAFF,
 } = require("../constants.js");
 const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
 
@@ -286,6 +288,58 @@ async function attemptLfgHelp(message) {
   }
 }
 
+async function attemptNoodleTownAction(message) {
+  // Do not attempt a Noodle Town action if the message was not sent in the Noodle Town channel
+  if (message.channelId !== HALOFUNTIME_ID_CHANNEL_NOODLE_TOWN) return;
+  // Do not attempt a Noodle Town action if the message was authored by this bot
+  if (message.author.id === message.client.user.id) return;
+  // Do not attempt a Noodle Town action if the message was sent by another application
+  if (message.applicationId) return;
+  // Do not attempt a Noodle Town action if the message mentions no one
+  if (message.mentions.users.size === 0) return;
+  // Do not attempt a Noodle Town action if the message was not sent by a Staff member
+  if (!message.member.roles.cache.has(HALOFUNTIME_ID_ROLE_STAFF)) return;
+  // Do not attempt a Noodle Town action if the message does not mention the bot specifically
+  const messageMentionedBot = message.mentions.users.reduce((acc, user) => {
+    if (acc) return true;
+    return user.id === message.client.user.id;
+  }, false);
+  if (!messageMentionedBot) return;
+  // Do not attempt a Noodle Town action if the message content does not match a lenient "noodle town" regular expression
+  const noodleTown = /(noodle){1}.+(town){1}/i;
+  if (!noodleTown.test(message.content)) return;
+  const noodleTownChannel = message.client.channels.cache.get(
+    HALOFUNTIME_ID_CHANNEL_NOODLE_TOWN
+  );
+  // Attempt actions on mentioned users based on whether "admit" or "banish" was said
+  let actionTaken = false;
+  await message.mentions.users.forEach(async (user) => {
+    if (user.id === message.client.user.id) return;
+    const admit = /(admit){1}/i;
+    const banish = /(banish){1}/i;
+    if (admit.test(message.content)) {
+      await noodleTownChannel.permissionOverwrites.create(user.id, {
+        ReadMessageHistory: true,
+        SendMessages: true,
+        ViewChannel: true,
+      });
+      await noodleTownChannel.send(
+        `<@${user.id}> has been admitted to Noodle Town by <@${message.author.id}>.`
+      );
+      actionTaken = true;
+    } else if (banish.test(message.content)) {
+      await noodleTownChannel.permissionOverwrites.delete(
+        user.id,
+        "Get the fork outta here."
+      );
+      await noodleTownChannel.send(
+        `<@${user.id}> has been banished from Noodle Town by <@${message.author.id}>.`
+      );
+      actionTaken = true;
+    }
+  });
+}
+
 async function attemptPassionPatrolAction(message) {
   // Do not attempt a Passion Patrol action if the message was authored by this bot
   if (message.author.id === message.client.user.id) return;
@@ -485,6 +539,7 @@ module.exports = {
       await attemptChatterPause(message);
       await attemptChatter(message);
       await attemptLfgHelp(message);
+      await attemptNoodleTownAction(message);
       await attemptPassionPatrolAction(message);
       await attemptPurpleCircleAction(message);
       await recordWaywoComment(message);

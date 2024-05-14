@@ -5,6 +5,8 @@ const utc = require("dayjs/plugin/utc");
 const {
   HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_E1,
   HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_E1,
+  HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_E2,
+  HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_E2,
 } = require("../constants");
 
 dayjs.extend(isBetween);
@@ -14,12 +16,21 @@ dayjs.extend(utc);
 const ERA_01 = "era01";
 const ERA_01_START_TIME = dayjs.tz("2024-01-30 11:00:00", "America/Denver");
 const ERA_01_END_TIME = dayjs.tz("2024-05-28 11:00:00", "America/Denver");
+const ERA_02 = "era02";
+const ERA_02_START_TIME = dayjs.tz("2024-05-28 11:00:00", "America/Denver");
+const ERA_02_END_TIME = dayjs.tz("2024-09-24 11:00:00", "America/Denver");
 const ERA_DATA = {
   [ERA_01]: {
     startTime: ERA_01_START_TIME,
     endTime: ERA_01_END_TIME,
     scoutRole: HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_E1,
     dynamoRole: HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_E1,
+  },
+  [ERA_02]: {
+    startTime: ERA_02_START_TIME,
+    endTime: ERA_02_END_TIME,
+    scoutRole: HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_E2,
+    dynamoRole: HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_E2,
   },
 };
 

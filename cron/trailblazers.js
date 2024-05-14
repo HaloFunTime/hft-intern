@@ -172,6 +172,7 @@ const checkTitanRoles = async (client) => {
   console.log("Finished checking Trailblazer Titan role eligibility.");
 };
 
+// NOTE: This has been turned off (no longer called by cron)
 const createTrailblazerTuesdayEvent = async (client) => {
   const now = dayjs();
   const nextTuesday = now.day(2).add(1, "week");
