@@ -33,7 +33,7 @@ const createFunTimeFridayEvent = async (client) => {
   const now = dayjs();
   const thisFriday = now.day(5);
   const eventStart = dayjs.tz(
-    `${thisFriday.format("YYYY-MM-DD")} 17:00:00`,
+    `${thisFriday.format("YYYY-MM-DD")} 18:00:00`,
     "America/Denver"
   );
   const thisSaturday = now.day(6);
@@ -42,7 +42,7 @@ const createFunTimeFridayEvent = async (client) => {
     "America/Denver"
   );
   const ftfNumber =
-    eventStart.diff(dayjs.tz("2022-11-11 17:00:00", "America/Denver"), "week") +
+    eventStart.diff(dayjs.tz("2022-11-11 18:00:00", "America/Denver"), "week") +
     1;
   const quips = [
     "is this week",
@@ -154,11 +154,11 @@ const publishFunTimeFridayReport = async (client) => {
   const now = dayjs();
   const thisFriday = now.day(5);
   const eventStart = dayjs.tz(
-    `${thisFriday.format("YYYY-MM-DD")} 17:00:00`,
+    `${thisFriday.format("YYYY-MM-DD")} 18:00:00`,
     "America/Denver"
   );
   const ftfNumber =
-    eventStart.diff(dayjs.tz("2022-11-11 17:00:00", "America/Denver"), "week") +
+    eventStart.diff(dayjs.tz("2022-11-11 18:00:00", "America/Denver"), "week") +
     1;
   const quips = [
     "has come to a close",
