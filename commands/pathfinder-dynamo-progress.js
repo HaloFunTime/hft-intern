@@ -268,6 +268,46 @@ module.exports = {
               }`,
             });
         }
+      } else if (currentEra === "era02") {
+        progressEmbed
+          .setDescription("**Era 2**")
+          .addFields({
+            name: "🫘 Bean Spender",
+            value: `> *Spend 50 🫘 **Pathfinder Beans** to submit a map to Pathfinder Hikes playtesting. Earnable once.*\n> **${
+              response.pointsBeanSpender
+            }/200 points** ${response.pointsBeanSpender === 200 ? "✅" : ""}`,
+          })
+          .addFields({
+            name: "🧱 What Are You Working On?",
+            value: `> *Create a* <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> *post for a project you're working on. 50 points per post.*\n> **${
+              response.pointsWhatAreYouWorkingOn
+            }/150 points** ${
+              response.pointsWhatAreYouWorkingOn === 150 ? "✅" : ""
+            }`,
+          })
+          .addFields({
+            name: "💬 Feedback Fiend",
+            value: `> *Comment on* <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> *posts. 1 point per comment.*\n> **${
+              response.pointsFeedbackFiend
+            }/100 points** ${response.pointsFeedbackFiend === 100 ? "✅" : ""}`,
+          });
+        if (response.linkedGamertag) {
+          progressEmbed
+            .addFields({
+              name: "🥾 Gone Hiking",
+              value: `> *Attend Pathfinder Hikes playtesting in-game! 10 points per map hiked.*\n> **${
+                response.pointsGoneHiking
+              }/250 points** ${response.pointsGoneHiking === 250 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "🔥 Forged in Fire",
+              value: `> *Spend time playing Custom Games on maps made on Forge canvases. 1 point per full hour played.*\n> **${
+                response.pointsForgedInFire
+              }/100 points** ${
+                response.pointsForgedInFire === 100 ? "✅" : ""
+              }`,
+            });
+        }
       }
       // Add the gamertag link prompt field if needed
       if (!response.linkedGamertag) {

@@ -272,6 +272,40 @@ module.exports = {
               }/100 points** ${response.pointsHotStreak === 100 ? "✅" : ""}`,
             });
         }
+      } else if (currentEra === "era02") {
+        progressEmbed.setDescription("**Era 2**").addFields({
+          name: "🦀 Church of the Crab",
+          value: `> *Attend Trailblazer Tuesday! 50 points per session attended.*\n> **${
+            response.pointsChurchOfTheCrab
+          }/250 points** ${response.pointsChurchOfTheCrab === 250 ? "✅" : ""}`,
+        });
+        if (response.linkedGamertag) {
+          progressEmbed
+            .addFields({
+              name: "📈 CSR Go Up",
+              value: `> *Win games in Ranked Arena. 1 point per win.*\n> **${
+                response.pointsCSRGoUp
+              }/200 points** ${response.pointsCSRGoUp === 200 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "💪 Too Stronk",
+              value: `> *Win Strongholds games in Ranked Arena. 5 points per win.*\n> **${
+                response.pointsTooStronk
+              }/100 points** ${response.pointsTooStronk === 100 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "📺 Scoreboard",
+              value: `> *Win games on the map Live Fire in Ranked Arena. 5 points per win.*\n> **${
+                response.pointsScoreboard
+              }/100 points** ${response.pointsScoreboard === 100 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "🔄 The Cycle",
+              value: `> *Win at least one CTF, KotH, Oddball, Slayer, and Strongholds game in Ranked Arena within a six-hour period. Earnable once.*\n> **${
+                response.pointsTheCycle
+              }/100 points** ${response.pointsTheCycle === 100 ? "✅" : ""}`,
+            });
+        }
       }
       // Add the gamertag link prompt field if needed
       if (!response.linkedGamertag) {
