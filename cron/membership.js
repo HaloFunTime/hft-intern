@@ -6,6 +6,8 @@ const timezone = require("dayjs/plugin/timezone");
 const members = require("../utils/members");
 const {
   HALO_INFINITE_RANKED_ARENA_PLAYLIST_ID,
+  HALO_INFINITE_RANKED_DOUBLES_PLAYLIST_ID,
+  HALO_INFINITE_RANKED_SLAYER_PLAYLIST_ID,
   HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS,
   HALOFUNTIME_ID_CHANNEL_FIRST_100,
   HALOFUNTIME_ID_CHANNEL_LFG_RANKED,
@@ -24,6 +26,18 @@ const {
   HALOFUNTIME_ID_ROLE_RANKED_ARENA_ONYX,
   HALOFUNTIME_ID_ROLE_RANKED_ARENA_PLATINUM,
   HALOFUNTIME_ID_ROLE_RANKED_ARENA_SILVER,
+  HALOFUNTIME_ID_ROLE_RANKED_DOUBLES_BRONZE,
+  HALOFUNTIME_ID_ROLE_RANKED_DOUBLES_DIAMOND,
+  HALOFUNTIME_ID_ROLE_RANKED_DOUBLES_GOLD,
+  HALOFUNTIME_ID_ROLE_RANKED_DOUBLES_ONYX,
+  HALOFUNTIME_ID_ROLE_RANKED_DOUBLES_PLATINUM,
+  HALOFUNTIME_ID_ROLE_RANKED_DOUBLES_SILVER,
+  HALOFUNTIME_ID_ROLE_RANKED_SLAYER_BRONZE,
+  HALOFUNTIME_ID_ROLE_RANKED_SLAYER_DIAMOND,
+  HALOFUNTIME_ID_ROLE_RANKED_SLAYER_GOLD,
+  HALOFUNTIME_ID_ROLE_RANKED_SLAYER_ONYX,
+  HALOFUNTIME_ID_ROLE_RANKED_SLAYER_PLATINUM,
+  HALOFUNTIME_ID_ROLE_RANKED_SLAYER_SILVER,
   HALOFUNTIME_ID_ROLE_RANKED,
   HALOFUNTIME_ID_ROLE_STAFF,
   HALOFUNTIME_ID,
@@ -35,13 +49,31 @@ const { getApplicationCommandMention } = require("../utils/formatting.js");
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const ROLE_ID_FOR_CSR_TIER = {
-  onyx: HALOFUNTIME_ID_ROLE_RANKED_ARENA_ONYX,
-  diamond: HALOFUNTIME_ID_ROLE_RANKED_ARENA_DIAMOND,
-  platinum: HALOFUNTIME_ID_ROLE_RANKED_ARENA_PLATINUM,
-  gold: HALOFUNTIME_ID_ROLE_RANKED_ARENA_GOLD,
-  silver: HALOFUNTIME_ID_ROLE_RANKED_ARENA_SILVER,
-  bronze: HALOFUNTIME_ID_ROLE_RANKED_ARENA_BRONZE,
+const TIERED_ROLE_IDS_BY_PLAYLIST_ID = {
+  [HALO_INFINITE_RANKED_ARENA_PLAYLIST_ID]: {
+    onyx: HALOFUNTIME_ID_ROLE_RANKED_ARENA_ONYX,
+    diamond: HALOFUNTIME_ID_ROLE_RANKED_ARENA_DIAMOND,
+    platinum: HALOFUNTIME_ID_ROLE_RANKED_ARENA_PLATINUM,
+    gold: HALOFUNTIME_ID_ROLE_RANKED_ARENA_GOLD,
+    silver: HALOFUNTIME_ID_ROLE_RANKED_ARENA_SILVER,
+    bronze: HALOFUNTIME_ID_ROLE_RANKED_ARENA_BRONZE,
+  },
+  [HALO_INFINITE_RANKED_DOUBLES_PLAYLIST_ID]: {
+    onyx: HALOFUNTIME_ID_ROLE_RANKED_DOUBLES_ONYX,
+    diamond: HALOFUNTIME_ID_ROLE_RANKED_DOUBLES_DIAMOND,
+    platinum: HALOFUNTIME_ID_ROLE_RANKED_DOUBLES_PLATINUM,
+    gold: HALOFUNTIME_ID_ROLE_RANKED_DOUBLES_GOLD,
+    silver: HALOFUNTIME_ID_ROLE_RANKED_DOUBLES_SILVER,
+    bronze: HALOFUNTIME_ID_ROLE_RANKED_DOUBLES_BRONZE,
+  },
+  [HALO_INFINITE_RANKED_SLAYER_PLAYLIST_ID]: {
+    onyx: HALOFUNTIME_ID_ROLE_RANKED_SLAYER_ONYX,
+    diamond: HALOFUNTIME_ID_ROLE_RANKED_SLAYER_DIAMOND,
+    platinum: HALOFUNTIME_ID_ROLE_RANKED_SLAYER_PLATINUM,
+    gold: HALOFUNTIME_ID_ROLE_RANKED_SLAYER_GOLD,
+    silver: HALOFUNTIME_ID_ROLE_RANKED_SLAYER_SILVER,
+    bronze: HALOFUNTIME_ID_ROLE_RANKED_SLAYER_BRONZE,
+  },
 };
 
 const kickLurkers = async (client) => {
@@ -396,83 +428,104 @@ const updateRankedRoles = async (client) => {
   const allMembersWithRankedRole = Array.from(allMembersMap.values()).filter(
     (m) => !m.user.bot && m.roles.cache.has(HALOFUNTIME_ID_ROLE_RANKED)
   );
+  const congratulationMessages = [];
   const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
-  const response = await axios
-    .post(
-      `${HALOFUNTIME_API_URL}/discord/ranked-role-check`,
-      {
-        discordUserIds: allMembersWithRankedRole.map((m) => m.user.id),
-        playlistId: HALO_INFINITE_RANKED_ARENA_PLAYLIST_ID,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+  for (const RANKED_PLAYLIST_ID of Object.keys(
+    TIERED_ROLE_IDS_BY_PLAYLIST_ID
+  )) {
+    let playlistName = "Unknown";
+    if (RANKED_PLAYLIST_ID === HALO_INFINITE_RANKED_ARENA_PLAYLIST_ID) {
+      playlistName = "Arena";
+    } else if (
+      RANKED_PLAYLIST_ID === HALO_INFINITE_RANKED_DOUBLES_PLAYLIST_ID
+    ) {
+      playlistName = "Doubles";
+    } else if (RANKED_PLAYLIST_ID === HALO_INFINITE_RANKED_SLAYER_PLAYLIST_ID) {
+      playlistName = "Slayer";
+    }
+    const response = await axios
+      .post(
+        `${HALOFUNTIME_API_URL}/discord/ranked-role-check`,
+        {
+          discordUserIds: allMembersWithRankedRole.map((m) => m.user.id),
+          playlistId: RANKED_PLAYLIST_ID,
         },
-      }
-    )
-    .then((response) => response.data)
-    .catch(async (error) => {
-      console.error(error);
-      // Return the error payload directly if present
-      if (error?.response?.data) {
-        return error.response.data;
-      }
-    });
-  if ("error" in response) {
-    console.error("Ran into an error checking ranked roles.");
-  } else {
-    console.log(JSON.stringify(response));
-    const congratulationMessages = [];
-    // Add and remove the specific role for each rank
-    for (rank of Object.keys(ROLE_ID_FOR_CSR_TIER)) {
-      const roleId = ROLE_ID_FOR_CSR_TIER[rank];
-      const membersIdsEarnedRank = response[rank];
-      const membersToRemoveRank = allMembers.filter(
-        (m) =>
-          m.roles.cache.has(roleId) && !membersIdsEarnedRank.includes(m.user.id)
-      );
-      const membersToAddRank = allMembers.filter(
-        (m) =>
-          m.roles.cache.has(HALOFUNTIME_ID_ROLE_RANKED) &&
-          !m.roles.cache.has(roleId) &&
-          membersIdsEarnedRank.includes(m.user.id)
-      );
-      for (m of membersToAddRank) {
-        const member = await m.roles.add(roleId);
-        console.log(
-          `ADDED ${rank.toUpperCase()} role to ${member.user.username}`
-        );
-        const congratsMessage = `<@${m.user.id}> has earned the <@&${roleId}> role!`;
-        congratulationMessages.push(congratsMessage);
-      }
-      for (m of membersToRemoveRank) {
-        const member = await m.roles.remove(roleId);
-        console.log(
-          `REMOVED ${rank.toUpperCase()} role from ${member.user.username}`
-        );
-      }
-    }
-    if (congratulationMessages.length > 0) {
-      const linkGamertagMention = await getApplicationCommandMention(
-        "link-gamertag",
-        client
-      );
-      const congratsMessage =
-        congratulationMessages.join("\n") +
-        `\n\n> ℹ️ *To get a rank role, link your gamertag with the* ${linkGamertagMention} *command. Rank roles are ` +
-        "updated every 15 minutes based on the highest rank you have achieved during the current ranking period. " +
-        `Removing the* <@&${HALOFUNTIME_ID_ROLE_RANKED}> *role in* <id:customize> *or changing your linked gamertag ` +
-        "will remove your rank role.*";
-      const channel = client.channels.cache.get(
-        HALOFUNTIME_ID_CHANNEL_LFG_RANKED
-      );
-      await channel.send({
-        content: congratsMessage,
-        allowedMentions: { parse: ["users"] },
+        {
+          headers: {
+            Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+          },
+        }
+      )
+      .then((response) => response.data)
+      .catch(async (error) => {
+        console.error(error);
+        // Return the error payload directly if present
+        if (error?.response?.data) {
+          return error.response.data;
+        }
       });
+    if ("error" in response) {
+      console.error("Ran into an error checking ranked roles.");
+    } else {
+      console.log(JSON.stringify(response));
+      // Add and remove the specific role for each rank in this playlist
+      for (let rank of Object.keys(
+        TIERED_ROLE_IDS_BY_PLAYLIST_ID[RANKED_PLAYLIST_ID]
+      )) {
+        const roleId = TIERED_ROLE_IDS_BY_PLAYLIST_ID[RANKED_PLAYLIST_ID][rank];
+        const memberIdsEarnedRank = response[rank];
+        const membersToRemoveRank = allMembers.filter(
+          (m) =>
+            m.roles.cache.has(roleId) &&
+            !memberIdsEarnedRank.includes(m.user.id)
+        );
+        const membersToAddRank = allMembers.filter(
+          (m) =>
+            m.roles.cache.has(HALOFUNTIME_ID_ROLE_RANKED) &&
+            !m.roles.cache.has(roleId) &&
+            memberIdsEarnedRank.includes(m.user.id)
+        );
+        for (m of membersToAddRank) {
+          const member = await m.roles.add(roleId);
+          console.log(
+            `ADDED ${playlistName.toUpperCase()} ${rank.toUpperCase()} role to ${
+              member.user.username
+            }`
+          );
+          const congratsMessage = `<@${m.user.id}> has earned the <@&${roleId}> role!`;
+          congratulationMessages.push(congratsMessage);
+        }
+        for (m of membersToRemoveRank) {
+          const member = await m.roles.remove(roleId);
+          console.log(
+            `REMOVED ${playlistName.toUpperCase()} ${rank.toUpperCase()} role from ${
+              member.user.username
+            }`
+          );
+        }
+      }
     }
-    console.log("Finished checking Ranked roles.");
   }
+  if (congratulationMessages.length > 0) {
+    const linkGamertagMention = await getApplicationCommandMention(
+      "link-gamertag",
+      client
+    );
+    const congratsMessage =
+      congratulationMessages.join("\n") +
+      `\n\n> ℹ️ *To get rank roles, link your gamertag with the* ${linkGamertagMention} *command. Rank roles are ` +
+      "updated every 15 minutes based on the highest rank you have achieved during the current ranking period in " +
+      `each permanent Ranked playlist (Arena, Doubles, and Slayer). Removing the* <@&${HALOFUNTIME_ID_ROLE_RANKED}>` +
+      " *role in* <id:customize> *or changing your linked gamertag will remove your rank roles.*";
+    const channel = client.channels.cache.get(
+      HALOFUNTIME_ID_CHANNEL_LFG_RANKED
+    );
+    await channel.send({
+      content: congratsMessage,
+      allowedMentions: { parse: ["users"] },
+    });
+  }
+  console.log("Finished checking Ranked roles.");
 };
 
 module.exports = {
