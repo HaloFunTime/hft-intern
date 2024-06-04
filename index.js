@@ -18,6 +18,7 @@ const {
   publishFunTimeFridayReport,
   unfocusFunTimeFridayEvent,
 } = require("./cron/funTimeFriday");
+const { scheduleGossip } = require("./cron/gossip");
 const {
   checkProdigyRoles,
   createPathfinderHikesEvent,
@@ -117,6 +118,9 @@ client.on("ready", () => {
   scheduleFunc("0 */5 * * * *", updateNewHereRoles, client); // every five minutes
   scheduleFunc("0 */15 * * * *", updateRankedRoles, client); // every fifteen minutes
   scheduleFunc("0 0 11 * * 1", updatePartyTimerRoles, client); // every Monday at 11AM
+
+  // Gossip
+  scheduleFunc("0 0 8 * * *", scheduleGossip, client); // every day at 8AM
 
   // Fun Time Friday
   scheduleFunc("0 0 11 * * 0", createFunTimeFridayEvent, client); // every Sunday at 11AM
