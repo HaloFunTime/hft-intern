@@ -167,6 +167,9 @@ const checkTitanRoles = async (client) => {
       });
     }
   } catch (error) {
+    console.log(
+      "Trailblazer Titan check errored out with the following error:"
+    );
     console.error(error);
   }
   console.log("Finished checking Trailblazer Titan role eligibility.");

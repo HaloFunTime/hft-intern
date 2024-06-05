@@ -166,6 +166,9 @@ const checkProdigyRoles = async (client) => {
       });
     }
   } catch (error) {
+    console.log(
+      "Pathfinder Prodigy check errored out with the following error:"
+    );
     console.error(error);
   }
   console.log("Finished checking Pathfinder Prodigy role eligibility.");
