@@ -1,6 +1,13 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const {
+  createAudioPlayer,
+  createAudioResource,
+  joinVoiceChannel,
+  AudioPlayerStatus,
+  NoSubscriberBehavior,
+} = require("@discordjs/voice");
+const {
   HALOFUNTIME_ID,
   HALOFUNTIME_ID_CHANNEL_COMMUNITY,
   HALOFUNTIME_ID_CHANNEL_PATHFINDERS_VC_1,
@@ -23,7 +30,7 @@ async function listMembersConnectedToVC(client, guildId, channelId) {
 }
 
 const attemptRandomGossip = async (client) => {
-  console.log("Gossip attempt!");
+  console.log("Attempting gossip...");
   const gossipsPath = path.join(__dirname, "gossips");
   const randomGossipFiles = fs
     .readdirSync(gossipsPath)
@@ -32,6 +39,7 @@ const attemptRandomGossip = async (client) => {
     console.log("Gossip attempt failed. No gossip files found.");
     return;
   }
+  const guild = client.guilds.cache.get(HALOFUNTIME_ID);
 
   const communityGossips = randomGossipFiles.filter(
     (file) => !file.startsWith("forgers")
@@ -52,22 +60,17 @@ const attemptRandomGossip = async (client) => {
   let channelId, vcMembers;
   if (gossipType === "Community") {
     channelId = HALOFUNTIME_ID_CHANNEL_COMMUNITY;
-    vcMembers = await listMembersConnectedToVC(
-      client,
-      HALOFUNTIME_ID,
-      channelId
-    );
+    vcMembers = await listMembersConnectedToVC(client, guild.id, channelId);
   } else if (gossipType === "Forge") {
     for (let id of [
       HALOFUNTIME_ID_CHANNEL_PATHFINDERS_VC_1,
       HALOFUNTIME_ID_CHANNEL_PATHFINDERS_VC_2,
     ]) {
       channelId = id;
-      vcMembers = await listMembersConnectedToVC(
-        client,
-        HALOFUNTIME_ID,
-        channelId
-      );
+      vcMembers = await listMembersConnectedToVC(client, guild.id, channelId);
+      if (vcMembers.size > 0) {
+        break;
+      }
     }
   } else {
     console.log(
@@ -108,7 +111,38 @@ const attemptRandomGossip = async (client) => {
     return;
   }
 
-  // Connect, Gossip, and GTFO
+  // Connect to the VC
+  const connection = joinVoiceChannel({
+    adapterCreator: guild.voiceAdapterCreator,
+    channelId: channelId,
+    guildId: guild.id,
+    selfDeaf: false,
+    selfMute: false,
+  });
+
+  // Create the audio resource and player
+  const audioResource = createAudioResource(`${gossipsPath}/${gossipFile}`);
+  const audioPlayer = createAudioPlayer({
+    behaviors: {
+      noSubscriber: NoSubscriberBehavior.Pause,
+    },
+  });
+
+  // Subscribe the connection to the player
+  const subscription = connection.subscribe(audioPlayer);
+
+  // Play the audio file and disconnect/clean up once done
+  audioPlayer.play(audioResource);
+  audioPlayer.on(AudioPlayerStatus.Idle, () => {
+    subscription.unsubscribe();
+    connection.disconnect();
+    audioPlayer.stop();
+    console.log(
+      `Gossip attempt successful! Played ${gossipFile} (a ${gossipType} gossip) in channel ${channelId} for these listeners: ${vcMembers
+        .map((m) => m.user.username)
+        .join(", ")}`
+    );
+  });
 };
 
 module.exports = {

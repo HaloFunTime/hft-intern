@@ -20,10 +20,13 @@
   },
   "homepage": "https://github.com/HaloFunTime/hft-intern#readme",
   "dependencies": {
+    "@discordjs/voice": "^0.17.0",
     "axios": "^1.6.2",
     "dayjs": "^1.11.7",
     "discord.js": "^14.15.2",
     "dotenv": "^16.0.3",
+    "ffmpeg-static": "^5.2.0",
+    "libsodium-wrappers": "^0.7.13",
     "node-cron": "3.0.0"
   },
   "devDependencies": {
