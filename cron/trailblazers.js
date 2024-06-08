@@ -12,6 +12,7 @@ const {
   HALOFUNTIME_ID_EMOJI_PASSION,
   HALOFUNTIME_ID_ROLE_TRAILBLAZER,
   HALOFUNTIME_ID_ROLE_TRAILBLAZER_TITAN,
+  HALOFUNTIME_ID_THREAD_TRAILBLAZER_BOT_COMMANDS,
   HALOFUNTIME_ID,
 } = require("../constants.js");
 const scheduledEvents = require("../utils/scheduledEvents");
@@ -145,13 +146,13 @@ const checkTitanRoles = async (client) => {
         member: m,
       });
     }
-    // Apply the promotions/demotions and announce them
-    const channel = client.channels.cache.get(
-      HALOFUNTIME_ID_CHANNEL_TRAILBLAZER_ANNOUNCEMENTS
+    // Apply the promotions/demotions and announce them in the Bot Commands thread
+    const thread = client.channels.cache.get(
+      HALOFUNTIME_ID_THREAD_TRAILBLAZER_BOT_COMMANDS
     );
     for (const promotion of promotionData) {
       await promotion.member.roles.add(HALOFUNTIME_ID_ROLE_TRAILBLAZER_TITAN);
-      const message = await channel.send({
+      const message = await thread.send({
         content: promotion.message,
         allowedMentions: { users: [promotion.member.user.id] },
       });
@@ -161,7 +162,7 @@ const checkTitanRoles = async (client) => {
     }
     for (const demotion of demotionData) {
       await demotion.member.roles.remove(HALOFUNTIME_ID_ROLE_TRAILBLAZER_TITAN);
-      await channel.send({
+      await thread.send({
         content: demotion.message,
         allowedMentions: { users: [demotion.member.user.id] },
       });

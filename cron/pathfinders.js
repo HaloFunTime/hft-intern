@@ -11,6 +11,7 @@ const {
   HALOFUNTIME_ID_EMOJI_HEART_PATHFINDERS,
   HALOFUNTIME_ID_ROLE_PATHFINDER_PRODIGY,
   HALOFUNTIME_ID_ROLE_PATHFINDER,
+  HALOFUNTIME_ID_THREAD_PATHFINDER_BOT_COMMANDS,
   HALOFUNTIME_ID,
 } = require("../constants.js");
 const scheduledEvents = require("../utils/scheduledEvents");
@@ -145,10 +146,12 @@ const checkProdigyRoles = async (client) => {
       });
     }
     // Apply the promotions/demotions and announce them
-    const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_SPOTLIGHT);
+    const thread = client.channels.cache.get(
+      HALOFUNTIME_ID_THREAD_PATHFINDER_BOT_COMMANDS
+    );
     for (const promotion of promotionData) {
       await promotion.member.roles.add(HALOFUNTIME_ID_ROLE_PATHFINDER_PRODIGY);
-      const message = await channel.send({
+      const message = await thread.send({
         content: promotion.message,
         allowedMentions: { users: [promotion.member.user.id] },
       });
@@ -160,7 +163,7 @@ const checkProdigyRoles = async (client) => {
       await demotion.member.roles.remove(
         HALOFUNTIME_ID_ROLE_PATHFINDER_PRODIGY
       );
-      await channel.send({
+      await thread.send({
         content: demotion.message,
         allowedMentions: { users: [demotion.member.user.id] },
       });
@@ -238,7 +241,7 @@ const createPathfinderHikesEvent = async (client) => {
   const eventStart = getDateTimeForPathfinderEventStart(nextWednesday);
   let messageContent;
   const hikesBlurb =
-    "Click the 'Interested' bell on the event below to be notified when it starts. Attending Pathfinder Hikes will earn you 🫘 **Pathfinder Beans** and points toward this season's **Pathfinder Dynamo** role.";
+    "Click the 'Interested' bell on the event below to be notified when it starts. Attending Pathfinder Hikes will earn you 🫘 **Pathfinder Beans** and points toward this era's **Pathfinder Dynamo** role.";
   if (skipRecap) {
     messageContent = `Pathfinder Hikes - our weekly Forge map testing session - has been scheduled for next week.\n\n${hikesBlurb}`;
   } else {
