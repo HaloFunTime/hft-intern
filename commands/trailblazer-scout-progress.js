@@ -2,18 +2,11 @@ const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
 const {
   HALOFUNTIME_ID_CHANNEL_TRAILBLAZER_ANNOUNCEMENTS,
-  HALOFUNTIME_ID_CHANNEL_VOD_REVIEW,
   HALOFUNTIME_ID_EMOJI_HEART_TRAILBLAZERS,
   HALOFUNTIME_ID_EMOJI_PASSION,
   HALOFUNTIME_ID_ROLE_TRAILBLAZER,
   HALOFUNTIME_ID_THREAD_TRAILBLAZER_BOT_COMMANDS,
 } = require("../constants.js");
-const {
-  getCurrentSeason,
-  SEASON_03,
-  SEASON_04,
-  SEASON_05,
-} = require("../utils/seasons");
 const { getCurrentEra, ERA_DATA } = require("../utils/eras");
 const { getApplicationCommandMention } = require("../utils/formatting.js");
 
@@ -70,9 +63,8 @@ module.exports = {
         ephemeral: true,
       });
     } else {
-      const currentSeason = getCurrentSeason();
       const currentEra = getCurrentEra();
-      if (!currentSeason && !currentEra) {
+      if (!currentEra) {
         await interaction.editReply({
           content:
             "Could not check your progress toward the Trailblazer Scout role at this time.",
@@ -85,160 +77,8 @@ module.exports = {
         .setColor(0x3498db)
         .setTitle("Trailblazer Scout Progress")
         .setThumbnail("https://api.halofuntime.com/static/TrailblazerLogo.png");
-      // Add the appropriate description and fields for the current season or era
-      if (currentSeason === SEASON_03) {
-        progressEmbed
-          .setDescription("**Season 3**")
-          .addFields({
-            name: "🦀 Church of the Crab",
-            value: `> *Attend Trailblazer Tuesday! 50 points per session attended.*\n> **${
-              response.pointsChurchOfTheCrab
-            }/250 points** ${
-              response.pointsChurchOfTheCrab === 250 ? "✅" : ""
-            }`,
-          })
-          .addFields({
-            name: "🫶 Sharing is Caring",
-            value: `> *Bring someone new to Trailblazer Tuesday! 50 points per referral.*\n> **${
-              response.pointsSharingIsCaring
-            }/150 points** ${
-              response.pointsSharingIsCaring === 150 ? "✅" : ""
-            }`,
-          })
-          .addFields({
-            name: "📚 Bookworm",
-            value: `> *Submit a VOD in <#${HALOFUNTIME_ID_CHANNEL_VOD_REVIEW}>! 50 points per VOD.*\n> **${
-              response.pointsBookworm
-            }/100 points** ${response.pointsBookworm === 100 ? "✅" : ""}`,
-          });
-        if (response.linkedGamertag) {
-          progressEmbed
-            .addFields({
-              name: "🎮 Online Warrior",
-              value: `> *Beat your Ranked Arena placement CSR by 200 or more. Earnable once.*\n> **${
-                response.pointsOnlineWarrior
-              }/200 points** ${
-                response.pointsOnlineWarrior === 200 ? "✅" : ""
-              }`,
-            })
-            .addFields({
-              name: "🔥 Hot Streak",
-              value: `> *Win 3 consecutive Ranked Arena games and finish on top of the scoreboard each time. Earnable once.*\n> **${
-                response.pointsHotStreak
-              }/100 points** ${response.pointsHotStreak === 100 ? "✅" : ""}`,
-            })
-            .addFields({
-              name: "💀 Oddly Effective",
-              value: `> *Win Oddball games in Ranked Arena. 4 points per win.*\n> **${
-                response.pointsOddlyEffective
-              }/100 points** ${
-                response.pointsOddlyEffective === 100 ? "✅" : ""
-              }`,
-            })
-            .addFields({
-              name: "💪 Too Stronk",
-              value: `> *Win Strongholds games in Ranked Arena. 4 points per win.*\n> **${
-                response.pointsTooStronk
-              }/100 points** ${response.pointsTooStronk === 100 ? "✅" : ""}`,
-            });
-        }
-      } else if (currentSeason === SEASON_04) {
-        progressEmbed
-          .setDescription("**Season 4**")
-          .addFields({
-            name: "🦀 Church of the Crab",
-            value: `> *Attend Trailblazer Tuesday! 50 points per session attended.*\n> **${
-              response.pointsChurchOfTheCrab
-            }/250 points** ${
-              response.pointsChurchOfTheCrab === 250 ? "✅" : ""
-            }`,
-          })
-          .addFields({
-            name: "📚 Bookworm",
-            value: `> *Submit a VOD in <#${HALOFUNTIME_ID_CHANNEL_VOD_REVIEW}>! 50 points per VOD.*\n> **${
-              response.pointsBookworm
-            }/150 points** ${response.pointsBookworm === 150 ? "✅" : ""}`,
-          })
-          .addFields({
-            name: "🎥 Film Critic",
-            value: `> *Write an excellent VOD review in <#${HALOFUNTIME_ID_CHANNEL_VOD_REVIEW}>! Earnable once.*\n> **${
-              response.pointsFilmCritic
-            }/100 points** ${response.pointsFilmCritic === 100 ? "✅" : ""}`,
-          });
-        if (response.linkedGamertag) {
-          progressEmbed
-            .addFields({
-              name: "🎮 Online Warrior",
-              value: `> *Beat your Ranked Arena placement CSR by 200 or more. Earnable once.*\n> **${
-                response.pointsOnlineWarrior
-              }/200 points** ${
-                response.pointsOnlineWarrior === 200 ? "✅" : ""
-              }`,
-            })
-            .addFields({
-              name: "🔄 The Cycle",
-              value: `> *Win at least one CTF, KotH, Oddball, Slayer, and Strongholds game in Ranked Arena within a six-hour period. Earnable once.*\n> **${
-                response.pointsTheCycle
-              }/100 points** ${response.pointsTheCycle === 100 ? "✅" : ""}`,
-            })
-            .addFields({
-              name: "🏁 Checkered Flag",
-              value: `> *Win Capture the Flag games in Ranked Arena. 4 points per win.*\n> **${
-                response.pointsCheckeredFlag
-              }/100 points** ${
-                response.pointsCheckeredFlag === 100 ? "✅" : ""
-              }`,
-            })
-            .addFields({
-              name: "⛰ Them Thar Hills",
-              value: `> *Win King of the Hill games in Ranked Arena. 4 points per win.*\n> **${
-                response.pointsThemTharHills
-              }/100 points** ${
-                response.pointsThemTharHills === 100 ? "✅" : ""
-              }`,
-            });
-        }
-      } else if (currentSeason === SEASON_05) {
-        progressEmbed.setDescription("**Season 5**").addFields({
-          name: "🦀 Church of the Crab",
-          value: `> *Attend Trailblazer Tuesday! 50 points per session attended.*\n> **${
-            response.pointsChurchOfTheCrab
-          }/250 points** ${response.pointsChurchOfTheCrab === 250 ? "✅" : ""}`,
-        });
-        if (response.linkedGamertag) {
-          progressEmbed
-            .addFields({
-              name: "🎮 Online Warrior",
-              value: `> *Beat your Ranked Arena placement CSR by 200 or more. Earnable once.*\n> **${
-                response.pointsOnlineWarrior
-              }/200 points** ${
-                response.pointsOnlineWarrior === 200 ? "✅" : ""
-              }`,
-            })
-            .addFields({
-              name: "🪙 Heads or Tails",
-              value: `> *Get headshot kills in Ranked Arena. 1 point for every 5 headshot kills.*\n> **${
-                response.pointsHeadsOrTails
-              }/150 points** ${
-                response.pointsHeadsOrTails === 150 ? "✅" : ""
-              }`,
-            })
-            .addFields({
-              name: "🔌 High Voltage",
-              value: `> *Win games on the map Recharge in Ranked Arena. 5 points per win.*\n> **${
-                response.pointsHighVoltage
-              }/100 points** ${response.pointsHighVoltage === 100 ? "✅" : ""}`,
-            })
-            .addFields({
-              name: "💀 Exterminator",
-              value: `> *Achieve an Extermination in Ranked Arena. Earnable once.*\n> **${
-                response.pointsExterminator
-              }/100 points** ${
-                response.pointsExterminator === 100 ? "✅" : ""
-              }`,
-            });
-        }
-      } else if (currentEra === "era01") {
+      // Add the appropriate description and fields for the current era
+      if (currentEra === "era01") {
         progressEmbed.setDescription("**Era 1**").addFields({
           name: "🦀 Church of the Crab",
           value: `> *Attend Trailblazer Tuesday! 50 points per session attended.*\n> **${
