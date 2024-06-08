@@ -63,6 +63,7 @@ module.exports = {
           playtestGameId: playtestGameId,
           discordUsersInVoice: discordUsersInVoice,
           waywoPostId: interaction.channelId,
+          waywoPostTitle: interaction.channel.name,
         },
         {
           headers: {
@@ -91,19 +92,8 @@ module.exports = {
         content: `${awardMentions.join("\n")}\n\n${playtestLine}`,
       });
     } else if ("error" in response) {
-      // Try to figure out a "friendly" rejection message
-      let friendlyMessage = "";
-      if (response?.error?.status_code === 403) {
-        if (
-          response?.error?.details?.detail ===
-          "Could not find an incomplete Pathfinder Hike Submission associated with this WAYWO Post."
-        ) {
-          friendlyMessage =
-            "\n\nThe system could not find an incomplete Pathfinder Hike Submission associated with this WAYWO Post.";
-        }
-      }
       await interaction.reply({
-        content: `Hike could not be completed.${friendlyMessage}`,
+        content: "Hike could not be completed.",
         ephemeral: true,
       });
     }
