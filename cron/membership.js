@@ -143,6 +143,30 @@ const postHelpfulHintToNewHereChannel = async (client) => {
   message.react("🧠");
 };
 
+const updateActivePlaylistMapModePairs = async (client) => {
+  console.log("Updating map/mode pairs for active playlists...");
+  const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+  await axios
+    .post(
+      `${HALOFUNTIME_API_URL}/halo-infinite/update-active-playlist-map-mode-pairs`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+        },
+      }
+    )
+    .then((response) => response.data)
+    .catch(async (error) => {
+      // Errors here are probably CloudFlare timeouts, but we don't care.
+      // As long as the job was kicked off on the server side, the data we need
+      // should end up in the database for future API calls to read from.
+      return;
+    });
+  // Log as if this completed successfully (even if it failed)
+  console.log("Finished updating map/mode pairs for active playlists.");
+};
+
 const updateFirst100Roles = async (client) => {
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
   const allMembersMap = await guild.members.fetch({
@@ -531,6 +555,7 @@ const updateRankedRoles = async (client) => {
 module.exports = {
   kickLurkers: kickLurkers,
   postHelpfulHintToNewHereChannel: postHelpfulHintToNewHereChannel,
+  updateActivePlaylistMapModePairs: updateActivePlaylistMapModePairs,
   updateFirst100Roles: updateFirst100Roles,
   updateNewHereRoles: updateNewHereRoles,
   updatePartyTimerRoles: updatePartyTimerRoles,
