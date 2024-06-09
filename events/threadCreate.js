@@ -77,15 +77,15 @@ async function attemptFileShareEnforcement(thread) {
 async function recordWaywoPost(thread) {
   // Do not record a WAYWO post if the thread is not in the WAYWO forum channel
   if (thread.parentId !== HALOFUNTIME_ID_CHANNEL_WAYWO) return;
-  const threadOwner = await thread.fetchOwner();
+  const threadOwner = await thread.client.users.fetch(thread.ownerId);
   // Record data in the backend
   const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
   const response = await axios
     .post(
       `${HALOFUNTIME_API_URL}/pathfinder/waywo-post`,
       {
-        posterDiscordId: threadOwner.user.id,
-        posterDiscordUsername: threadOwner.user.username,
+        posterDiscordId: threadOwner.id,
+        posterDiscordUsername: threadOwner.username,
         postId: thread.id,
         postTitle: thread.name,
       },

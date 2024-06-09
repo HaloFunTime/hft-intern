@@ -272,7 +272,7 @@ const updateNewHereRoles = async (client) => {
     try {
       await member.send(welcomeDM);
     } catch (e) {
-      console.log("Error sending welcome DM");
+      console.log("Error sending welcome DM.");
       console.error(e);
     }
   }
@@ -491,7 +491,6 @@ const updateRankedRoles = async (client) => {
     if ("error" in response) {
       console.error("Ran into an error checking ranked roles.");
     } else {
-      console.log(JSON.stringify(response));
       // Add and remove the specific role for each rank in this playlist
       for (let rank of Object.keys(
         TIERED_ROLE_IDS_BY_PLAYLIST_ID[RANKED_PLAYLIST_ID]
