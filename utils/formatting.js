@@ -6,7 +6,6 @@ const { Client } = require("discord.js");
  * @param {Client} client
  */
 async function getApplicationCommandMention(name, client) {
-  await client.application.commands.fetch();
   const command = client.application.commands.cache.find((e) => e.name == name);
   if (!command) {
     console.warn(`Failed to fetch command "${name}"`);

@@ -139,7 +139,19 @@ const postHelpfulHintToNewHereChannel = async (client) => {
   // Return without trying to send a hint if error data is present
   if ("error" in hintPayload) return;
   const channel = client.channels.cache.get(HALOFUNTIME_ID_CHANNEL_NEW_HERE);
-  const message = await channel.send(hintPayload.hint);
+  let textToSend = hintPayload.hint;
+  const re = /\`\/([^`]+)\`/g;
+  let match;
+  do {
+    match = re.exec(textToSend);
+    if (match) {
+      textToSend = textToSend.replace(
+        match[0],
+        await getApplicationCommandMention(match[1], client)
+      );
+    }
+  } while (match);
+  const message = await channel.send(textToSend);
   message.react("🧠");
 };
 
