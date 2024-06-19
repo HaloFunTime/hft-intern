@@ -4,6 +4,14 @@ const cron = require("node-cron");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const dotenv = require("dotenv");
 const {
+  conditionalWednesdayPost,
+  createFunTimeFridayEvent,
+  focusFunTimeFridayEvent,
+  publishFunTimeFridayReport,
+  unfocusFunTimeFridayEvent,
+} = require("./cron/funTimeFriday");
+const { scheduleGossip } = require("./cron/gossip");
+const {
   kickLurkers,
   postHelpfulHintToNewHereChannel,
   updateActivePlaylistMapModePairs,
@@ -13,18 +21,11 @@ const {
   updateRankedRoles,
 } = require("./cron/membership");
 const {
-  conditionalWednesdayPost,
-  createFunTimeFridayEvent,
-  focusFunTimeFridayEvent,
-  publishFunTimeFridayReport,
-  unfocusFunTimeFridayEvent,
-} = require("./cron/funTimeFriday");
-const { scheduleGossip } = require("./cron/gossip");
-const {
   checkProdigyRoles,
   createPathfinderHikesEvent,
   weeklyPopularFilesReport,
 } = require("./cron/pathfinders");
+const { attemptRepNudges } = require("./cron/reputation");
 const {
   checkTitanRoles,
   trailblazerDailyPassionReport,
@@ -120,6 +121,9 @@ client.on("ready", () => {
   scheduleFunc("0 */5 * * * *", updateNewHereRoles, client); // every five minutes
   scheduleFunc("0 */15 * * * *", updateRankedRoles, client); // every fifteen minutes
   scheduleFunc("0 0 11 * * 1", updatePartyTimerRoles, client); // every Monday at 11AM
+
+  // Reputation
+  scheduleFunc("0 */5 * * * *", attemptRepNudges, client); // every five minutes
 
   // Gossip
   scheduleFunc("0 0 8 * * *", scheduleGossip, client); // every day at 8AM
