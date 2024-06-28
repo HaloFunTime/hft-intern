@@ -542,16 +542,7 @@ const updateRankedRoles = async (client) => {
     }
   }
   if (congratulationMessages.length > 0) {
-    const linkGamertagMention = await getApplicationCommandMention(
-      "link-gamertag",
-      client
-    );
-    const congratsMessage =
-      congratulationMessages.join("\n") +
-      `\n\n> ℹ️ *To get rank roles, link your gamertag with the* ${linkGamertagMention} *command. Rank roles are ` +
-      "updated every 15 minutes based on the highest rank you have achieved during the current ranking period in " +
-      `each permanent Ranked playlist (Arena, Doubles, and Slayer). Removing the* <@&${HALOFUNTIME_ID_ROLE_RANKED}>` +
-      " *role in* <id:customize> *or changing your linked gamertag will remove your rank roles.*";
+    const congratsMessage = congratulationMessages.join("\n");
     const channel = client.channels.cache.get(
       HALOFUNTIME_ID_CHANNEL_LFG_RANKED
     );
