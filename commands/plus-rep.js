@@ -78,6 +78,17 @@ module.exports = {
         plusRepSuccessQuip = "Giving rep is a nice thing to do.";
       } else {
         plusRepSuccessQuip = quipPayload.quip;
+        const re = /\`\/([^`]+)\`/g;
+        let match;
+        do {
+          match = re.exec(plusRepSuccessQuip);
+          if (match) {
+            plusRepSuccessQuip = plusRepSuccessQuip.replace(
+              match[0],
+              await getApplicationCommandMention(match[1], client)
+            );
+          }
+        } while (match);
       }
       await interaction.reply(
         `Thanks for giving party hosting rep! ${plusRepSuccessQuip}`
