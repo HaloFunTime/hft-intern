@@ -19,11 +19,12 @@ function randBoxMuller() {
 const scheduleGossip = async (client) => {
   // Every day, pick a random number of minutes after the cron initation time.
   // Using the Box-Muller transform and Math.random(), we bias RNG to a normal
-  // distro centered 12 hours after the cron initiation time - which coincides
-  // with peak Halo population hours (10PM Eastern/7PM Pacific). This maximizes
-  // the chance that a gossip attempt happens with players around.
+  // distro centered 10 hours after the cron initiation time - which coincides
+  // with peak Halo population hours (8PM Eastern/5PM Pacific). This maximizes
+  // the chance that a gossip attempt happens with players around. Gossip will
+  // not happen between 6AM Eastern/3AM Pacific and 10AM Eastern/7AM Pacific.
   const multiplier = randBoxMuller();
-  const minutes = Math.floor(1440 * multiplier);
+  const minutes = Math.floor(1200 * multiplier);
   const gossipTime = dayjs().add(minutes, "minutes").tz("America/Denver");
   setTimeout(attemptRandomGossip, 1000 * 60 * minutes, client);
   console.log(
