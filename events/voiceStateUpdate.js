@@ -1,14 +1,27 @@
 const axios = require("axios");
 const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+const timezone = require("dayjs/plugin/timezone");
 const {
-  HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY,
-  HALOFUNTIME_ID_CHANNEL_WAITING_ROOM,
+  HALOFUNTIME_ID_CATEGORY_PLAY_HALO,
+  HALOFUNTIME_ID_CHANNEL_NEW_HALO_VC,
 } = require("../constants.js");
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 async function attemptFunTimeFridayVoiceConnect(voiceState) {
-  if (voiceState.channel.parentId !== HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY)
+  if (voiceState.channel.parentId !== HALOFUNTIME_ID_CATEGORY_PLAY_HALO) return;
+  if (voiceState.channelId === HALOFUNTIME_ID_CHANNEL_NEW_HALO_VC) return;
+  const now = dayjs();
+  const nowTZ = now.tz("America/Denver");
+  if (
+    (nowTZ.day() !== 5 && nowTZ.day() !== 6) || // It is not Friday or Saturday
+    (nowTZ.day() === 5 && nowTZ.hour() < 12) || // It is Friday before noon
+    (nowTZ.day() === 6 && nowTZ.hour() >= 12) // It is Saturday after noon
+  ) {
     return;
-  if (voiceState.channelId === HALOFUNTIME_ID_CHANNEL_WAITING_ROOM) return;
+  }
   const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
   const response = await axios
     .post(
@@ -16,7 +29,7 @@ async function attemptFunTimeFridayVoiceConnect(voiceState) {
       {
         connectorDiscordId: voiceState.member.user.id,
         connectorDiscordUsername: voiceState.member.user.username,
-        connectedAt: dayjs().toISOString(),
+        connectedAt: now.toISOString(),
         channelId: voiceState.channelId,
         channelName: voiceState.channel.name,
       },
@@ -41,9 +54,17 @@ async function attemptFunTimeFridayVoiceConnect(voiceState) {
 }
 
 async function attemptFunTimeFridayVoiceDisconnect(voiceState) {
-  if (voiceState.channel.parentId !== HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY)
+  if (voiceState.channel.parentId !== HALOFUNTIME_ID_CATEGORY_PLAY_HALO) return;
+  if (voiceState.channelId === HALOFUNTIME_ID_CHANNEL_NEW_HALO_VC) return;
+  const now = dayjs();
+  const nowTZ = now.tz("America/Denver");
+  if (
+    (nowTZ.day() !== 5 && nowTZ.day() !== 6) || // It is not Friday or Saturday
+    (nowTZ.day() === 5 && nowTZ.hour() < 12) || // It is Friday before noon
+    (nowTZ.day() === 6 && nowTZ.hour() >= 12) // It is Saturday after noon
+  ) {
     return;
-  if (voiceState.channelId === HALOFUNTIME_ID_CHANNEL_WAITING_ROOM) return;
+  }
   const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
   const response = await axios
     .post(
@@ -51,7 +72,7 @@ async function attemptFunTimeFridayVoiceDisconnect(voiceState) {
       {
         disconnectorDiscordId: voiceState.member.user.id,
         disconnectorDiscordUsername: voiceState.member.user.username,
-        disconnectedAt: dayjs().toISOString(),
+        disconnectedAt: now.toISOString(),
         channelId: voiceState.channelId,
         channelName: voiceState.channel.name,
       },

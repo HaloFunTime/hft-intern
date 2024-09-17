@@ -1,21 +1,22 @@
+const { ChannelType, GuildScheduledEventStatus } = require("discord.js");
 const axios = require("axios");
 const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
 const {
-  HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY,
   HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS,
   HALOFUNTIME_ID_CHANNEL_GENERAL,
-  HALOFUNTIME_ID_CHANNEL_WAITING_ROOM,
+  HALOFUNTIME_ID_CHANNEL_NEW_HALO_VC,
   HALOFUNTIME_ID_EMOJI_GRUNT_BIRTHDAY,
   HALOFUNTIME_ID_EMOJI_HALOFUNTIME_DOT_COM,
   HALOFUNTIME_ID_EMOJI_HFT_INTERESTED,
   HALOFUNTIME_ID_EMOJI_HFT_UPVOTE,
   HALOFUNTIME_ID_ROLE_MEMBER,
   HALOFUNTIME_ID,
+  HALOFUNTIME_ID_CATEGORY_PLAY_HALO,
 } = require("../constants.js");
-const categories = require("../utils/categories");
 const scheduledEvents = require("../utils/scheduledEvents");
+const { listMembersConnectedToVC } = require("../utils/voice");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -38,7 +39,7 @@ const createFunTimeFridayEvent = async (client) => {
   );
   const thisSaturday = now.day(6);
   const eventEnd = dayjs.tz(
-    `${thisSaturday.format("YYYY-MM-DD")} 05:00:00`,
+    `${thisSaturday.format("YYYY-MM-DD")} 06:00:00`,
     "America/Denver"
   );
   const ftfNumber =
@@ -64,12 +65,12 @@ const createFunTimeFridayEvent = async (client) => {
       client,
       HALOFUNTIME_ID,
       HALOFUNTIME_ID_CHANNEL_ANNOUNCEMENTS,
-      `<@&${HALOFUNTIME_ID_ROLE_MEMBER}> Fun Time Friday #${ftfNumber} ${quip}!\n\nWhen the event starts, connect to any voice channel in the __**FUN TIME FRIDAY**__ section to join the fun - or create your own voice channel to start your own lobby.\n\nClick the \"Interested\" bell on the event if you'll be joining us this week!`,
+      `<@&${HALOFUNTIME_ID_ROLE_MEMBER}> Fun Time Friday #${ftfNumber} ${quip}!\n\nWhen the event starts, connect to any voice channel in the __**PLAY HALO**__ section to join the fun - or create your own voice channel to start your own lobby.\n\nClick the \"Interested\" bell on the event if you'll be joining us this week!`,
       `Fun Time Friday #${ftfNumber}`,
-      HALOFUNTIME_ID_CHANNEL_WAITING_ROOM,
+      HALOFUNTIME_ID_CHANNEL_NEW_HALO_VC,
       eventStart.toISOString(),
       eventEnd.toISOString(),
-      "Join your party-up pals at HaloFunTime for an evening of custom games, matchmaking, and all sorts of other shenanigans.",
+      "Join your party-up pals at HaloFunTime for an evening of custom games, matchmaking, and fun. Start a new VC or join an existing one to get in on the fun.",
       "https://i.imgur.com/g704sdo.jpg"
     );
     if (message) {
@@ -98,55 +99,131 @@ const createFunTimeFridayEvent = async (client) => {
   }
 };
 
-const focusFunTimeFridayEvent = async (client) => {
-  try {
-    await categories.raiseAndOpenForRole(
-      client,
-      HALOFUNTIME_ID,
-      HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY,
-      HALOFUNTIME_ID_ROLE_MEMBER,
-      "🎉 Fun Time Friday 🎉"
-    );
-    const category = client.channels.cache.get(
-      HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY
-    );
-    const childChannelIds = category.children.cache.map(
-      (channel) => channel.id
-    );
-    for (const channelId of childChannelIds) {
-      if (channelId !== HALOFUNTIME_ID_CHANNEL_WAITING_ROOM) {
-        const channel = client.channels.cache.get(channelId);
-        channel.lockPermissions();
-      }
-    }
-  } catch (e) {
-    console.error(e);
+const startFunTimeFridayEvent = async (client) => {
+  // Get the correct ScheduledEvent for Fun Time Friday
+  const guild = client.guilds.cache.get(HALOFUNTIME_ID);
+  const events = await guild.scheduledEvents.cache.filter(
+    (scheduledEvent) =>
+      scheduledEvent.name.includes("Fun Time Friday") &&
+      scheduledEvent.isScheduled()
+  );
+
+  // Set its status to "Active"
+  for (const event of events) {
+    await event.setStatus(GuildScheduledEventStatus.Active);
   }
 };
 
-const unfocusFunTimeFridayEvent = async (client) => {
-  try {
-    await categories.lowerAndCloseForRole(
+const endFunTimeFridayEvent = async (client) => {
+  // Get the correct ScheduledEvent for Fun Time Friday
+  const guild = client.guilds.cache.get(HALOFUNTIME_ID);
+  const events = await guild.scheduledEvents.cache.filter(
+    (scheduledEvent) =>
+      scheduledEvent.name.includes("Fun Time Friday") &&
+      scheduledEvent.isActive()
+  );
+
+  // Set its status to "Completed"
+  for (const event of events) {
+    await event.setStatus(GuildScheduledEventStatus.Completed);
+  }
+};
+
+const startFunTimeFriday = async (client) => {
+  // Start Fun Time Friday by creating Voice Connect records for all people currently connected to PLAY HALO VCs.
+  const now = dayjs();
+  const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+  const guild = client.guilds.cache.get(HALOFUNTIME_ID);
+  const channels = guild.channels.cache.filter(
+    (channel) =>
+      channel.parentId === HALOFUNTIME_ID_CATEGORY_PLAY_HALO &&
+      channel.type === ChannelType.GuildVoice
+  );
+  for (const channel of channels) {
+    const members = await listMembersConnectedToVC(
       client,
-      HALOFUNTIME_ID,
-      HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY,
-      HALOFUNTIME_ID_ROLE_MEMBER,
-      "Fun Time Friday"
+      guild.id,
+      channel.id
     );
-    const category = client.channels.cache.get(
-      HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY
-    );
-    const childChannelIds = category.children.cache.map(
-      (channel) => channel.id
-    );
-    for (const channelId of childChannelIds) {
-      if (channelId !== HALOFUNTIME_ID_CHANNEL_WAITING_ROOM) {
-        const channel = client.channels.cache.get(channelId);
-        channel.lockPermissions();
+    for (const member of members) {
+      const response = await axios
+        .post(
+          `${HALOFUNTIME_API_URL}/fun-time-friday/voice-connect`,
+          {
+            connectorDiscordId: member.user.id,
+            connectorDiscordUsername: member.user.username,
+            connectedAt: now.toISOString(),
+            channelId: channel.id,
+            channelName: channel.name,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+            },
+          }
+        )
+        .then((response) => response.data)
+        .catch(async (error) => {
+          console.error(error);
+          // Return the error payload directly if present
+          if (error.response.data) {
+            return error.response.data;
+          }
+        });
+      // Log if an error happens
+      if (response.success === false || "error" in response) {
+        console.log(response.error);
       }
     }
-  } catch (e) {
-    console.error(e);
+  }
+};
+
+const endFunTimeFriday = async (client) => {
+  // End Fun Time Friday by creating Voice Disconnect records for all people currently connected to PLAY HALO VCs.
+  const now = dayjs();
+  const { HALOFUNTIME_API_KEY, HALOFUNTIME_API_URL } = process.env;
+  const guild = client.guilds.cache.get(HALOFUNTIME_ID);
+  const channels = guild.channels.cache.filter(
+    (channel) =>
+      channel.parentId === HALOFUNTIME_ID_CATEGORY_PLAY_HALO &&
+      channel.type === ChannelType.GuildVoice
+  );
+  for (const channel of channels) {
+    const members = await listMembersConnectedToVC(
+      client,
+      guild.id,
+      channel.id
+    );
+    for (const member of members) {
+      const response = await axios
+        .post(
+          `${HALOFUNTIME_API_URL}/fun-time-friday/voice-disconnect`,
+          {
+            disconnectorDiscordId: member.user.id,
+            disconnectorDiscordUsername: member.user.username,
+            disconnectedAt: now.toISOString(),
+            channelId: channel.id,
+            channelName: channel.name,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${HALOFUNTIME_API_KEY}`,
+            },
+          }
+        )
+        .then((response) => response.data)
+        .catch(async (error) => {
+          console.error(error);
+          // Return the error payload directly if present
+          if (error.response.data) {
+            return error.response.data;
+          }
+        });
+      // Log if an error happens
+      if (response.success === false || "error" in response) {
+        console.log(response.error);
+      }
+    }
   }
 };
 
@@ -283,7 +360,9 @@ const publishFunTimeFridayReport = async (client) => {
 module.exports = {
   conditionalWednesdayPost: conditionalWednesdayPost,
   createFunTimeFridayEvent: createFunTimeFridayEvent,
-  focusFunTimeFridayEvent: focusFunTimeFridayEvent,
-  unfocusFunTimeFridayEvent: unfocusFunTimeFridayEvent,
+  endFunTimeFriday: endFunTimeFriday,
+  endFunTimeFridayEvent: endFunTimeFridayEvent,
   publishFunTimeFridayReport: publishFunTimeFridayReport,
+  startFunTimeFriday: startFunTimeFriday,
+  startFunTimeFridayEvent: startFunTimeFridayEvent,
 };

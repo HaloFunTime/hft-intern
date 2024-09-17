@@ -3,10 +3,7 @@ const { getApplicationCommandMention } = require("../utils/formatting.js");
 const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
-const {
-  HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY,
-  HALOFUNTIME_ID_CATEGORY_PLAY_HALO,
-} = require("../constants.js");
+const { HALOFUNTIME_ID_CATEGORY_PLAY_HALO } = require("../constants.js");
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -17,21 +14,16 @@ const attemptRepNudges = async (client) => {
   const oneHourFiveMinutesAgoUnix = oneHourAgo.subtract(5, "minutes").valueOf();
   const plusRepMention = await getApplicationCommandMention("plus-rep", client);
 
-  // Find all recent VCs in the "Play Halo" or "Fun Time Friday" categories created at least an hour ago
+  // Find all recent VCs in the "PLAY HALO" category created at least an hour ago
   const playHaloChildren = client.channels.cache.get(
     HALOFUNTIME_ID_CATEGORY_PLAY_HALO
   ).children.cache;
-  const ftfChildren = client.channels.cache.get(
-    HALOFUNTIME_ID_CATEGORY_FUN_TIME_FRIDAY
-  ).children.cache;
-  const recentVCs = playHaloChildren
-    .concat(ftfChildren)
-    .filter(
-      (channel) =>
-        channel.type === ChannelType.GuildVoice &&
-        channel.createdTimestamp > oneHourFiveMinutesAgoUnix &&
-        channel.createdTimestamp <= oneHourAgoUnix
-    );
+  const recentVCs = playHaloChildren.filter(
+    (channel) =>
+      channel.type === ChannelType.GuildVoice &&
+      channel.createdTimestamp > oneHourFiveMinutesAgoUnix &&
+      channel.createdTimestamp <= oneHourAgoUnix
+  );
 
   // For each recent VC, ping with a rep nudge if players are present
   await recentVCs.forEach(async (vc) => {

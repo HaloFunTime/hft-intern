@@ -6,9 +6,11 @@ const dotenv = require("dotenv");
 const {
   conditionalWednesdayPost,
   createFunTimeFridayEvent,
-  focusFunTimeFridayEvent,
+  endFunTimeFriday,
+  endFunTimeFridayEvent,
   publishFunTimeFridayReport,
-  unfocusFunTimeFridayEvent,
+  startFunTimeFriday,
+  startFunTimeFridayEvent,
 } = require("./cron/funTimeFriday");
 const { scheduleGossip } = require("./cron/gossip");
 const {
@@ -131,9 +133,11 @@ client.on("ready", () => {
   // Fun Time Friday
   scheduleFunc("0 0 11 * * 0", createFunTimeFridayEvent, client); // every Sunday at 11AM
   scheduleFunc("0 0 6 * * 3", conditionalWednesdayPost, client); // every Wednesday at 6AM
-  scheduleFunc("0 0 12 * * 5", focusFunTimeFridayEvent, client); // every Friday at noon
-  scheduleFunc("0 0 5 * * 6", unfocusFunTimeFridayEvent, client); // every Saturday at 5AM
-  scheduleFunc("0 0 12 * * 6", publishFunTimeFridayReport, client); // every Saturday at noon
+  scheduleFunc("0 0 12 * * 5", startFunTimeFriday, client); // every Friday at noon
+  scheduleFunc("0 0 18 * * 5", startFunTimeFridayEvent, client); // every Friday at 6PM
+  scheduleFunc("0 0 6 * * 6", endFunTimeFridayEvent, client); // every Saturday at 6AM
+  scheduleFunc("0 0 12 * * 6", endFunTimeFriday, client); // every Saturday at noon
+  scheduleFunc("0 5 12 * * 6", publishFunTimeFridayReport, client); // every Saturday at 12:05 PM
 
   // Pathfinders
   scheduleFunc("0 0 * * * *", checkProdigyRoles, client); // every hour at the top of the hour
