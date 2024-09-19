@@ -14,6 +14,7 @@ const {
   HALOFUNTIME_ID_CHANNEL_LFG_TESTING,
   HALOFUNTIME_ID_CHANNEL_PASSION_PATROL,
   HALOFUNTIME_ID_CHANNEL_PURPLE_CIRCLE,
+  HALOFUNTIME_ID_CHANNEL_PURPLE_CIRCLE_VC,
   HALOFUNTIME_ID_CHANNEL_WAYWO,
   HALOFUNTIME_ID_ROLE_8S,
   HALOFUNTIME_ID_ROLE_BTB,
@@ -411,10 +412,13 @@ async function attemptPurpleCircleAction(message) {
   const purpleCircle = /(purple){1}.+(circle){1}/i;
   if (!purpleCircle.test(message.content)) return;
   // Retrieve the current leader of the Purple Circle
-  const purpleCircleChannel = message.client.channels.cache.get(
+  const purpleCircleTextChannel = message.client.channels.cache.get(
     HALOFUNTIME_ID_CHANNEL_PURPLE_CIRCLE
   );
-  const matches = purpleCircleChannel.topic.match(/(\d+)/);
+  const purpleCircleVoiceChannel = message.client.channels.cache.get(
+    HALOFUNTIME_ID_CHANNEL_PURPLE_CIRCLE_VC
+  );
+  const matches = purpleCircleTextChannel.topic.match(/(\d+)/);
   if (!matches) return;
   // Do not attempt a Purple Circle action if the message was not sent by the Leader of the Purple Circle
   const purpleCircleLeaderId = matches[0];
@@ -426,21 +430,31 @@ async function attemptPurpleCircleAction(message) {
     const add = /(add){1}/i;
     const remove = /(remove){1}/i;
     if (add.test(message.content)) {
-      await purpleCircleChannel.permissionOverwrites.create(user.id, {
+      await purpleCircleTextChannel.permissionOverwrites.create(user.id, {
         ReadMessageHistory: true,
         SendMessages: true,
         ViewChannel: true,
       });
-      await purpleCircleChannel.send(
+      await purpleCircleVoiceChannel.permissionOverwrites.create(user.id, {
+        Connect: true,
+        ReadMessageHistory: true,
+        SendMessages: true,
+        ViewChannel: true,
+      });
+      await purpleCircleTextChannel.send(
         `<@${user.id}> has been added to the Purple Circle by <@${purpleCircleLeaderId}>.`
       );
       actionTaken = true;
     } else if (remove.test(message.content)) {
-      await purpleCircleChannel.permissionOverwrites.delete(
+      await purpleCircleTextChannel.permissionOverwrites.delete(
         user.id,
         "Leader's orders."
       );
-      await purpleCircleChannel.send(
+      await purpleCircleVoiceChannel.permissionOverwrites.delete(
+        user.id,
+        "Leader's orders."
+      );
+      await purpleCircleTextChannel.send(
         `<@${user.id}> has been removed from the Purple Circle by <@${purpleCircleLeaderId}>.`
       );
       actionTaken = true;

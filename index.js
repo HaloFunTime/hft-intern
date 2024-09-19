@@ -24,7 +24,6 @@ const {
 } = require("./cron/membership");
 const {
   checkProdigyRoles,
-  createPathfinderHikesEvent,
   weeklyPopularFilesReport,
 } = require("./cron/pathfinders");
 const { attemptRepNudges } = require("./cron/reputation");
@@ -141,7 +140,6 @@ client.on("ready", () => {
 
   // Pathfinders
   scheduleFunc("0 0 * * * *", checkProdigyRoles, client); // every hour at the top of the hour
-  scheduleFunc("0 0 10 * * 4", createPathfinderHikesEvent, client); // every Thursday at 10AM
   scheduleFunc("0 0 10 * * 5", weeklyPopularFilesReport, client); // every Friday at 10AM
 
   // Trailblazers
