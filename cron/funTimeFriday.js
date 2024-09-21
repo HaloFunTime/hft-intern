@@ -102,31 +102,31 @@ const createFunTimeFridayEvent = async (client) => {
 const startFunTimeFridayEvent = async (client) => {
   // Get the correct ScheduledEvent for Fun Time Friday
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
-  const events = await guild.scheduledEvents.cache.filter(
+  const events = guild.scheduledEvents.cache.filter(
     (scheduledEvent) =>
       scheduledEvent.name.includes("Fun Time Friday") &&
       scheduledEvent.isScheduled()
   );
 
   // Set its status to "Active"
-  for (const event of events) {
+  events.forEach(async (event) => {
     await event.setStatus(GuildScheduledEventStatus.Active);
-  }
+  });
 };
 
 const endFunTimeFridayEvent = async (client) => {
   // Get the correct ScheduledEvent for Fun Time Friday
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
-  const events = await guild.scheduledEvents.cache.filter(
+  const events = guild.scheduledEvents.cache.filter(
     (scheduledEvent) =>
       scheduledEvent.name.includes("Fun Time Friday") &&
       scheduledEvent.isActive()
   );
 
   // Set its status to "Completed"
-  for (const event of events) {
+  events.forEach(async (event) => {
     await event.setStatus(GuildScheduledEventStatus.Completed);
-  }
+  });
 };
 
 const startFunTimeFriday = async (client) => {
