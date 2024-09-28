@@ -145,7 +145,7 @@ const startFunTimeFriday = async (client) => {
       guild.id,
       channel.id
     );
-    for (const member of members) {
+    for (const [id, member] of members.entries()) {
       const response = await axios
         .post(
           `${HALOFUNTIME_API_URL}/fun-time-friday/voice-connect`,
@@ -194,7 +194,7 @@ const endFunTimeFriday = async (client) => {
       guild.id,
       channel.id
     );
-    for (const member of members) {
+    for (const [id, member] of members.entries()) {
       const response = await axios
         .post(
           `${HALOFUNTIME_API_URL}/fun-time-friday/voice-disconnect`,
