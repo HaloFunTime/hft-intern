@@ -20,9 +20,9 @@ const ERA_01_START_TIME = dayjs.tz("2024-01-30 11:00:00", "America/Denver");
 const ERA_01_END_TIME = dayjs.tz("2024-05-28 11:00:00", "America/Denver");
 const ERA_02 = "era02";
 const ERA_02_START_TIME = dayjs.tz("2024-05-28 11:00:00", "America/Denver");
-const ERA_02_END_TIME = dayjs.tz("2024-10-08 11:00:00", "America/Denver");
+const ERA_02_END_TIME = dayjs.tz("2024-12-03 11:00:00", "America/Denver");
 const ERA_03 = "era03";
-const ERA_03_START_TIME = dayjs.tz("2024-10-08 11:00:00", "America/Denver");
+const ERA_03_START_TIME = dayjs.tz("2024-12-03 11:00:00", "America/Denver");
 const ERA_03_END_TIME = dayjs.tz("2025-02-11 11:00:00", "America/Denver");
 const ERA_DATA = {
   [ERA_01]: {
