@@ -140,12 +140,15 @@ const startFunTimeFriday = async (client) => {
       channel.type === ChannelType.GuildVoice
   );
   for (const channel of channels) {
-    const members = await listMembersConnectedToVC(
+    const vcMembers = await listMembersConnectedToVC(
       client,
       guild.id,
       channel.id
     );
-    for (const [id, member] of members.entries()) {
+    if (vcMembers.size === 0) {
+      continue;
+    }
+    for (const [id, member] of vcMembers.entries()) {
       const response = await axios
         .post(
           `${HALOFUNTIME_API_URL}/fun-time-friday/voice-connect`,
@@ -189,12 +192,15 @@ const endFunTimeFriday = async (client) => {
       channel.type === ChannelType.GuildVoice
   );
   for (const channel of channels) {
-    const members = await listMembersConnectedToVC(
+    const vcMembers = await listMembersConnectedToVC(
       client,
       guild.id,
       channel.id
     );
-    for (const [id, member] of members.entries()) {
+    if (vcMembers.size === 0) {
+      continue;
+    }
+    for (const [id, member] of vcMembers.entries()) {
       const response = await axios
         .post(
           `${HALOFUNTIME_API_URL}/fun-time-friday/voice-disconnect`,
