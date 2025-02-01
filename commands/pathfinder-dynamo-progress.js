@@ -158,6 +158,31 @@ module.exports = {
               }`,
             });
         }
+      } else if (currentEra === "era03") {
+        progressEmbed
+          .setDescription("**Era 3**")
+          .addFields({
+            name: "🧱 What Are You Working On?",
+            value: `> *Create a* <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> *post for a project you're working on. 100 points per post.*\n> **${
+              response.pointsWhatAreYouWorkingOn
+            }/200 points** ${
+              response.pointsWhatAreYouWorkingOn === 200 ? "✅" : ""
+            }`,
+          })
+          .addFields({
+            name: "💬 Feedback Fiend",
+            value: `> *Comment on* <#${HALOFUNTIME_ID_CHANNEL_WAYWO}> *posts. 1 point per comment.*\n> **${
+              response.pointsFeedbackFiend
+            }/300 points** ${response.pointsFeedbackFiend === 300 ? "✅" : ""}`,
+          });
+        if (response.linkedGamertag) {
+          progressEmbed.addFields({
+            name: "🔥 Forged in Fire",
+            value: `> *Spend time playing Custom Games on maps made on Forge canvases. 1 point per full hour played.*\n> **${
+              response.pointsForgedInFire
+            }/300 points** ${response.pointsForgedInFire === 300 ? "✅" : ""}`,
+          });
+        }
       }
       // Add the gamertag link prompt field if needed
       if (!response.linkedGamertag) {

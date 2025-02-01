@@ -146,6 +146,43 @@ module.exports = {
               }/100 points** ${response.pointsTheCycle === 100 ? "✅" : ""}`,
             });
         }
+      } else if (currentEra === "era03") {
+        progressEmbed.setDescription("**Era 3**");
+        if (response.linkedGamertag) {
+          progressEmbed
+            .addFields({
+              name: "📈 CSR Go Up",
+              value: `> *Win games in Ranked Arena. 1 point per win.*\n> **${
+                response.pointsCSRGoUp
+              }/300 points** ${response.pointsCSRGoUp === 300 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "💣 Bomb Dot Com",
+              value: `> *Win Neutral Bomb games in Ranked Arena. 5 points per win.*\n> **${
+                response.pointsBombDotCom
+              }/100 points** ${response.pointsBombDotCom === 100 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "💀 Oddly Effective",
+              value: `> *Win Oddball games in Ranked Arena. 5 points per win.*\n> **${
+                response.pointsOddlyEffective
+              }/100 points** ${
+                response.pointsOddlyEffective === 100 ? "✅" : ""
+              }`,
+            })
+            .addFields({
+              name: "📅 It's the Age",
+              value: `> *Win games on the map Aquarius in Ranked Arena. 5 points per win.*\n> **${
+                response.pointsItsTheAge
+              }/100 points** ${response.pointsItsTheAge === 100 ? "✅" : ""}`,
+            })
+            .addFields({
+              name: "4️⃣ Overkill",
+              value: `> *Achieve an Overkill in Ranked Arena. Earnable once.*\n> **${
+                response.pointsOverkill
+              }/100 points** ${response.pointsOverkill === 100 ? "✅" : ""}`,
+            });
+        }
       }
       // Add the gamertag link prompt field if needed
       if (!response.linkedGamertag) {
