@@ -26,10 +26,7 @@ module.exports = {
     const now = dayjs();
     const joinChallengeStart = ERA_DATA["era03"].startTime;
     const joinChallengeEnd = ERA_DATA["era03"].endTime;
-    if (
-      now < joinChallengeStart &&
-      !interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_STAFF)
-    ) {
+    if (now < joinChallengeStart) {
       await interaction.reply({
         content: "You can't board the boat to join the **Boat Challenge** yet.",
         ephemeral: true,
@@ -43,11 +40,7 @@ module.exports = {
       return;
     }
     // Command may only be executed in the Boat Challenge channel
-    if (
-      interaction.channelId !== HALOFUNTIME_ID_CHANNEL_BOAT_CHALLENGE &&
-      !interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_STAFF) &&
-      interaction.channelId !== HALOFUNTIME_ID_CHANNEL_STAFF
-    ) {
+    if (interaction.channelId !== HALOFUNTIME_ID_CHANNEL_BOAT_CHALLENGE) {
       await interaction.reply({
         content: `You may only use this command in the <#${HALOFUNTIME_ID_CHANNEL_BOAT_CHALLENGE}> channel.`,
         ephemeral: true,

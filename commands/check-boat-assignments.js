@@ -44,7 +44,6 @@ module.exports = {
     // Command may only be executed in the Boat Challenge channel
     if (
       interaction.channelId !== HALOFUNTIME_ID_CHANNEL_BOAT_CHALLENGE &&
-      !interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_STAFF) &&
       interaction.channelId !== HALOFUNTIME_ID_CHANNEL_STAFF
     ) {
       await interaction.reply({
@@ -153,12 +152,12 @@ module.exports = {
           })
       );
     }
+    */
     // TODO: Add an embed for newly-unlocked secrets
     await interaction.editReply({
       allowedMentions: { users: [interaction.user.id] },
-      embeds: embeds,
+      embeds: [],
     });
-    */
     // Award role
     // TODO: Make this reachable based on rank check
     if (false) {
