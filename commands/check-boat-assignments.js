@@ -16,6 +16,19 @@ const { getApplicationCommandMention } = require("../utils/formatting.js");
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+const preDepartureQuips = [
+  "Gotta make sure we have enough FunTime snacks.",
+  "You would not believe how little this boat cost me.",
+  "Do you have your HaloFunTime branded pool noodle?",
+  "I need to stock the galley.",
+  "I need to spend some time in the engine room.",
+  "I need to wash the sheets.",
+  "I need to make sure my insurance company knows exactly how much this thing's worth.",
+  "I need to check the hull for any damage.",
+  "I need to make sure the lights are working.",
+  "We need as many deckhands as possible.",
+];
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("check-boat-assignments")
@@ -29,8 +42,10 @@ module.exports = {
       now < assignmentCheckingStart &&
       !interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_STAFF)
     ) {
+      const preDepartureQuip =
+        preDepartureQuips[(preDepartureQuips.length * Math.random()) | 0];
       await interaction.reply({
-        content: `I won't have an assignment for you until <t:${assignmentCheckingStart.unix()}:f>.`,
+        content: `I won't have an assignment for you until <t:${assignmentCheckingStart.unix()}:f>, when we set sail. ${preDepartureQuip}`,
         ephemeral: true,
       });
       return;

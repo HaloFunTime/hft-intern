@@ -89,11 +89,11 @@ module.exports = {
       interaction.client
     );
     if (response.newJoiner) {
-      responseContent = `Welcome aboard the S.S. FunTime, <@${interaction.user.id}>. Your rank is **${response.rank}**.\n\n`;
-      responseContent += `Maybe someday you'll be worthy of the title <@&${HALOFUNTIME_ID_ROLE_E3_BOAT_CAPTAIN}>... but for now, you work for me.\n\n`;
+      responseContent = `Welcome aboard the S.S. FunTime, <@${interaction.user.id}>. We have work to do. And by we, I mean you.\n\n`;
+      responseContent += `Maybe someday you'll earn the <@&${HALOFUNTIME_ID_ROLE_E3_BOAT_CAPTAIN}> rank... but you're going to start out as a **${response.rank}**.\n\n`;
       responseContent += `Use ${checkBoatAssignmentsMention} to see how you can help me out.`;
     } else {
-      responseContent = `<@${interaction.user.id}>, your rank is **${response.rank}**. Use ${checkBoatAssignmentsMention} to see how you can help me out.`;
+      responseContent = `<@${interaction.user.id}>, you are a **${response.rank}**. Use ${checkBoatAssignmentsMention} to see how you can help me out.`;
     }
     await interaction.editReply({
       content: responseContent,
