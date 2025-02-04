@@ -156,7 +156,7 @@ module.exports = {
     // TODO: Add an embed for newly-unlocked secrets
     await interaction.editReply({
       allowedMentions: { users: [interaction.user.id] },
-      embeds: [],
+      content: "Placeholder message.",
     });
     // Award role
     // TODO: Make this reachable based on rank check
