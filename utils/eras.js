@@ -24,6 +24,9 @@ const ERA_02_END_TIME = dayjs.tz("2025-02-04 11:00:00", "America/Denver");
 const ERA_03 = "era03";
 const ERA_03_START_TIME = dayjs.tz("2025-02-04 11:00:00", "America/Denver");
 const ERA_03_END_TIME = dayjs.tz("2025-08-05 11:00:00", "America/Denver");
+const ERA_04 = "era04";
+const ERA_04_START_TIME = dayjs.tz("2025-08-05 11:00:00", "America/Denver");
+const ERA_04_END_TIME = dayjs.tz("2026-02-03 11:00:00", "America/Denver");
 const ERA_DATA = {
   [ERA_01]: {
     startTime: ERA_01_START_TIME,
@@ -42,6 +45,10 @@ const ERA_DATA = {
     endTime: ERA_03_END_TIME,
     scoutRole: HALOFUNTIME_ID_ROLE_TRAILBLAZER_SCOUT_E3,
     dynamoRole: HALOFUNTIME_ID_ROLE_PATHFINDER_DYNAMO_E3,
+  },
+  [ERA_04]: {
+    startTime: ERA_04_START_TIME,
+    endTime: ERA_04_END_TIME,
   },
 };
 
