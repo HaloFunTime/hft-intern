@@ -138,10 +138,7 @@ module.exports = {
     const now = dayjs();
     const assignmentCheckingStart = ERA_DATA["era03"].startTime.add(7, "day");
     const assignmentCheckingEnd = ERA_DATA["era03"].endTime;
-    if (
-      now < assignmentCheckingStart &&
-      !interaction.member.roles.cache.has(HALOFUNTIME_ID_ROLE_STAFF)
-    ) {
+    if (now < assignmentCheckingStart) {
       const preDepartureQuip =
         preDepartureQuips[(preDepartureQuips.length * Math.random()) | 0];
       await interaction.reply({
@@ -157,10 +154,7 @@ module.exports = {
       return;
     }
     // Command may only be executed in the Boat Challenge channel
-    if (
-      interaction.channelId !== HALOFUNTIME_ID_CHANNEL_BOAT_CHALLENGE &&
-      interaction.channelId !== HALOFUNTIME_ID_CHANNEL_STAFF
-    ) {
+    if (interaction.channelId !== HALOFUNTIME_ID_CHANNEL_BOAT_CHALLENGE) {
       await interaction.reply({
         content: `You may only use this command in the <#${HALOFUNTIME_ID_CHANNEL_BOAT_CHALLENGE}> channel.`,
         ephemeral: true,
