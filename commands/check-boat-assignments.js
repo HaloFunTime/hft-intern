@@ -238,7 +238,12 @@ module.exports = {
           response.currentRankTier >= 10
             ? `*\"Who's the <@&${HALOFUNTIME_ID_ROLE_E3_BOAT_CAPTAIN}> now? You are!\"*`
             : `*\"${overviewDescription}\"*`
-        );
+        )
+        .setFooter({
+          text: "HaloFunTime Boat Challenge",
+          iconURL: "https://api.halofuntime.com/static/HFTLogo.png",
+        })
+        .setTimestamp();
       embeds.push(overviewEmbed);
       // Add an assignments progress embed if incomplete assignments exist and the user isn't already at rank 10
       if (
@@ -263,7 +268,7 @@ module.exports = {
             }`
           )
           .setDescription(
-            `<@${response.discordUserId}>'s Rank: **${response.currentRank}**\n*\"${progressDescription}\"*`
+            `<@${response.discordUserId}>'s Rank: **${response.currentRank}**\n\n*\"${progressDescription}\"*`
           )
           .addFields({
             name: "**Assignment #1:**",
@@ -305,7 +310,7 @@ module.exports = {
           .setColor(0x006994)
           .setTitle("Weekly Boat Assignments Completed")
           .setDescription(
-            `<@${response.discordUserId}>'s Rank: **${response.currentRank}**\n*\"${completedDescription}\"*`
+            `<@${response.discordUserId}>'s Rank: **${response.currentRank}**\n\n*\"${completedDescription}\"*`
           );
         embeds.push(completedEmbed);
       }
