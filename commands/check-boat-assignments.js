@@ -94,19 +94,39 @@ const incompleteAssignmentsQuips = [
   "No shore leave until these assignments are done for the week.",
   "A true sailor never leaves their duties unfinished. Get back to work!",
   "The Captain's not pleased with your incomplete assignments, matey.",
+  "Slacking off? Those assignments won't complete themselves, sailor!",
+  "By Poseidon's beard, finish your weekly assignments or walk the plank!",
+  "You call yourself a sailor with these incomplete assignments? Pathetic!",
+  "The sea demands dedication - and so do your weekly assignments!",
+  "No grog for you until these assignments are squared away!",
+  "Your shipmates are carrying your dead weight. Complete those assignments!",
+  "Even the ship's cat works harder than you. Finish your assignments!",
+  "The Kraken fears nothing except your work ethic. Complete those tasks!",
+  "Davy Jones himself would be disappointed in these incomplete assignments!",
+  "Storm's brewing and so is my temper - get those assignments done!",
 ];
 
 const weeklyAssignmentsCompletedQuips = [
-  "Rest up, sailor. You've completed your assignments for the week.",
-  "Ahoy! You're done with your assignments for the week.",
-  "Good thing I didn't throw you to the sharks! Nice work completing your weekly assignments.",
-  "Well shiver me timbers! All assignments complete for this week's voyage.",
-  "You've earned your sea legs! Your weekly assignments are done and dusted.",
-  "Splice the mainbrace! You've finished all your assignments this week.",
-  "By Neptune's beard, you've completed your weekly assignments!",
-  "The Captain approves - all assignments ship-shape for the week.",
-  "Smooth sailing ahead - you've finished all your assignments this week.",
-  "A job well done, matey! Weekly assignments complete and accounted for.",
+  "Rest up, sailor. You've completed your assignments for the week. Check back next week for more!",
+  "Ahoy! You're done with your assignments for the week. Check back next week for more!",
+  "Good thing I didn't throw you to the sharks! Nice work completing your weekly assignments. Check back next week for more!",
+  "Well shiver me timbers! All assignments complete for this week's voyage. Check back next week for more!",
+  "You've earned your sea legs! Your weekly assignments are done and dusted. Check back next week for more!",
+  "Splice the mainbrace! You've finished all your assignments this week. Check back next week for more!",
+  "By Neptune's beard, you've completed your weekly assignments! Check back next week for more!",
+  "The Captain approves - all assignments ship-shape for the week. Check back next week for more!",
+  "Smooth sailing ahead - you've finished all your assignments this week. Check back next week for more!",
+  "A job well done, matey! Weekly assignments complete and accounted for. Check back next week for more!",
+  "Yo ho ho! You've conquered this week's challenges. Check back next week for more!",
+  "Batten down the hatches - you're all done for the week! Check back next week for more!",
+  "Clear skies and calm seas - weekly assignments complete! Check back next week for more!",
+  "Anchors aweigh! You've finished your duties for the week. Check back next week for more!",
+  "Blimey! You've mastered this week's tasks. Check back next week for more!",
+  "Full steam ahead - all assignments completed! Check back next week for more!",
+  "Three cheers for the sailor who finished their tasks! Check back next week for more!",
+  "You've navigated these challenges like a pro! Check back next week for more!",
+  "The crew's impressed with your work this week! Check back next week for more!",
+  "Mission accomplished, you salty sea dog! Check back next week for more!",
 ];
 
 module.exports = {
@@ -302,8 +322,8 @@ module.exports = {
             (weeklyAssignmentsCompletedQuips.length * Math.random()) | 0
           ];
         const completedEmbed = new EmbedBuilder()
-          .setColor(0x006994)
-          .setTitle("Weekly Boat Assignments Completed")
+          .setColor(0xffd700)
+          .setTitle("Weekly Boat Assignments Completed!")
           .setDescription(
             `<@${response.discordUserId}>'s Rank: **${response.currentRank}**\n\n*\"${completedDescription}\"*`
           );
