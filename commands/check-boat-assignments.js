@@ -246,12 +246,7 @@ module.exports = {
         .setTimestamp();
       embeds.push(overviewEmbed);
       // Add an assignments progress embed if incomplete assignments exist and the user isn't already at rank 10
-      if (
-        response.currentRankTier < 10 &&
-        (!response.assignment1Completed ||
-          !response.assignment2Completed ||
-          !response.assignment3Completed)
-      ) {
+      if (response.currentRankTier < 10 && !response.assignmentsCompleted) {
         let progressDescription =
           "I just picked your assignments for this week. Check again when you've made some progress.";
         if (response.existingAssignments) {
