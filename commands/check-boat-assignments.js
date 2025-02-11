@@ -29,6 +29,33 @@ const preDepartureQuips = [
   "We need as many deckhands as possible.",
 ];
 
+const incompleteAssignmentsQuips = [
+  "Get to work! You still have assignments to complete for the week.",
+  "You're not done yet! Complete your assignments for the week.",
+  "Lazy oaf! Finish your assignments for the week before they reset.",
+  "Do you want a promotion? Complete your assignments for the week.",
+  "This boat doesn't run on magic. Complete your assignments for the week.",
+  "Work harder! You're not impressing me with those incomplete assignments.",
+  "Shape up sailor! These assignments won't complete themselves.",
+  "The sea is unforgiving - just like me when assignments are incomplete.",
+  "No shore leave until these assignments are done for the week.",
+  "A true sailor never leaves their duties unfinished. Get back to work!",
+  "The Captain's not pleased with your incomplete assignments, matey.",
+];
+
+const weeklyAssignmentsCompletedQuips = [
+  "Rest up, sailor. You've completed your assignments for the week.",
+  "Ahoy! You're done with your assignments for the week.",
+  "Good thing I didn't throw you to the sharks! Nice work completing your weekly assignments.",
+  "Well shiver me timbers! All assignments complete for this week's voyage.",
+  "You've earned your sea legs! Your weekly assignments are done and dusted.",
+  "Splice the mainbrace! You've finished all your assignments this week.",
+  "By Neptune's beard, you've completed your weekly assignments!",
+  "The Captain approves - all assignments ship-shape for the week.",
+  "Smooth sailing ahead - you've finished all your assignments this week.",
+  "A job well done, matey! Weekly assignments complete and accounted for.",
+];
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("check-boat-assignments")
@@ -102,7 +129,6 @@ module.exports = {
       });
       return;
     }
-    /* TODO: All of this
     // Hit the HFT API with a progress check request
     const response = await axios
       .post(
@@ -135,7 +161,7 @@ module.exports = {
       return;
     }
     // Handle response indicating user isn't part of challenge yet
-    if (!response.boardedBoat) {
+    if (!response.joinedChallenge) {
       const boardBoatMention = await getApplicationCommandMention(
         "board-boat",
         interaction.client
@@ -150,7 +176,84 @@ module.exports = {
     const embeds = [];
     if (response.linkedGamertag) {
       // Generate the boat assignment embed if a gamertag is linked
-      // TODO: Current assignment progress embed - should show current rank and each assignment
+      const overviewEmbed = new EmbedBuilder()
+        .setColor(response.currentRankTier >= 10 ? 0x2ecc71 : 0x006994)
+        .setTitle("Era 3 Boat Challenge")
+        .setDescription(
+          response.currentRankTier >= 10
+            ? `Who's the <@&${HALOFUNTIME_ID_ROLE_E3_BOAT_CAPTAIN}> now? You are!`
+            : "Assignments must be completed in matchmade Halo Infinite games."
+        );
+      embeds.push(overviewEmbed);
+      // Add an assignments progress embed if incomplete assignments exist and the user isn't already at rank 10
+      if (
+        response.currentRankTier < 10 &&
+        (!response.assignment1Completed ||
+          !response.assignment2Completed ||
+          !response.assignment3Completed)
+      ) {
+        let progressDescription =
+          "I just picked your assignments for this week. Check again when you've made some progress.";
+        if (response.existingAssignments) {
+          progressDescription =
+            incompleteAssignmentsQuips[
+              (incompleteAssignmentsQuips.length * Math.random()) | 0
+            ];
+        }
+        const assignmentsEmbed = new EmbedBuilder()
+          .setColor(0x006994)
+          .setTitle(
+            `<@${response.discordUserId}>'s Weekly Assignment${
+              response.existingAssignments ? " Progress" : "s"
+            }`
+          )
+          .setDescription(
+            `Current Rank: **${response.currentRank}**\n*${progressDescription}*`
+          )
+          .addFields({
+            name: "**Assignment #1:**",
+            value: `> *${response.assignment1}* ${
+              response.assignment1Completed ? "✅" : "❌"
+            }`,
+          });
+        if (response.assignment2) {
+          assignmentsEmbed.addFields({
+            name: "**Assignment #2:**",
+            value: `> *${response.assignment2}* ${
+              response.assignment2Completed ? "✅" : "❌"
+            }`,
+          });
+        }
+        if (response.assignment3) {
+          assignmentsEmbed.addFields({
+            name: "**Assignment #3:**",
+            value: `> *${response.assignment3}* ${
+              response.assignment3Completed ? "✅" : "❌"
+            }`,
+          });
+        }
+        embeds.push(assignmentsEmbed);
+      } else if (response.justPromoted) {
+        const justPromotedEmbed = new EmbedBuilder()
+          .setColor(0xffd700)
+          .setTitle("Promotion Alert!")
+          .setDescription(
+            `Great work! You've been promoted to **${response.currentRank}**!`
+          );
+        embeds.push(justPromotedEmbed);
+      } else {
+        let completedDescription =
+          weeklyAssignmentsCompletedQuips[
+            (weeklyAssignmentsCompletedQuips.length * Math.random()) | 0
+          ];
+        const completedEmbed = new EmbedBuilder()
+          .setColor(0x006994)
+          .setTitle("Weekly Assignments Completed")
+          .setDescription(
+            `Current Rank: **${response.currentRank}**\n*${completedDescription}*`
+          );
+        embeds.push(completedEmbed);
+      }
     } else {
       const linkGamertagMention = await getApplicationCommandMention(
         "link-gamertag",
@@ -167,23 +270,20 @@ module.exports = {
           })
       );
     }
-    */
-    // TODO: Add an embed for newly-unlocked secrets
+    // TODO: Add an extra embed for newly-unlocked secrets
     await interaction.editReply({
       allowedMentions: { users: [interaction.user.id] },
-      content: "Placeholder message.",
+      embeds: embeds,
     });
     // Award role
-    // TODO: Make this reachable based on rank check
-    if (false) {
+    if (response.currentRankTier >= 10) {
       const challengeCompleteResponse = await axios
         .post(
           `${HALOFUNTIME_API_URL}/era-03/save-boat-captain`,
           {
             discordUserId: response.discordUserId,
             discordUsername: interaction.user.username,
-            bingoCount: bingoCount,
-            challengeCount: response.lettersCompleted.length,
+            rankTier: response.currentRankTier,
           },
           {
             headers: {
