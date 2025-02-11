@@ -29,6 +29,59 @@ const preDepartureQuips = [
   "We need as many deckhands as possible.",
 ];
 
+const overviewQuips = [
+  "Avast ye, matey! This boat's a-comin'!",
+  "I'm on a boat! So are you! But don't jump overboard because I don't have insurance.",
+  "It's a sailor's life for me! And you. Whether you like it or not.",
+  "Welcome aboard the S.S. FunTime! Mind the leaks, they're part of the charm.",
+  "Batten down the hatches! And maybe grab a bucket, just in case.",
+  "All hands on deck! Well, the parts of the deck that aren't falling apart.",
+  "Set sail for adventure! Or at least as far as this rickety vessel will take us.",
+  "Yo ho ho and a bottle of... actually, no bottles allowed on board. Safety first!",
+  "Ready to rule the seven seas? We'll start with the kiddie pool and work our way up.",
+  "Anchors aweigh! Though between you and me, I'm not sure where the anchor went.",
+  "Raise the sails! Well, what's left of them after that unfortunate seagull incident.",
+  "Welcome to the finest vessel in the harbor! Don't mind the duct tape repairs.",
+  "Prepare for the voyage of a lifetime! Or at least until we need to call the coast guard.",
+  "Chart a course for glory! Just as soon as I find where I put the compass.",
+  "The sea beckons! Though it might just be the sound of water in the bilge.",
+  "Behold our mighty vessel! The paint's still wet in some places, so watch your step.",
+  "Time to experience the majesty of the ocean! From a relatively safe distance.",
+  "Join our brave crew! No prior sailing experience required (or possible on this boat).",
+  "Set a course for adventure! Once we figure out which end is the front.",
+  "Prepare to meet your destiny! Right after we patch these mysterious holes.",
+  "Sailing the high seas! Well, more like the moderately elevated seas.",
+  "Welcome to the pride of the fleet! Don't ask about the other boats.",
+  "Ready for some nautical nonsense? That's our specialty!",
+  "This ship's got character! And several interesting quirks we're still discovering.",
+  "Adventure awaits! Just as soon as we fix this minor flooding issue.",
+  "The wind's in our sails! Though that might just be the air conditioning.",
+  "Prepare to embark! Once we finish reading this 'Sailing for Dummies' book.",
+  "Welcome to maritime excellence! Or our best approximation of it.",
+  "Set sail for destiny! Or at least the nearest safe harbor.",
+  "Behold the majesty! The slightly rusty, creaky majesty!",
+  "Ready for some seafaring fun? We've got a very loose definition of 'fun'.",
+  "Welcome aboard the flagship! Don't ask why it's the only ship.",
+  "Prepare for nautical adventures! Life jackets are mandatory, trust me.",
+  "The ocean calls! Though it might be calling for help.",
+  "Join the crew of legends! We're still working on the legend part.",
+  "Experience true sailing! Or whatever this qualifies as.",
+  "Welcome to maritime history! We're making it up as we go.",
+  "Prepare for ocean mastery! Disclaimer: results may vary.",
+  "All aboard the adventure! Mind the suspicious creaking sounds.",
+  "Ready to become a sailor? The bar is surprisingly low!",
+  "Join the nautical elite! We're very generous with that term.",
+  "Welcome to seafaring glory! Bring your own safety equipment.",
+  "Prepare for maritime excellence! Or at least maritime adequacy.",
+  "Set sail for greatness! Or whatever's within rowing distance.",
+  "Experience the thrill! Of wondering if we'll make it back.",
+  "Join our prestigious crew! We can't afford to be picky.",
+  "Welcome to nautical adventure! No refunds, no complaints.",
+  "Ready for the journey? Neither are we, but let's go anyway!",
+  "Set sail for victory! Or at least minimal embarrassment.",
+  "Join the finest crew! By process of elimination.",
+];
+
 const incompleteAssignmentsQuips = [
   "Get to work! You still have assignments to complete for the week.",
   "You're not done yet! Complete your assignments for the week.",
@@ -176,13 +229,15 @@ module.exports = {
     const embeds = [];
     if (response.linkedGamertag) {
       // Generate the boat assignment embed if a gamertag is linked
+      const overviewDescription =
+        overviewQuips[(overviewQuips.length * Math.random()) | 0];
       const overviewEmbed = new EmbedBuilder()
         .setColor(response.currentRankTier >= 10 ? 0x2ecc71 : 0x006994)
         .setTitle("Era 3 Boat Challenge")
         .setDescription(
           response.currentRankTier >= 10
-            ? `Who's the <@&${HALOFUNTIME_ID_ROLE_E3_BOAT_CAPTAIN}> now? You are!`
-            : "Assignments must be completed in matchmade Halo Infinite games."
+            ? `*\"Who's the <@&${HALOFUNTIME_ID_ROLE_E3_BOAT_CAPTAIN}> now? You are!\"*`
+            : `*\"${overviewDescription}\"*`
         );
       embeds.push(overviewEmbed);
       // Add an assignments progress embed if incomplete assignments exist and the user isn't already at rank 10
@@ -203,12 +258,12 @@ module.exports = {
         const assignmentsEmbed = new EmbedBuilder()
           .setColor(0x006994)
           .setTitle(
-            `Weekly Assignment${
+            `Weekly Boat Assignment${
               response.existingAssignments ? " Progress" : "s"
             }`
           )
           .setDescription(
-            `<@${response.discordUserId}>'s Rank: **${response.currentRank}**\n*${progressDescription}*`
+            `<@${response.discordUserId}>'s Rank: **${response.currentRank}**\n*\"${progressDescription}\"*`
           )
           .addFields({
             name: "**Assignment #1:**",
@@ -238,7 +293,7 @@ module.exports = {
           .setColor(0xffd700)
           .setTitle("Promotion Alert!")
           .setDescription(
-            `Great work! You've been promoted to **${response.currentRank}**!`
+            `*\"Great work! You've been promoted to **${response.currentRank}**!\"*`
           );
         embeds.push(justPromotedEmbed);
       } else {
@@ -248,9 +303,9 @@ module.exports = {
           ];
         const completedEmbed = new EmbedBuilder()
           .setColor(0x006994)
-          .setTitle("Weekly Assignments Completed")
+          .setTitle("Weekly Boat Assignments Completed")
           .setDescription(
-            `<@${response.discordUserId}>'s Rank: **${response.currentRank}**\n*${completedDescription}*`
+            `<@${response.discordUserId}>'s Rank: **${response.currentRank}**\n*\"${completedDescription}\"*`
           );
         embeds.push(completedEmbed);
       }
