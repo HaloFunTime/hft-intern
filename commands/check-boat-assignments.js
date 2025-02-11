@@ -203,12 +203,12 @@ module.exports = {
         const assignmentsEmbed = new EmbedBuilder()
           .setColor(0x006994)
           .setTitle(
-            `<@${response.discordUserId}>'s Weekly Assignment${
+            `Weekly Assignment${
               response.existingAssignments ? " Progress" : "s"
             }`
           )
           .setDescription(
-            `Current Rank: **${response.currentRank}**\n*${progressDescription}*`
+            `<@${response.discordUserId}>'s Rank: **${response.currentRank}**\n*${progressDescription}*`
           )
           .addFields({
             name: "**Assignment #1:**",
@@ -250,7 +250,7 @@ module.exports = {
           .setColor(0x006994)
           .setTitle("Weekly Assignments Completed")
           .setDescription(
-            `Current Rank: **${response.currentRank}**\n*${completedDescription}*`
+            `<@${response.discordUserId}>'s Rank: **${response.currentRank}**\n*${completedDescription}*`
           );
         embeds.push(completedEmbed);
       }
