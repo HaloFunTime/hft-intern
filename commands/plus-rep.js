@@ -85,7 +85,7 @@ module.exports = {
           if (match) {
             plusRepSuccessQuip = plusRepSuccessQuip.replace(
               match[0],
-              await getApplicationCommandMention(match[1], client)
+              await getApplicationCommandMention(match[1], interaction.client)
             );
           }
         } while (match);
