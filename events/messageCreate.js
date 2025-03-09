@@ -12,6 +12,7 @@ const {
   HALOFUNTIME_ID_CHANNEL_LFG_RANKED,
   HALOFUNTIME_ID_CHANNEL_LFG_SOCIAL,
   HALOFUNTIME_ID_CHANNEL_LFG_TESTING,
+  HALOFUNTIME_ID_CHANNEL_ORB,
   HALOFUNTIME_ID_CHANNEL_PASSION_PATROL,
   HALOFUNTIME_ID_CHANNEL_PURPLE_CIRCLE,
   HALOFUNTIME_ID_CHANNEL_PURPLE_CIRCLE_VC,
@@ -341,6 +342,62 @@ async function attemptNoodleTownAction(message) {
   });
 }
 
+async function attemptOrbAction(message) {
+  // Do not attempt an Orb action if the message was authored by this bot
+  if (message.author.id === message.client.user.id) return;
+  // Do not attempt an Orb action if the message was sent by another application
+  if (message.applicationId) return;
+  // Do not attempt an Orb action if the message was not sent in the Orb channel
+  if (message.channelId !== HALOFUNTIME_ID_CHANNEL_ORB) return;
+  // Do not attempt an Orb action if the message mentions no one
+  if (message.mentions.users.size === 0) return;
+  // Do not attempt an Orb action if the message does not mention the bot specifically
+  const messageMentionedBot = message.mentions.users.reduce((acc, user) => {
+    if (acc) return true;
+    return user.id === message.client.user.id;
+  }, false);
+  if (!messageMentionedBot) return;
+  // Do not attempt an Orb action if the message content does not match a lenient "orb" regular expression
+  const orb = /(orb){1}/i;
+  if (!orb.test(message.content)) return;
+  // Retrieve the current Orbiter
+  const orbChannel = message.client.channels.cache.get(
+    HALOFUNTIME_ID_CHANNEL_ORB
+  );
+  const matches = orbChannel.topic.match(/(\d+)/);
+  if (!matches) return;
+  // Do not attempt an Orb action if the message was not sent by the Orbiter
+  const orbiterId = matches[0];
+  if (message.author.id !== orbiterId) return;
+  // Attempt actions on mentioned users based on whether "ponder" or "shun" was said
+  let actionTaken = false;
+  await message.mentions.users.forEach(async (user) => {
+    if (user.id === message.client.user.id) return;
+    const ponder = /(ponder){1}/i;
+    const shun = /(shun){1}/i;
+    if (ponder.test(message.content)) {
+      await orbChannel.permissionOverwrites.create(user.id, {
+        ReadMessageHistory: true,
+        SendMessages: true,
+        ViewChannel: true,
+      });
+      await orbChannel.send(
+        `<@${orbiterId}> has noted <@${user.id}>'s orb pondering.`
+      );
+      actionTaken = true;
+    } else if (shun.test(message.content)) {
+      await orbChannel.permissionOverwrites.delete(
+        user.id,
+        "Orbitrary decision."
+      );
+      await orbChannel.send(
+        `<@${orbiterId}> has noted <@${user.id}>'s orb shunning.`
+      );
+      actionTaken = true;
+    }
+  });
+}
+
 async function attemptPassionPatrolAction(message) {
   // Do not attempt a Passion Patrol action if the message was authored by this bot
   if (message.author.id === message.client.user.id) return;
@@ -554,6 +611,7 @@ module.exports = {
       await attemptChatter(message);
       await attemptLfgHelp(message);
       await attemptNoodleTownAction(message);
+      await attemptOrbAction(message);
       await attemptPassionPatrolAction(message);
       await attemptPurpleCircleAction(message);
       await recordWaywoComment(message);
