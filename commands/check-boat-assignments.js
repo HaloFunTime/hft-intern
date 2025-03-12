@@ -390,6 +390,10 @@ module.exports = {
       embeds.push(overviewEmbed);
       // Add an assignments progress embed if incomplete assignments exist and the user isn't already at rank 10
       if (response.currentRankTier < 10 && !response.assignmentsCompleted) {
+        let secretsDescription = "";
+        if (response.secretsUnlocked.length > 0) {
+          secretsDescription = `\nSecrets Discovered: **${response.secretsUnlocked.length}/7**`;
+        }
         let progressDescription =
           "I just picked your assignments for this week. Check again when you've made some progress.";
         if (response.existingAssignments) {
@@ -406,7 +410,7 @@ module.exports = {
             }`
           )
           .setDescription(
-            `<@${response.discordUserId}>'s Rank: **${response.currentRank}**\n\n*\"${progressDescription}\"*`
+            `<@${response.discordUserId}>'s Rank: **${response.currentRank}**${secretsDescription}\n\n*\"${progressDescription}\"*`
           )
           .addFields({
             name: "**Assignment #1:**",
@@ -469,7 +473,24 @@ module.exports = {
           })
       );
     }
-    // TODO: Add an extra embed for newly-unlocked secrets
+    // Add an embed for each newly-unlocked secret
+    if (response.secretsUnlocked.length > 0) {
+      for (const secret of response.secretsUnlocked) {
+        if (secret.newlyUnlocked) {
+          const secretUnlockedEmbed = new EmbedBuilder()
+            .setColor(0xffd700)
+            .setTitle("New Secret Discovered!")
+            .setDescription(
+              `*\"Wow! You've discovered the **${secret.title}**!\"*`
+            )
+            .addFields({
+              name: "**Discovery:**",
+              value: `> *${secret.hint}*`,
+            });
+          embeds.push(secretUnlockedEmbed);
+        }
+      }
+    }
     await interaction.editReply({
       allowedMentions: { users: [interaction.user.id] },
       embeds: embeds,
