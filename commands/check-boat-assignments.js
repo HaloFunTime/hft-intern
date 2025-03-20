@@ -388,12 +388,12 @@ module.exports = {
         })
         .setTimestamp();
       embeds.push(overviewEmbed);
+      let secretsDescription = "";
+      if (response.secretsUnlocked.length > 0) {
+        secretsDescription = `\nSecrets Discovered: **${response.secretsUnlocked.length}/7**`;
+      }
       // Add an assignments progress embed if incomplete assignments exist and the user isn't already at rank 10
       if (response.currentRankTier < 10 && !response.assignmentsCompleted) {
-        let secretsDescription = "";
-        if (response.secretsUnlocked.length > 0) {
-          secretsDescription = `\nSecrets Discovered: **${response.secretsUnlocked.length}/7**`;
-        }
         let progressDescription =
           "I just picked your assignments for this week. Check again when you've made some progress.";
         if (response.existingAssignments) {
@@ -453,7 +453,7 @@ module.exports = {
           .setColor(0xffd700)
           .setTitle("Weekly Boat Assignments Completed!")
           .setDescription(
-            `<@${response.discordUserId}>'s Rank: **${response.currentRank}**\n\n*\"${completedDescription}\"*`
+            `<@${response.discordUserId}>'s Rank: **${response.currentRank}**${secretsDescription}\n\n*\"${completedDescription}\"*`
           );
         embeds.push(completedEmbed);
       }
