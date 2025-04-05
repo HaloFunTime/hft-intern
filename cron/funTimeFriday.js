@@ -145,10 +145,19 @@ const startFunTimeFriday = async (client) => {
       guild.id,
       channel.id
     );
+    if (!vcMembers) {
+      console.error(
+        `Failed to get members for channel ${channel.id} (${channel.name})`
+      );
+      continue;
+    }
     if (vcMembers.size === 0) {
       continue;
     }
     for (const [id, member] of vcMembers.entries()) {
+      if (member.user.bot) {
+        continue;
+      }
       const response = await axios
         .post(
           `${HALOFUNTIME_API_URL}/fun-time-friday/voice-connect`,
@@ -175,7 +184,14 @@ const startFunTimeFriday = async (client) => {
         });
       // Log if an error happens
       if (response.success === false || "error" in response) {
-        console.log(response.error);
+        console.error(
+          `API call failed for user ${member.user.username}:`,
+          response.error
+        );
+      } else {
+        console.log(
+          `Successfully saved connect for ${member.user.username} in ${channel.name}`
+        );
       }
     }
   }
@@ -197,10 +213,19 @@ const endFunTimeFriday = async (client) => {
       guild.id,
       channel.id
     );
+    if (!vcMembers) {
+      console.error(
+        `Failed to get members for channel ${channel.id} (${channel.name})`
+      );
+      continue;
+    }
     if (vcMembers.size === 0) {
       continue;
     }
     for (const [id, member] of vcMembers.entries()) {
+      if (member.user.bot) {
+        continue;
+      }
       const response = await axios
         .post(
           `${HALOFUNTIME_API_URL}/fun-time-friday/voice-disconnect`,
@@ -227,7 +252,14 @@ const endFunTimeFriday = async (client) => {
         });
       // Log if an error happens
       if (response.success === false || "error" in response) {
-        console.log(response.error);
+        console.error(
+          `API call failed for user ${member.user.username}:`,
+          response.error
+        );
+      } else {
+        console.log(
+          `Successfully saved disconnect for ${member.user.username} in ${channel.name}`
+        );
       }
     }
   }
