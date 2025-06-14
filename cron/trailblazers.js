@@ -212,8 +212,8 @@ const createTrailblazerTuesdayEvent = async (client) => {
   }
 };
 
-const trailblazerDailyPassionReport = async (client) => {
-  console.log("Running daily passion report...");
+const trailblazerWeeklyPassionReport = async (client) => {
+  console.log("Running weekly passion report...");
   const now = dayjs();
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
   const allMembersMap = await guild.members.fetch({
@@ -391,9 +391,9 @@ const trailblazerDailyPassionReport = async (client) => {
     );
     const passionReportEmbed = new EmbedBuilder()
       .setColor(0xf93a2f)
-      .setTitle(`__Daily Passion Report: <t:${now.unix()}:D>__`)
+      .setTitle(`__Weekly Passion Report: <t:${now.unix()}:D>__`)
       .setDescription(
-        `Every day we check each Trailblazer's passion in the Ranked Arena playlist. Link your gamertag with ${linkGamertagMention} to be included.`
+        `Every week we check each Trailblazer's passion in the Ranked Arena playlist. Link your gamertag with ${linkGamertagMention} to be included.`
       )
       .setFooter({
         text: `"${passionReportQuip}"`,
@@ -424,11 +424,11 @@ const trailblazerDailyPassionReport = async (client) => {
       }
     }
   }
-  console.log("Finished daily passion report.");
+  console.log("Finished weekly passion report.");
 };
 
 module.exports = {
   checkTitanRoles: checkTitanRoles,
   createTrailblazerTuesdayEvent: createTrailblazerTuesdayEvent,
-  trailblazerDailyPassionReport: trailblazerDailyPassionReport,
+  trailblazerWeeklyPassionReport: trailblazerWeeklyPassionReport,
 };

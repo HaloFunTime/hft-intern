@@ -29,7 +29,7 @@ const {
 const { attemptRepNudges } = require("./cron/reputation");
 const {
   checkTitanRoles,
-  trailblazerDailyPassionReport,
+  trailblazerWeeklyPassionReport,
 } = require("./cron/trailblazers");
 
 dotenv.config();
@@ -144,5 +144,5 @@ client.on("ready", () => {
 
   // Trailblazers
   scheduleFunc("0 0 * * * *", checkTitanRoles, client); // every hour at the top of the hour
-  scheduleFunc("0 0 9 * * *", trailblazerDailyPassionReport, client); // every day at 9AM
+  scheduleFunc("0 0 9 * * 2", trailblazerWeeklyPassionReport, client); // every Tuesday at 9AM
 });
