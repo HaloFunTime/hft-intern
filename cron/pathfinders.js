@@ -143,7 +143,7 @@ const checkProdigyRoles = async (client) => {
       });
     }
     // Apply the promotions/demotions and announce them
-    const thread = client.channels.cache.get(
+    const thread = await client.channels.fetch(
       HALOFUNTIME_ID_THREAD_PATHFINDER_BOT_COMMANDS
     );
     for (const promotion of promotionData) {

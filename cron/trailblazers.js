@@ -144,7 +144,7 @@ const checkTitanRoles = async (client) => {
       });
     }
     // Apply the promotions/demotions and announce them in the Bot Commands thread
-    const thread = client.channels.cache.get(
+    const thread = await client.channels.fetch(
       HALOFUNTIME_ID_THREAD_TRAILBLAZER_BOT_COMMANDS
     );
     for (const promotion of promotionData) {
