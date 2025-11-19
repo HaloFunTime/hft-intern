@@ -78,10 +78,7 @@ const TIERED_ROLE_IDS_BY_PLAYLIST_ID = {
 
 const kickLurkers = async (client) => {
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
-  const allMembersMap = await guild.members.fetch({
-    cache: true,
-    withUserCount: true,
-  });
+  const allMembersMap = guild.members.cache;
   const allMembers = Array.from(allMembersMap.values());
   const now = dayjs();
   const twoWeeksAgoUnix = now.subtract(2, "week").valueOf();
@@ -181,10 +178,7 @@ const updateActivePlaylistMapModePairs = async (client) => {
 
 const updateFirst100Roles = async (client) => {
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
-  const allMembersMap = await guild.members.fetch({
-    cache: true,
-    withUserCount: true,
-  });
+  const allMembersMap = guild.members.cache;
   const allMembers = Array.from(allMembersMap.values()).filter(
     (m) => !m.user.bot && m.roles.cache.has(HALOFUNTIME_ID_ROLE_MEMBER)
   );
@@ -218,7 +212,7 @@ const updateNewHereRoles = async (client) => {
   const allMembersMap = await guild.members.fetch({
     cache: true,
     withUserCount: true,
-  });
+  }); // NOTE: This is the ONLY place fresh member fetching is allowed.
   const allMembers = Array.from(allMembersMap.values()).filter(
     (m) => !m.user.bot
   );
@@ -321,10 +315,7 @@ const updateNewHereRoles = async (client) => {
 const updatePartyTimerRoles = async (client) => {
   const now = dayjs();
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
-  const allMembersMap = await guild.members.fetch({
-    cache: true,
-    withUserCount: true,
-  });
+  const allMembersMap = guild.members.cache;
   const allMembers = Array.from(allMembersMap.values()).filter(
     (m) => !m.user.bot
   );
@@ -454,10 +445,7 @@ const updatePartyTimerRoles = async (client) => {
 const updateRankedRoles = async (client) => {
   console.log("Checking Ranked roles...");
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
-  const allMembersMap = await guild.members.fetch({
-    cache: true,
-    withUserCount: true,
-  });
+  const allMembersMap = guild.members.cache;
   const allMembers = Array.from(allMembersMap.values()).filter(
     (m) => !m.user.bot
   );

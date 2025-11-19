@@ -31,10 +31,7 @@ const checkProdigyRoles = async (client) => {
   }
   try {
     const guild = client.guilds.cache.get(HALOFUNTIME_ID);
-    const allMembersMap = await guild.members.fetch({
-      cache: true,
-      withUserCount: true,
-    });
+    const allMembersMap = guild.members.cache;
     const allMembersWithPathfinderRole = Array.from(
       allMembersMap.values()
     ).filter(
@@ -179,10 +176,7 @@ const checkProdigyRoles = async (client) => {
 
 const createPathfinderHikesEvent = async (client) => {
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
-  const allMembersMap = await guild.members.fetch({
-    cache: true,
-    withUserCount: true,
-  });
+  const allMembersMap = guild.members.cache;
   const allMembersWithPathfinderRole = Array.from(
     allMembersMap.values()
   ).filter(

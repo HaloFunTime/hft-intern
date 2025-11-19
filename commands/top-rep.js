@@ -28,10 +28,7 @@ module.exports = {
     let excludeIds = "";
     if (who === CHOICE_NON_STAFF) {
       const guild = interaction.client.guilds.cache.get(interaction.guildId);
-      const allMembersMap = await guild.members.fetch({
-        cache: true,
-        withUserCount: true,
-      });
+      const allMembersMap = guild.members.cache;
       const allMembers = Array.from(allMembersMap.values()).filter(
         (m) => !m.user.bot
       );

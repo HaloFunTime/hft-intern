@@ -36,7 +36,7 @@ module.exports = {
     );
     if (commandMemberIsCrew) {
       const guild = interaction.client.guilds.cache.get(interaction.guildId);
-      const playerMember = await guild.members.fetch(player.id);
+      const playerMember = guild.members.cache.get(player.id);
       if (
         !playerMember.roles.cache.has(HALOFUNTIME_ID_ROLE_TOURNAMENT_COMPETITOR)
       ) {

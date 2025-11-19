@@ -31,10 +31,7 @@ const checkTitanRoles = async (client) => {
   }
   try {
     const guild = client.guilds.cache.get(HALOFUNTIME_ID);
-    const allMembersMap = await guild.members.fetch({
-      cache: true,
-      withUserCount: true,
-    });
+    const allMembersMap = guild.members.cache;
     const allMembersWithTrailblazerRole = Array.from(
       allMembersMap.values()
     ).filter(
@@ -216,10 +213,7 @@ const trailblazerWeeklyPassionReport = async (client) => {
   console.log("Running weekly passion report...");
   const now = dayjs();
   const guild = client.guilds.cache.get(HALOFUNTIME_ID);
-  const allMembersMap = await guild.members.fetch({
-    cache: true,
-    withUserCount: true,
-  });
+  const allMembersMap = guild.members.cache;
   const allMembersWithTrailblazerRole = Array.from(
     allMembersMap.values()
   ).filter(

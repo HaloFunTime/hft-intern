@@ -108,8 +108,8 @@ const scheduleFunc = (cronExpression, func, ...args) => {
   }
 };
 
-// Schedule all future cronjobs when the client emits the "ready" event
-client.on("ready", () => {
+// Schedule all future cronjobs when the client emits the "clientReady" event
+client.on("clientReady", () => {
   // Membership
   scheduleFunc("0 0 8 * * 1", kickLurkers, client); // every Monday at 8AM
   scheduleFunc(
